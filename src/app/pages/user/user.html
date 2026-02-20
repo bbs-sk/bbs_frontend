@@ -1,0 +1,191 @@
+<div class="col-md-12 col-xl-8">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0">User</h5>
+
+    <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
+      <i class="bi bi-plus-lg me-1"></i> Tambah User
+    </button>
+  </div>
+
+  <div class="card tbl-card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Nama</th>
+            <th>Role</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Email</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (u of users; track u.id_user) {
+            <tr>
+              <td>
+                <a href="javascript:" class="text-muted">{{ u.id_user }}</a>
+              </td>
+
+              <td>{{ u.name }}</td>
+
+              <td>
+                <span class="d-block">
+                  <i class="badge-circle {{ roleBadgeClass(u.role) }} f-10 m-r-5"></i>
+                  {{ roleLabel(u.role) }}
+                </span>
+              </td>
+
+              <td>{{ u.username }}</td>
+              <td>{{ u.password }}</td>
+              <td>{{ u.email }}</td>
+
+              <td class="text-center">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-primary me-2"
+                  (click)="onEdit(u)"
+                  title="Edit"
+                >
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="onDelete(u)"
+                  title="Hapus"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL TAMBAH ========== -->
+<div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
+<div class="modal-custom" *ngIf="showAddModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="mb-0">Tambah User</h5>
+      <button type="button" class="btn-close" (click)="closeAdd()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label class="form-label">Nama</label>
+        <input class="form-control" [(ngModel)]="addForm.name" name="add_name" />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Role</label>
+        <select class="form-select" [(ngModel)]="addForm.role" name="add_role">
+          <option [ngValue]="1">Admin</option>
+          <option [ngValue]="2">Gudang</option>
+          <option [ngValue]="3">Lapangan</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Username</label>
+        <input class="form-control" [(ngModel)]="addForm.username" name="add_username" />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Password</label>
+        <input class="form-control" [(ngModel)]="addForm.password" name="add_password" />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Email</label>
+        <input class="form-control" [(ngModel)]="addForm.email" name="add_email" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="closeAdd()">Batal</button>
+      <button type="button" class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL EDIT ========== -->
+<div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
+<div class="modal-custom" *ngIf="showEditModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="mb-0">Edit User</h5>
+      <button type="button" class="btn-close" (click)="closeEdit()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label class="form-label">ID</label>
+        <input class="form-control" [value]="editForm.id_user" disabled />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Nama</label>
+        <input class="form-control" [(ngModel)]="editForm.name" name="edit_name" />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Role</label>
+        <select class="form-select" [(ngModel)]="editForm.role" name="edit_role">
+          <option [ngValue]="1">Admin</option>
+          <option [ngValue]="2">Gudang</option>
+          <option [ngValue]="3">Lapangan</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Username</label>
+        <input class="form-control" [(ngModel)]="editForm.username" name="edit_username" />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Password</label>
+        <input class="form-control" [(ngModel)]="editForm.password" name="edit_password" />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Email</label>
+        <input class="form-control" [(ngModel)]="editForm.email" name="edit_email" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="closeEdit()">Batal</button>
+      <button type="button" class="btn btn-primary" (click)="submitEdit()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL DELETE KONFIRMASI ========== -->
+<div class="modal-backdrop-custom" *ngIf="showDeleteModal" (click)="closeDelete()"></div>
+<div class="modal-custom" *ngIf="showDeleteModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="mb-0">Konfirmasi Hapus</h5>
+      <button type="button" class="btn-close" (click)="closeDelete()"></button>
+    </div>
+
+    <div class="modal-body">
+      Yakin hapus user:
+      <b>{{ deleteTarget?.name }}</b>
+      (ID: <b>{{ deleteTarget?.id_user }}</b>) ?
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="closeDelete()">Batal</button>
+      <button type="button" class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>

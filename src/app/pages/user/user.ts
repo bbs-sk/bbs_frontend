@@ -1,0 +1,176 @@
+import { Component, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ApiService } from 'src/app/shared/services/api.service';
+
+@Component({
+  selector: 'app-user',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './user.html',
+  styleUrl: './user.scss'
+})
+export class User {
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  users: any[] = [];
+  isLoading = false;
+
+  showAddModal = false;
+  showEditModal = false;
+  showDeleteModal = false;
+
+  addForm: any = {
+    name: '',
+    role: 1,
+    username: '',
+    password: '',
+    email: ''
+  };
+
+  editForm: any = {
+    id_user: null,
+    name: '',
+    role: 1,
+    username: '',
+    password: '',
+    email: ''
+  };
+
+  deleteTarget: any = null;
+
+  ngOnInit(): void {
+    this.loadUsers(); // <= ini yang bikin data balik lagi setelah refresh/HMR
+  }
+
+  loadUsers(): void {
+    this.isLoading = true;
+    this.api.getUsers().subscribe({
+      next: (res: any) => {
+        this.users = Array.isArray(res) ? res : (res?.val ?? []);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error(err);
+        this.users = [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // ===== Helpers =====
+  roleLabel(role: any): string {
+    const r = Number(role);
+    return r === 1 ? 'Admin' : r === 2 ? 'Gudang' : r === 3 ? 'Lapangan' : '-';
+  }
+
+  roleBadgeClass(role: any): string {
+    const r = Number(role);
+    return r === 1 ? 'text-success' : r === 2 ? 'text-primary' : r === 3 ? 'text-warning' : 'text-secondary';
+  }
+
+  // ===== Add =====
+  openAdd(): void {
+    this.addForm = { name: '', role: 1, username: '', password: '', email: '' };
+    this.showAddModal = true;
+  }
+
+  closeAdd(): void {
+    this.showAddModal = false;
+  }
+
+  submitAdd(): void {
+    // sesuaikan payload dengan backend kamu
+    const payload = {
+      name: this.addForm.name,
+      role: Number(this.addForm.role),
+      username: this.addForm.username,
+      password: this.addForm.password,
+      email: this.addForm.email
+    };
+
+    // pastikan ApiService punya method ini
+    this.api.addUser(payload).subscribe({
+      next: () => {
+        this.closeAdd();
+        this.loadUsers(); // penting: refresh list
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  // ===== Edit =====
+  onEdit(u: any): void {
+    // clone agar tidak langsung mengubah table sebelum save
+    this.editForm = {
+      id_user: u.id_user,
+      name: u.name ?? '',
+      role: Number(u.role ?? 1),
+      username: u.username ?? '',
+      password: u.password ?? '',
+      email: u.email ?? ''
+    };
+    this.showEditModal = true;
+  }
+
+  closeEdit(): void {
+    this.showEditModal = false;
+  }
+
+  submitEdit(): void {
+    const payload = {
+      id_user: this.editForm.id_user,
+      name: this.editForm.name,
+      role: Number(this.editForm.role),
+      username: this.editForm.username,
+      password: this.editForm.password,
+      email: this.editForm.email
+    };
+
+    // pastikan ApiService punya method ini
+    this.api.updateUser(payload).subscribe({
+      next: () => {
+        this.closeEdit();
+        this.loadUsers();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  // ===== Delete =====
+  onDelete(u: any): void {
+    this.deleteTarget = u;
+    this.showDeleteModal = true;
+  }
+
+  closeDelete(): void {
+    this.showDeleteModal = false;
+    this.deleteTarget = null;
+  }
+
+  confirmDelete(): void {
+    const id = this.deleteTarget?.id_user;
+
+    // pastikan ApiService punya method ini
+    this.api.deleteUser(id).subscribe({
+      next: () => {
+        this.closeDelete();
+        this.loadUsers();
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  // tutup modal via klik backdrop / esc (opsional sederhana)
+  closeAllModals(): void {
+    this.showAddModal = false;
+    this.showEditModal = false;
+    this.showDeleteModal = false;
+    this.deleteTarget = null;
+  }
+}
