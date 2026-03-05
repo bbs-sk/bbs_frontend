@@ -1,1 +1,140 @@
-<p>barang works!</p>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h5 class="mb-0">Data Barang</h5>
+
+  <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
+    <i class="bi bi-plus-lg me-1"></i>
+    Tambah Barang
+  </button>
+</div>
+
+<div class="card tbl-card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nama Barang</th>
+          <th>Satuan</th>
+          <th>Jumlah</th>
+          <th>Harga</th>
+          <th class="text-center">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (b of barang; track b.id_barang) {
+        <tr>
+          <td>{{ b.id_barang }}</td>
+          <td>{{ b.nama_barang }}</td>
+          <td>{{ b.satuan }}</td>
+          <td>{{ b.jumlah }}</td>
+          <td>{{ b.harga }}</td>
+
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="onEdit(b)">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger" (click)="onDelete(b)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH -->
+<div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
+<div class="modal-custom" *ngIf="showAddModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>Tambah Barang</h5>
+      <button class="btn-close" (click)="closeAdd()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label>Nama Barang</label>
+        <input class="form-control" [(ngModel)]="addForm.nama_barang" />
+      </div>
+
+      <div class="mb-2">
+        <label>Satuan</label>
+        <input class="form-control" [(ngModel)]="addForm.satuan" />
+      </div>
+
+      <div class="mb-2">
+        <label>Harga</label>
+        <input type="number" class="form-control" [(ngModel)]="addForm.harga" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeAdd()">Batal</button>
+      <button class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT -->
+<div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
+<div class="modal-custom" *ngIf="showEditModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>Edit Barang</h5>
+      <button class="btn-close" (click)="closeEdit()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label>ID</label>
+        <input class="form-control" [value]="editForm.id_barang" disabled />
+      </div>
+
+      <div class="mb-2">
+        <label>Nama Barang</label>
+        <input class="form-control" [(ngModel)]="editForm.nama_barang" />
+      </div>
+
+      <div class="mb-2">
+        <label>Satuan</label>
+        <input class="form-control" [(ngModel)]="editForm.satuan" />
+      </div>
+
+      <div class="mb-2">
+        <label>Harga</label>
+        <input type="number" class="form-control" [(ngModel)]="editForm.harga" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeEdit()">Batal</button>
+      <button class="btn btn-primary" (click)="submitEdit()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DELETE -->
+<div class="modal-backdrop-custom" *ngIf="showDeleteModal" (click)="closeDelete()"></div>
+<div class="modal-custom" *ngIf="showDeleteModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>Konfirmasi Hapus</h5>
+      <button class="btn-close" (click)="closeDelete()"></button>
+    </div>
+
+    <div class="modal-body">
+      Yakin hapus barang
+      <b>{{ deleteTarget?.nama_barang }}</b>
+      ?
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeDelete()">Batal</button>
+      <button class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>

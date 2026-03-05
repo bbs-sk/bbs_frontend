@@ -1,71 +1,60 @@
-<div class="col-md-12 col-xl-8">
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h5 class="mb-0">User</h5>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h5 class="mb-0">User</h5>
 
-    <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
-      <i class="bi bi-plus-lg me-1"></i> Tambah User
-    </button>
-  </div>
+  <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
+    <i class="bi bi-plus-lg me-1"></i>
+    Tambah User
+  </button>
+</div>
 
-  <div class="card tbl-card">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Nama</th>
-            <th>Role</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th>Email</th>
-            <th class="text-center">Action</th>
-          </tr>
-        </thead>
+<div class="card tbl-card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Nama</th>
+          <th>Role</th>
+          <th>Username</th>
+          <th>Password</th>
+          <th>Email</th>
+          <th class="text-center">Action</th>
+        </tr>
+      </thead>
 
-        <tbody>
-          @for (u of users; track u.id_user) {
-            <tr>
-              <td>
-                <a href="javascript:" class="text-muted">{{ u.id_user }}</a>
-              </td>
+      <tbody>
+        @for (u of users; track u.id_user) {
+        <tr>
+          <td>
+            <a href="javascript:" class="text-muted">{{ u.id_user }}</a>
+          </td>
 
-              <td>{{ u.name }}</td>
+          <td>{{ u.name }}</td>
 
-              <td>
-                <span class="d-block">
-                  <i class="badge-circle {{ roleBadgeClass(u.role) }} f-10 m-r-5"></i>
-                  {{ roleLabel(u.role) }}
-                </span>
-              </td>
+          <td>
+            <span class="d-block">
+              <i class="badge-circle {{ roleBadgeClass(u.role) }} f-10 m-r-5"></i>
+              {{ roleLabel(u.role) }}
+            </span>
+          </td>
 
-              <td>{{ u.username }}</td>
-              <td>{{ u.password }}</td>
-              <td>{{ u.email }}</td>
+          <td>{{ u.username }}</td>
+          <td>{{ u.password }}</td>
+          <td>{{ u.email }}</td>
 
-              <td class="text-center">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-primary me-2"
-                  (click)="onEdit(u)"
-                  title="Edit"
-                >
-                  <i class="bi bi-pencil-square"></i>
-                </button>
+          <td class="text-center">
+            <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="onEdit(u)" title="Edit">
+              <i class="bi bi-pencil-square"></i>
+            </button>
 
-                <button
-                  type="button"
-                  class="btn btn-sm btn-outline-danger"
-                  (click)="onDelete(u)"
-                  title="Hapus"
-                >
-                  <i class="bi bi-trash"></i>
-                </button>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+            <button type="button" class="btn btn-sm btn-outline-danger" (click)="onDelete(u)" title="Hapus">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
   </div>
 </div>
 
@@ -180,7 +169,9 @@
     <div class="modal-body">
       Yakin hapus user:
       <b>{{ deleteTarget?.name }}</b>
-      (ID: <b>{{ deleteTarget?.id_user }}</b>) ?
+      (ID:
+      <b>{{ deleteTarget?.id_user }}</b>
+      ) ?
     </div>
 
     <div class="modal-footer">

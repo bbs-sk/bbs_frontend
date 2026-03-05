@@ -1,1 +1,135 @@
-<p>project works!</p>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h5 class="mb-0">Data Project</h5>
+
+  <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
+    <i class="bi bi-plus-lg me-1"></i>
+    Tambah Project
+  </button>
+</div>
+
+<div class="card tbl-card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nama Project</th>
+          <th>Alamat</th>
+          <th class="text-center">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (p of project; track p.id_project) {
+        <tr>
+          <td>{{ p.id_project }}</td>
+          <td>{{ p.nama_project }}</td>
+          <td>{{ p.alamat }}</td>
+
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="onEdit(p)">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger" (click)="onDelete(p)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================= MODAL TAMBAH ================= -->
+
+<div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
+
+<div class="modal-custom" *ngIf="showAddModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>Tambah Project</h5>
+      <button class="btn-close" (click)="closeAdd()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label>Nama Project</label>
+        <input class="form-control" [(ngModel)]="addForm.nama_project" />
+      </div>
+
+      <div class="mb-2">
+        <label>Alamat</label>
+        <input class="form-control" [(ngModel)]="addForm.alamat" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeAdd()">Batal</button>
+      <button class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL EDIT ================= -->
+
+<div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
+
+<div class="modal-custom" *ngIf="showEditModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>Edit Project</h5>
+      <button class="btn-close" (click)="closeEdit()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label>ID</label>
+        <input class="form-control" [value]="editForm.id_project" disabled />
+      </div>
+
+      <div class="mb-2">
+        <label>Nama Project</label>
+        <input class="form-control" [(ngModel)]="editForm.nama_project" />
+      </div>
+
+      <div class="mb-2">
+        <label>Alamat</label>
+        <input class="form-control" [(ngModel)]="editForm.alamat" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeEdit()">Batal</button>
+      <button class="btn btn-primary" (click)="submitEdit()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL DELETE ================= -->
+
+<div class="modal-backdrop-custom" *ngIf="showDeleteModal" (click)="closeDelete()"></div>
+
+<div class="modal-custom" *ngIf="showDeleteModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>Konfirmasi Hapus</h5>
+      <button class="btn-close" (click)="closeDelete()"></button>
+    </div>
+
+    <div class="modal-body">
+      Yakin hapus project
+
+      <b>{{ deleteTarget?.nama_project }}</b>
+
+      ?
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeDelete()">Batal</button>
+
+      <button class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
