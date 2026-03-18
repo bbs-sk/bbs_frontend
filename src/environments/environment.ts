@@ -4,6 +4,5 @@ export const environment = {
   appVersion: packageInfo.version,
   production: false,
   //apiUrl: 'http://localhost:3000'
-
   apiUrl: 'https://bbs-backend-three.vercel.app/api'
 };

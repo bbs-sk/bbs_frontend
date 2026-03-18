@@ -9,7 +9,7 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   getUsers() {
-    return this.http.post<any>(`${environment.apiUrl}/user/`, {});
+    return this.http.post<any>(`${environment.apiUrl}/user`, {});
   }
 
   addUser(payload: any) {
@@ -25,7 +25,7 @@ export class ApiService {
   }
 
   getBarang() {
-    return this.http.post<any>(`${environment.apiUrl}/barang/`, {});
+    return this.http.post<any>(`${environment.apiUrl}/barang`, {});
   }
 
   addBarang(payload: any) {
@@ -41,7 +41,7 @@ export class ApiService {
   }
 
   getProject() {
-    return this.http.post<any>(`${environment.apiUrl}/project/`, {});
+    return this.http.post<any>(`${environment.apiUrl}/project`, {});
   }
 
   addProject(payload: any) {
