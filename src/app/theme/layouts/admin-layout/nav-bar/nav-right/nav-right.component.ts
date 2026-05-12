@@ -26,7 +26,7 @@ import {
   CommentOutline,
   UnorderedListOutline,
   ArrowRightOutline,
-  GithubOutline
+  GithubOutline,
 } from '@ant-design/icons-angular/icons';
 
 @Component({
@@ -67,7 +67,7 @@ export class NavRightComponent {
         ArrowRightOutline,
         BellOutline,
         GithubOutline,
-        WalletOutline
+        WalletOutline,
       ]
     );
   }

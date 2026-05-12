@@ -86,6 +86,15 @@ export const NavigationItems: NavigationItem[] = [
         url: '/stock',
         icon: 'stock',
         breadcrumbs: false
+      },
+      {
+        id: 'Order',
+        title: 'Order',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/order',
+        icon: 'shopping-cart',
+        breadcrumbs: false
       }
     ]
   },

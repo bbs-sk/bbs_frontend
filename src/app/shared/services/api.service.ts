@@ -55,4 +55,56 @@ export class ApiService {
   deleteProject(id_barang: number) {
     return this.http.post<any>(`${environment.apiUrl}/project/delete`, { id_barang });
   }
+
+  getInvoice() {
+    return this.http.post<any>(`${environment.apiUrl}/invoice`, {});
+  }
+
+  addInvoice(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/invoice/add`, payload);
+  }
+
+  updateInvoice(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/invoice/update`, payload);
+  }
+
+  deleteInvoice(id_invoice: number) {
+    return this.http.post<any>(`${environment.apiUrl}/invoice/delete`, { id_invoice });
+  }
+
+  getStock() {
+    return this.http.post<any>(`${environment.apiUrl}/stock`, {});
+  }
+
+  addStock(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/stock/add`, payload);
+  }
+
+  updateStock(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/stock/update`, payload);
+  }
+
+  deleteStock(id_stock: number) {
+    return this.http.post<any>(`${environment.apiUrl}/stock/delete`, { id_stock });
+  }
+
+  getOrder() {
+    return this.http.post<any>(`${environment.apiUrl}/order`, {});
+  }
+
+  addOrder(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/order/add`, payload);
+  }
+
+  updateOrder(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/order/update`, payload);
+  }
+
+  deleteOrder(id_order: number) {
+    return this.http.post<any>(`${environment.apiUrl}/order/delete`, { id_order });
+  }
+
+  approveOrder(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/order/approve`, payload);
+  }
 }

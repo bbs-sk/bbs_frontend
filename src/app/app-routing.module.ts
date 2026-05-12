@@ -37,6 +37,10 @@ const routes: Routes = [
         loadComponent: () => import('./pages/invoice/invoice').then((c) => c.Invoice)
       },
       {
+        path: 'order',
+        loadComponent: () => import('./pages/order/order').then((c) => c.Order)
+      },
+      {
         path: 'stock',
         loadComponent: () => import('./pages/stock/stock').then((c) => c.Stock)
       },

@@ -1,1 +1,142 @@
-<p>stock works!</p>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h5 class="mb-0">Data Stock</h5>
+
+  <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
+    <i class="bi bi-plus-lg me-1"></i>
+    Tambah Stock
+  </button>
+</div>
+
+<div class="card tbl-card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Barang</th>
+          <th>Satuan</th>
+          <th>Jumlah</th>
+          <th>Status</th>
+          <th>Harga</th>
+          <th>Invoice</th>
+          <th class="text-center">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (s of stock; track s.id_stock) {
+        <tr>
+          <td>{{ s.id_stock }}</td>
+          <td>{{ getNamaBarang(s.id_barang) }}</td>
+          <td>{{ getSatuanBarang(s.id_barang) }}</td>
+          <td>{{ s.jumlah }}</td>
+          <td>{{ s.status }}</td>
+          <td>{{ s.harga }}</td>
+          <td>{{ s.id_invoice ?? '--' }}</td>
+
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="onEdit(s)">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger" (click)="onDelete(s)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH -->
+<div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
+<div class="modal-custom" *ngIf="showAddModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>Tambah Stock</h5>
+      <button class="btn-close" (click)="closeAdd()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label>ID Barang</label>
+        <select class="form-control" [(ngModel)]="addForm.id_barang">
+          <option [ngValue]="null">Pilih Barang</option>
+          <option *ngFor="let b of barangList" [ngValue]="b.id_barang">{{ b.nama_barang }} ({{ b.satuan }})</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label>Jumlah</label>
+        <input type="number" class="form-control" [(ngModel)]="addForm.jumlah" />
+      </div>
+
+      <div class="mb-2">
+        <label>Harga</label>
+        <input type="number" class="form-control" [(ngModel)]="addForm.harga" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeAdd()">Batal</button>
+      <button class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT -->
+<div class="modal-backdrop-custom" *ngIf="showEditModal"></div>
+<div class="modal-custom" *ngIf="showEditModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h5>Edit Stock</h5>
+      <button class="btn-close" (click)="closeEdit()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label>ID</label>
+        <input class="form-control" [value]="editForm.id_stock" disabled />
+      </div>
+
+      <div class="mb-2">
+        <label>Jumlah</label>
+        <input type="number" class="form-control" [(ngModel)]="editForm.jumlah" />
+      </div>
+
+      <div class="mb-2">
+        <label>Harga</label>
+        <input type="number" class="form-control" [(ngModel)]="editForm.harga" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeEdit()">Batal</button>
+      <button class="btn btn-primary" (click)="submitEdit()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DELETE -->
+<div class="modal-backdrop-custom" *ngIf="showDeleteModal"></div>
+<div class="modal-custom" *ngIf="showDeleteModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h5>Konfirmasi Hapus</h5>
+      <button class="btn-close" (click)="closeDelete()"></button>
+    </div>
+
+    <div class="modal-body">
+      Yakin hapus stock
+      <b>{{ deleteTarget?.id_stock }}</b>
+      ?
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeDelete()">Batal</button>
+      <button class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
+    </div>
+  </div>
+</div>
