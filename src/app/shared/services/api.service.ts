@@ -107,4 +107,27 @@ export class ApiService {
   approveOrder(payload: any) {
     return this.http.post<any>(`${environment.apiUrl}/order/approve`, payload);
   }
+
+  getBrgMasuk() {
+    return this.http.post<any>(`${environment.apiUrl}/brgMasuk`, {});
+  }
+
+  addBrgMasuk(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/brgMasuk/add`, payload);
+  }
+
+  updateBrgMasuk(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/brgMasuk/update`, payload);
+  }
+
+  deleteBrgMasuk(id_brg_masuk: number) {
+    return this.http.post<any>(`${environment.apiUrl}/brgMasuk/delete`, { id_brg_masuk });
+  }
+
+  getBrgKeluar() {
+    return this.http.post<any>(`${environment.apiUrl}/brgKeluar`, {});
+  }
+  getRetur() {
+    return this.http.post<any>(`${environment.apiUrl}/brgRetur`, {});
+  }
 }

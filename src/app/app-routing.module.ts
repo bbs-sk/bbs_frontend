@@ -45,6 +45,10 @@ const routes: Routes = [
         loadComponent: () => import('./pages/stock/stock').then((c) => c.Stock)
       },
       {
+        path: 'transaksi',
+        loadComponent: () => import('./pages/transaksi/transaksi').then((c) => c.Transaksi)
+      },
+      {
         path: 'typography',
         loadComponent: () => import('./demo/component/basic-component/typography/typography.component').then((c) => c.TypographyComponent)
       },

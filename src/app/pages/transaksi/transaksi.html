@@ -1,0 +1,229 @@
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <h4 class="mb-0">Data Transaksi</h4>
+</div>
+
+<!-- ================= BARANG MASUK ================= -->
+<div class="card tbl-card mb-4">
+  <div class="card-header d-flex align-items-center justify-content-between mb-3">
+    <h5 class="mb-0">Barang Masuk</h5>
+    <button type="button" class="btn btn-sm btn-primary" (click)="openAddMasuk()">
+      <i class="bi bi-plus-lg me-1"></i>
+      Tambah Stock Barang
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Barang</th>
+          <th>Jumlah</th>
+          <th>Harga Beli</th>
+          <th>Tanggal</th>
+          <th class="text-center">Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (m of barangMasuk; track m.id_brg_masuk) {
+        <tr>
+          <td>{{ m.id_brg_masuk }}</td>
+          <td>{{ getNamaBarang(m.id_barang) }}</td>
+          <td>{{ m.jumlah }}</td>
+          <td>{{ m.harga_beli | number }}</td>
+          <td>{{ m.datetime | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="text-center">
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="onEditMasuk(m)">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+
+            <button class="btn btn-sm btn-outline-danger" (click)="onDeleteMasuk(m)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================= BARANG KELUAR ================= -->
+<div class="card tbl-card mb-4">
+  <div class="card-header">
+    <h5 class="mb-0">Barang Keluar</h5>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Barang</th>
+          <th>Invoice</th>
+          <th>Jumlah</th>
+          <th>Harga Jual</th>
+          <th>Tanggal</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (k of barangKeluar; track k.id_brg_keluar) {
+        <tr>
+          <td>{{ k.id_brg_keluar }}</td>
+          <td>{{ getNamaBarang(k.id_barang) }}</td>
+          <td>{{ k.id_invoice }}</td>
+          <td>{{ k.jumlah }}</td>
+          <td>{{ k.harga_jual | number }}</td>
+          <td>{{ k.datetime | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ================= RETUR ================= -->
+<div class="card tbl-card">
+  <div class="card-header">
+    <h5 class="mb-0">Data Retur</h5>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Barang</th>
+          <th>Invoice</th>
+          <th>Jumlah</th>
+          <th>Harga Jual</th>
+          <th>Kondisi</th>
+          <th>Tanggal</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (r of retur; track r.id_retur) {
+        <tr>
+          <td>{{ r.id_retur }}</td>
+          <td>{{ getNamaBarang(r.id_barang) }}</td>
+          <td>{{ r.id_invoice }}</td>
+          <td>{{ r.jumlah }}</td>
+          <td>{{ r.harga_jual | number }}</td>
+          <td>{{ r.kondisi }}</td>
+          <td>{{ r.datetime | date:'dd/MM/yyyy HH:mm' }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH BARANG MASUK -->
+<div class="modal-backdrop-custom" *ngIf="showAddMasukModal" (click)="closeAddMasuk()"></div>
+
+<div class="modal-custom" *ngIf="showAddMasukModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5>Tambah Barang Masuk</h5>
+
+      <button class="btn-close" (click)="closeAddMasuk()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label>Barang</label>
+
+        <select class="form-control" [(ngModel)]="addMasukForm.id_barang">
+          <option [ngValue]="null">Pilih Barang</option>
+
+          <option *ngFor="let b of barangList" [ngValue]="b.id_barang">{{ b.nama_barang }} ({{ b.satuan }})</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label>Jumlah</label>
+
+        <input type="number" class="form-control" [(ngModel)]="addMasukForm.jumlah" />
+      </div>
+
+      <div class="mb-2">
+        <label>Harga Beli</label>
+
+        <input type="number" class="form-control" [(ngModel)]="addMasukForm.harga_beli" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeAddMasuk()">Batal</button>
+
+      <button class="btn btn-primary" (click)="submitAddMasuk()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT -->
+<div class="modal-backdrop-custom" *ngIf="showEditMasukModal"></div>
+
+<div class="modal-custom" *ngIf="showEditMasukModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h5>Edit Barang Masuk</h5>
+
+      <button class="btn-close" (click)="closeEditMasuk()"></button>
+    </div>
+
+    <div class="modal-body">
+      <div class="mb-2">
+        <label>ID</label>
+
+        <input class="form-control" [value]="editMasukForm.id_brg_masuk" disabled />
+      </div>
+
+      <div class="mb-2">
+        <label>Jumlah</label>
+
+        <input type="number" class="form-control" [(ngModel)]="editMasukForm.jumlah" />
+      </div>
+
+      <div class="mb-2">
+        <label>Harga Beli</label>
+
+        <input type="number" class="form-control" [(ngModel)]="editMasukForm.harga_beli" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeEditMasuk()">Batal</button>
+
+      <button class="btn btn-primary" (click)="submitEditMasuk()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DELETE -->
+<div class="modal-backdrop-custom" *ngIf="showDeleteMasukModal"></div>
+
+<div class="modal-custom" *ngIf="showDeleteMasukModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h5>Konfirmasi Hapus</h5>
+
+      <button class="btn-close" (click)="closeDeleteMasuk()"></button>
+    </div>
+
+    <div class="modal-body">
+      Yakin hapus data
+      <b>{{ deleteMasukTarget?.id_brg_masuk }}</b>
+      ?
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-light" (click)="closeDeleteMasuk()">Batal</button>
+
+      <button class="btn btn-danger" (click)="confirmDeleteMasuk()">Hapus</button>
+    </div>
+  </div>
+</div>

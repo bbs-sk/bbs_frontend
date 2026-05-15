@@ -17,7 +17,6 @@
           <th>Role</th>
           <th>Username</th>
           <th>Password</th>
-          <th>Email</th>
           <th class="text-center">Action</th>
         </tr>
       </thead>
@@ -40,7 +39,6 @@
 
           <td>{{ u.username }}</td>
           <td>{{ u.password }}</td>
-          <td>{{ u.email }}</td>
 
           <td class="text-center">
             <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="onEdit(u)" title="Edit">
@@ -91,11 +89,6 @@
         <label class="form-label">Password</label>
         <input class="form-control" [(ngModel)]="addForm.password" name="add_password" />
       </div>
-
-      <div class="mb-2">
-        <label class="form-label">Email</label>
-        <input class="form-control" [(ngModel)]="addForm.email" name="add_email" />
-      </div>
     </div>
 
     <div class="modal-footer">
@@ -142,11 +135,6 @@
       <div class="mb-2">
         <label class="form-label">Password</label>
         <input class="form-control" [(ngModel)]="editForm.password" name="edit_password" />
-      </div>
-
-      <div class="mb-2">
-        <label class="form-label">Email</label>
-        <input class="form-control" [(ngModel)]="editForm.email" name="edit_email" />
       </div>
     </div>
 

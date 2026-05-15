@@ -24,16 +24,17 @@ export class Barang {
   showDeleteModal = false;
 
   addForm: any = {
+    kode_barang: '',
     nama_barang: '',
     satuan: '',
-    harga: 0
+    harga_jual: 0
   };
 
   editForm: any = {
-    id_barang: null,
+    kode_barang: '',
     nama_barang: '',
     satuan: '',
-    harga: 0
+    harga_jual: 0
   };
 
   deleteTarget: any = null;
@@ -65,12 +66,10 @@ export class Barang {
 
   openAdd() {
     this.addForm = {
+      kode_barang: '',
       nama_barang: '',
       satuan: '',
-      jumlah: 0,
-      harga: 0,
-      stock: 0,
-      status: 1
+      harga_jual: 0
     };
 
     this.showAddModal = true;

@@ -79,11 +79,11 @@ export const NavigationItems: NavigationItem[] = [
         breadcrumbs: false
       },
       {
-        id: 'Stock',
-        title: 'Stock',
+        id: 'Transaksi',
+        title: 'Transaksi Barang',
         type: 'item',
         classes: 'nav-item',
-        url: '/stock',
+        url: '/transaksi',
         icon: 'stock',
         breadcrumbs: false
       },

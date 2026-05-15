@@ -76,7 +76,7 @@ export class User {
 
   // ===== Add =====
   openAdd(): void {
-    this.addForm = { name: '', role: 1, username: '', password: '', email: '' };
+    this.addForm = { name: '', role: 1, username: '', password: '' };
     this.showAddModal = true;
   }
 
@@ -90,8 +90,7 @@ export class User {
       name: this.addForm.name,
       role: Number(this.addForm.role),
       username: this.addForm.username,
-      password: this.addForm.password,
-      email: this.addForm.email
+      password: this.addForm.password
     };
 
     // pastikan ApiService punya method ini
@@ -112,8 +111,7 @@ export class User {
       name: u.name ?? '',
       role: Number(u.role ?? 1),
       username: u.username ?? '',
-      password: u.password ?? '',
-      email: u.email ?? ''
+      password: u.password ?? ''
     };
     this.showEditModal = true;
   }
@@ -128,8 +126,7 @@ export class User {
       name: this.editForm.name,
       role: Number(this.editForm.role),
       username: this.editForm.username,
-      password: this.editForm.password,
-      email: this.editForm.email
+      password: this.editForm.password
     };
 
     // pastikan ApiService punya method ini
