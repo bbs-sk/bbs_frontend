@@ -27,7 +27,7 @@ export const NavigationItems: NavigationItem[] = [
     children: [
       {
         id: 'default',
-        title: 'Default',
+        title: 'Dashboard',
         type: 'item',
         classes: 'nav-item',
         url: '/dashboard/default',
@@ -42,15 +42,6 @@ export const NavigationItems: NavigationItem[] = [
     type: 'group',
     icon: 'icon-navigation',
     children: [
-      {
-        id: 'User',
-        title: 'User',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/user',
-        icon: 'user',
-        breadcrumbs: false
-      },
       {
         id: 'Proyek',
         title: 'Proyek',
@@ -71,7 +62,7 @@ export const NavigationItems: NavigationItem[] = [
       },
       {
         id: 'Invoice',
-        title: 'Invoice',
+        title: 'Pemesanan',
         type: 'item',
         classes: 'nav-item',
         url: '/invoice',
@@ -84,7 +75,7 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         classes: 'nav-item',
         url: '/transaksi',
-        icon: 'stock',
+        icon: 'interaction',
         breadcrumbs: false
       },
       {
@@ -95,7 +86,25 @@ export const NavigationItems: NavigationItem[] = [
         url: '/order',
         icon: 'shopping-cart',
         breadcrumbs: false
-      }
+      },
+        {
+        id: 'Laporan',
+        title: 'Laporan Penjualan',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/laporan',
+        icon: 'stock',
+        breadcrumbs: false
+      },
+       {
+        id: 'User',
+        title: 'Daftar Pengguna',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/user',
+        icon: 'user',
+        breadcrumbs: false
+      },
     ]
   },
   {
