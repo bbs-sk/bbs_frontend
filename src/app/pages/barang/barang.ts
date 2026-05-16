@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from 'src/app/shared/services/api.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-barang',
@@ -21,7 +22,6 @@ export class Barang {
 
   showAddModal = false;
   showEditModal = false;
-  showDeleteModal = false;
 
   addForm: any = {
     kode_barang: '',
@@ -36,8 +36,6 @@ export class Barang {
     satuan: '',
     harga_jual: 0
   };
-
-  deleteTarget: any = null;
 
   ngOnInit() {
     this.loadBarang();
@@ -82,10 +80,29 @@ export class Barang {
   submitAdd() {
     this.api.addBarang(this.addForm).subscribe({
       next: () => {
+        const nama = this.addForm.nama_barang;
+
         this.closeAdd();
         this.loadBarang();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: `Barang "${nama}" berhasil ditambahkan.`,
+          timer: 2500,
+          showConfirmButton: false
+        });
       },
-      error: (err) => console.log(err)
+
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Barang gagal ditambahkan. Silakan coba lagi.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
     });
   }
 
@@ -102,33 +119,68 @@ export class Barang {
   submitEdit() {
     this.api.updateBarang(this.editForm).subscribe({
       next: () => {
+        const nama = this.editForm.nama_barang;
+
         this.closeEdit();
         this.loadBarang();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: `Barang "${nama}" berhasil diperbarui.`,
+          timer: 3000,
+          showConfirmButton: false
+        });
       },
-      error: (err) => console.log(err)
+
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Barang gagal diperbarui. Silakan coba lagi.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
     });
   }
 
   onDelete(b: any) {
-    this.deleteTarget = b;
+    Swal.fire({
+      title: 'Konfirmasi Hapus',
+      text: `Apakah Anda yakin ingin menghapus barang "${b.nama_barang}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Hapus',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.api.deleteBarang(b.id_barang).subscribe({
+          next: () => {
+            this.loadBarang();
 
-    this.showDeleteModal = true;
-  }
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil',
+              text: `Barang "${b.nama_barang}" berhasil dihapus.`,
+              timer: 2500,
+              showConfirmButton: false
+            });
+          },
 
-  closeDelete() {
-    this.showDeleteModal = false;
-    this.deleteTarget = null;
-  }
+          error: (err) => {
+            const msg = err?.error?.message || err?.message || 'Barang gagal dihapus. Silakan coba lagi.';
 
-  confirmDelete() {
-    const id = this.deleteTarget?.id_barang;
-
-    this.api.deleteBarang(id).subscribe({
-      next: () => {
-        this.closeDelete();
-        this.loadBarang();
-      },
-      error: (err) => console.log(err)
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal',
+              text: msg
+            });
+          }
+        });
+      }
     });
   }
 }

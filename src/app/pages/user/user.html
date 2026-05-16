@@ -1,9 +1,9 @@
 <div class="d-flex align-items-center justify-content-between mb-3">
-  <h5 class="mb-0">User</h5>
+  <h5 class="mb-0">Daftar Pengguna</h5>
 
   <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
     <i class="bi bi-plus-lg me-1"></i>
-    Tambah User
+    Tambah Pengguna
   </button>
 </div>
 
@@ -12,7 +12,7 @@
     <table class="table table-hover mb-0">
       <thead>
         <tr>
-          <th>Id</th>
+          <th>No</th>
           <th>Nama</th>
           <th>Role</th>
           <th>Username</th>
@@ -24,10 +24,7 @@
       <tbody>
         @for (u of users; track u.id_user) {
         <tr>
-          <td>
-            <a href="javascript:" class="text-muted">{{ u.id_user }}</a>
-          </td>
-
+          <td>{{ $index + 1 }}</td>
           <td>{{ u.name }}</td>
 
           <td>
@@ -61,7 +58,7 @@
 <div class="modal-custom" *ngIf="showAddModal">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h5 class="mb-0">Tambah User</h5>
+      <h5 class="mb-0">Tambah Pengguna</h5>
       <button type="button" class="btn-close" (click)="closeAdd()"></button>
     </div>
 
@@ -103,7 +100,7 @@
 <div class="modal-custom" *ngIf="showEditModal">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h5 class="mb-0">Edit User</h5>
+      <h5 class="mb-0">Edit Pengguna</h5>
       <button type="button" class="btn-close" (click)="closeEdit()"></button>
     </div>
 
