@@ -144,27 +144,3 @@
     </div>
   </div>
 </div>
-
-<!-- ========== MODAL DELETE KONFIRMASI ========== -->
-<div class="modal-backdrop-custom" *ngIf="showDeleteModal" (click)="closeDelete()"></div>
-<div class="modal-custom" *ngIf="showDeleteModal">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h5 class="mb-0">Konfirmasi Hapus</h5>
-      <button type="button" class="btn-close" (click)="closeDelete()"></button>
-    </div>
-
-    <div class="modal-body">
-      Yakin hapus user:
-      <b>{{ deleteTarget?.name }}</b>
-      (ID:
-      <b>{{ deleteTarget?.id_user }}</b>
-      ) ?
-    </div>
-
-    <div class="modal-footer">
-      <button type="button" class="btn btn-light" (click)="closeDelete()">Batal</button>
-      <button type="button" class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
-    </div>
-  </div>
-</div>
