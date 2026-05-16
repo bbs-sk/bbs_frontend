@@ -26,7 +26,8 @@ import {
   GoldOutline,
   StockOutline,
   DollarOutline,
-  ShoppingCartOutline
+  InteractionOutline,
+  ShoppingCartOutline,
 } from '@ant-design/icons-angular/icons';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 
@@ -71,7 +72,8 @@ export class NavContentComponent implements OnInit {
         GoldOutline,
         DollarOutline,
         StockOutline,
-        ShoppingCartOutline
+        ShoppingCartOutline,
+        InteractionOutline
       ]
     );
     this.navigations = NavigationItems;

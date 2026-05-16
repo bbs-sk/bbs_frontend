@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from 'src/app/shared/services/api.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-user',
@@ -21,7 +22,6 @@ export class User {
 
   showAddModal = false;
   showEditModal = false;
-  showDeleteModal = false;
 
   addForm: any = {
     name: '',
@@ -39,8 +39,6 @@ export class User {
     password: '',
     email: ''
   };
-
-  deleteTarget: any = null;
 
   ngOnInit(): void {
     this.loadUsers(); // <= ini yang bikin data balik lagi setelah refresh/HMR
@@ -139,27 +137,41 @@ export class User {
     });
   }
 
-  // ===== Delete =====
   onDelete(u: any): void {
-    this.deleteTarget = u;
-    this.showDeleteModal = true;
-  }
+    Swal.fire({
+      title: 'Konfirmasi Hapus',
+      text: `Apakah Anda yakin ingin menghapus pengguna "${u.name}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Hapus',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.api.deleteUser(u.id_user).subscribe({
+          next: () => {
+            Swal.fire({
+              title: 'Berhasil!',
+              text: `Pengguna "${u.name}" berhasil dihapus`,
+              icon: 'success',
+              timer: 2000,
+              showConfirmButton: false
+            });
 
-  closeDelete(): void {
-    this.showDeleteModal = false;
-    this.deleteTarget = null;
-  }
+            this.loadUsers();
+          },
+          error: (err) => {
+            console.error(err);
 
-  confirmDelete(): void {
-    const id = this.deleteTarget?.id_user;
-
-    // pastikan ApiService punya method ini
-    this.api.deleteUser(id).subscribe({
-      next: () => {
-        this.closeDelete();
-        this.loadUsers();
-      },
-      error: (err) => console.error(err)
+            Swal.fire({
+              title: 'Gagal!',
+              text: 'Pengguna gagal dihapus',
+              icon: 'error'
+            });
+          }
+        });
+      }
     });
   }
 
@@ -167,7 +179,5 @@ export class User {
   closeAllModals(): void {
     this.showAddModal = false;
     this.showEditModal = false;
-    this.showDeleteModal = false;
-    this.deleteTarget = null;
   }
 }

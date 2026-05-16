@@ -48,6 +48,10 @@ const routes: Routes = [
         path: 'transaksi',
         loadComponent: () => import('./pages/transaksi/transaksi').then((c) => c.Transaksi)
       },
+       {
+        path: 'laporan',
+        loadComponent: () => import('./pages/laporan/laporan').then((c) => c.Laporan)
+      },
       {
         path: 'typography',
         loadComponent: () => import('./demo/component/basic-component/typography/typography.component').then((c) => c.TypographyComponent)
