@@ -21,6 +21,16 @@ export class Invoice {
   showAddModal = false;
   showEditModal = false;
   showDeleteModal = false;
+  showDetailModal = false;
+  showStatusModal = false;
+
+  detailInvoice: any = null;
+  detailBarang: any[] = [];
+
+  statusForm: any = {
+    id_invoice: null,
+    status: ''
+  };
 
   addForm: any = {
     id_user: null,
@@ -107,6 +117,52 @@ export class Invoice {
     this.api.deleteInvoice(id).subscribe({
       next: () => {
         this.closeDelete();
+        this.loadInvoice();
+      },
+      error: (err) => console.log(err)
+    });
+  }
+
+  openDetail(i: any) {
+    this.detailInvoice = i;
+
+    this.detailBarang = [];
+
+    this.api.getBrgKeluarId(i.id_invoice).subscribe({
+      next: (res: any) => {
+        this.detailBarang = Array.isArray(res) ? res : (res?.val ?? []);
+
+        this.showDetailModal = true;
+
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.log(err)
+    });
+  }
+
+  closeDetail() {
+    this.showDetailModal = false;
+    this.detailInvoice = null;
+    this.detailBarang = [];
+  }
+
+  openStatus(i: any) {
+    this.statusForm = {
+      id_invoice: i.id_invoice,
+      status: i.status
+    };
+
+    this.showStatusModal = true;
+  }
+
+  closeStatus() {
+    this.showStatusModal = false;
+  }
+
+  submitStatus() {
+    this.api.updateStatusInvoice(this.statusForm).subscribe({
+      next: () => {
+        this.closeStatus();
         this.loadInvoice();
       },
       error: (err) => console.log(err)

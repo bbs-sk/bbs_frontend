@@ -68,6 +68,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/invoice/update`, payload);
   }
 
+  updateStatusInvoice(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/invoice/status`, payload);
+  }
+
   deleteInvoice(id_invoice: number) {
     return this.http.post<any>(`${environment.apiUrl}/invoice/delete`, { id_invoice });
   }
@@ -126,6 +130,9 @@ export class ApiService {
 
   getBrgKeluar() {
     return this.http.post<any>(`${environment.apiUrl}/brgKeluar`, {});
+  }
+  getBrgKeluarId(id_invoice: number) {
+    return this.http.post<any>(`${environment.apiUrl}/brgKeluar/invoice`, { id_invoice });
   }
   getRetur() {
     return this.http.post<any>(`${environment.apiUrl}/brgRetur`, {});
