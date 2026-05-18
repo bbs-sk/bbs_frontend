@@ -52,8 +52,8 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/project/update`, payload);
   }
 
-  deleteProject(id_barang: number) {
-    return this.http.post<any>(`${environment.apiUrl}/project/delete`, { id_barang });
+  deleteProject(id_project: number) {
+    return this.http.post<any>(`${environment.apiUrl}/project/delete`, { id_project });
   }
 
   getInvoice() {

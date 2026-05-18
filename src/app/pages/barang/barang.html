@@ -12,7 +12,7 @@
     <table class="table table-hover mb-0">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>No</th>
           <th>Nama Barang</th>
           <th>Satuan</th>
           <th>Jumlah</th>
@@ -26,7 +26,7 @@
       <tbody>
         @for (b of barang; track b.id_barang) {
         <tr>
-          <td>{{ b.id_barang }}</td>
+          <td>{{ $index + 1 }}</td>
           <td>{{ b.nama_barang }}</td>
           <td>{{ b.satuan }}</td>
           <td>{{ b.jumlah }}</td>
@@ -127,28 +127,6 @@
     <div class="modal-footer">
       <button class="btn btn-light" (click)="closeEdit()">Batal</button>
       <button class="btn btn-primary" (click)="submitEdit()">Update</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL DELETE -->
-<div class="modal-backdrop-custom" *ngIf="showDeleteModal" (click)="closeDelete()"></div>
-<div class="modal-custom" *ngIf="showDeleteModal">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h5>Konfirmasi Hapus</h5>
-      <button class="btn-close" (click)="closeDelete()"></button>
-    </div>
-
-    <div class="modal-body">
-      Yakin hapus barang
-      <b>{{ deleteTarget?.nama_barang }}</b>
-      ?
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeDelete()">Batal</button>
-      <button class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
     </div>
   </div>
 </div>

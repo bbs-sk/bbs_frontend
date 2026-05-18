@@ -1,9 +1,9 @@
 <div class="d-flex align-items-center justify-content-between mb-3">
-  <h5 class="mb-0">Data Project</h5>
+  <h5 class="mb-0">Data Proyek</h5>
 
   <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
     <i class="bi bi-plus-lg me-1"></i>
-    Tambah Project
+    Tambah Proyek
   </button>
 </div>
 
@@ -12,8 +12,8 @@
     <table class="table table-hover mb-0">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Nama Project</th>
+          <th>No</th>
+          <th>Nama Proyek</th>
           <th>Alamat</th>
           <th class="text-center">Action</th>
         </tr>
@@ -22,7 +22,7 @@
       <tbody>
         @for (p of project; track p.id_project) {
         <tr>
-          <td>{{ p.id_project }}</td>
+          <td>{{ $index + 1 }}</td>
           <td>{{ p.nama_project }}</td>
           <td>{{ p.alamat }}</td>
 
@@ -49,13 +49,13 @@
 <div class="modal-custom" *ngIf="showAddModal">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h5>Tambah Project</h5>
+      <h5>Tambah Proyek</h5>
       <button class="btn-close" (click)="closeAdd()"></button>
     </div>
 
     <div class="modal-body">
       <div class="mb-2">
-        <label>Nama Project</label>
+        <label>Nama Proyek</label>
         <input class="form-control" [(ngModel)]="addForm.nama_project" />
       </div>
 
@@ -79,7 +79,7 @@
 <div class="modal-custom" *ngIf="showEditModal">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h5>Edit Project</h5>
+      <h5>Edit Proyek</h5>
       <button class="btn-close" (click)="closeEdit()"></button>
     </div>
 
@@ -90,7 +90,7 @@
       </div>
 
       <div class="mb-2">
-        <label>Nama Project</label>
+        <label>Nama Proyek</label>
         <input class="form-control" [(ngModel)]="editForm.nama_project" />
       </div>
 
@@ -102,34 +102,7 @@
 
     <div class="modal-footer">
       <button class="btn btn-light" (click)="closeEdit()">Batal</button>
-      <button class="btn btn-primary" (click)="submitEdit()">Update</button>
-    </div>
-  </div>
-</div>
-
-<!-- ================= MODAL DELETE ================= -->
-
-<div class="modal-backdrop-custom" *ngIf="showDeleteModal" (click)="closeDelete()"></div>
-
-<div class="modal-custom" *ngIf="showDeleteModal">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h5>Konfirmasi Hapus</h5>
-      <button class="btn-close" (click)="closeDelete()"></button>
-    </div>
-
-    <div class="modal-body">
-      Yakin hapus project
-
-      <b>{{ deleteTarget?.nama_project }}</b>
-
-      ?
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeDelete()">Batal</button>
-
-      <button class="btn btn-danger" (click)="confirmDelete()">Hapus</button>
+      <button class="btn btn-primary" (click)="submitEdit()">Simpan</button>
     </div>
   </div>
 </div>

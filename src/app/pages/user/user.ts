@@ -41,7 +41,7 @@ export class User {
   };
 
   ngOnInit(): void {
-    this.loadUsers(); // <= ini yang bikin data balik lagi setelah refresh/HMR
+    this.loadUsers();
   }
 
   loadUsers(): void {
@@ -83,7 +83,6 @@ export class User {
   }
 
   submitAdd(): void {
-    // sesuaikan payload dengan backend kamu
     const payload = {
       name: this.addForm.name,
       role: Number(this.addForm.role),
@@ -91,13 +90,30 @@ export class User {
       password: this.addForm.password
     };
 
-    // pastikan ApiService punya method ini
     this.api.addUser(payload).subscribe({
       next: () => {
+        const nama = this.addForm.name;
+
         this.closeAdd();
-        this.loadUsers(); // penting: refresh list
+        this.loadUsers();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: `Pengguna "${nama}" berhasil ditambahkan.`,
+          timer: 2500,
+          showConfirmButton: false
+        });
       },
-      error: (err) => console.error(err)
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Pengguna gagal ditambahkan. Silakan coba lagi.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
     });
   }
 
@@ -127,13 +143,30 @@ export class User {
       password: this.editForm.password
     };
 
-    // pastikan ApiService punya method ini
     this.api.updateUser(payload).subscribe({
       next: () => {
+        const nama = this.editForm.name;
+
         this.closeEdit();
         this.loadUsers();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: `Pengguna "${nama}" berhasil diperbarui.`,
+          timer: 3000,
+          showConfirmButton: false
+        });
       },
-      error: (err) => console.error(err)
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Pengguna gagal diperbarui. Silakan coba lagi.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
     });
   }
 
@@ -151,23 +184,23 @@ export class User {
       if (result.isConfirmed) {
         this.api.deleteUser(u.id_user).subscribe({
           next: () => {
+            this.loadUsers();
+
             Swal.fire({
-              title: 'Berhasil!',
-              text: `Pengguna "${u.name}" berhasil dihapus`,
               icon: 'success',
-              timer: 2000,
+              title: 'Berhasil',
+              text: `Pengguna "${u.name}" berhasil dihapus.`,
+              timer: 2500,
               showConfirmButton: false
             });
-
-            this.loadUsers();
           },
           error: (err) => {
-            console.error(err);
+            const msg = err?.error?.message || err?.message || 'Pengguna gagal dihapus. Silakan coba lagi.';
 
             Swal.fire({
-              title: 'Gagal!',
-              text: 'Pengguna gagal dihapus',
-              icon: 'error'
+              icon: 'error',
+              title: 'Gagal',
+              text: msg
             });
           }
         });
@@ -175,7 +208,6 @@ export class User {
     });
   }
 
-  // tutup modal via klik backdrop / esc (opsional sederhana)
   closeAllModals(): void {
     this.showAddModal = false;
     this.showEditModal = false;

@@ -2,6 +2,7 @@ import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from 'src/app/shared/services/api.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-project',
@@ -21,7 +22,6 @@ export class Project {
 
   showAddModal = false;
   showEditModal = false;
-  showDeleteModal = false;
 
   addForm: any = {
     nama_project: '',
@@ -33,8 +33,6 @@ export class Project {
     nama_project: '',
     alamat: ''
   };
-
-  deleteTarget: any = null;
 
   ngOnInit() {
     this.loadProject();
@@ -75,12 +73,29 @@ export class Project {
   submitAdd() {
     this.api.addProject(this.addForm).subscribe({
       next: () => {
-        this.closeAdd();
+        const nama = this.addForm.nama_project;
 
+        this.closeAdd();
         this.loadProject();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: `Proyek "${nama}" berhasil ditambahkan.`,
+          timer: 2500,
+          showConfirmButton: false
+        });
       },
 
-      error: (err) => console.log(err)
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Proyek gagal ditambahkan. Silakan coba lagi.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
     });
   }
 
@@ -103,40 +118,69 @@ export class Project {
   submitEdit() {
     this.api.updateProject(this.editForm).subscribe({
       next: () => {
-        this.closeEdit();
+        const nama = this.editForm.nama_project;
 
+        this.closeEdit();
         this.loadProject();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: `Proyek "${nama}" berhasil diperbarui.`,
+          timer: 3000,
+          showConfirmButton: false
+        });
       },
 
-      error: (err) => console.log(err)
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'Proyek gagal diperbarui. Silakan coba lagi.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
     });
   }
 
   // ================= DELETE (SOFT DELETE) =================
-
   onDelete(p: any) {
-    this.deleteTarget = p;
+    Swal.fire({
+      title: 'Konfirmasi Hapus',
+      text: `Apakah Anda yakin ingin menghapus proyek "${p.nama_project}"?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Hapus',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.api.deleteProject(p.id_project).subscribe({
+          next: () => {
+            this.loadProject();
 
-    this.showDeleteModal = true;
-  }
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil',
+              text: `Proyek "${p.nama_project}" berhasil dihapus.`,
+              timer: 2500,
+              showConfirmButton: false
+            });
+          },
 
-  closeDelete() {
-    this.showDeleteModal = false;
+          error: (err) => {
+            const msg = err?.error?.message || err?.message || 'Proyek gagal dihapus. Silakan coba lagi.';
 
-    this.deleteTarget = null;
-  }
-
-  confirmDelete() {
-    const id = this.deleteTarget?.id_project;
-
-    this.api.deleteProject(id).subscribe({
-      next: () => {
-        this.closeDelete();
-
-        this.loadProject();
-      },
-
-      error: (err) => console.log(err)
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal',
+              text: msg
+            });
+          }
+        });
+      }
     });
   }
 }

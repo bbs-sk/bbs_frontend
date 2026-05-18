@@ -5,4 +5,6 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:3000/api'
   //apiUrl: 'https://bbs-backend-three.vercel.app/api'
+  // apiUrl: 'http://localhost:3000/api'
+  apiUrl: 'https://bbs-backend-three.vercel.app/api'
 };
