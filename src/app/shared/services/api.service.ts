@@ -24,6 +24,14 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/user/delete`, { id_user });
   }
 
+  searchUser(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/user/search`, payload);
+  }
+
+  getUserLapangan() {
+    return this.http.post<any>(`${environment.apiUrl}/user/get_lapangan`, {});
+  }
+
   getBarang() {
     return this.http.post<any>(`${environment.apiUrl}/barang`, {});
   }
@@ -44,6 +52,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/barang/delete`, { id_barang });
   }
 
+  searchBarang(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/barang/search`, payload);
+  }
+
   getProject() {
     return this.http.post<any>(`${environment.apiUrl}/project`, {});
   }
@@ -58,6 +70,10 @@ export class ApiService {
 
   deleteProject(id_project: number) {
     return this.http.post<any>(`${environment.apiUrl}/project/delete`, { id_project });
+  }
+
+  searchProject(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/project/search`, payload);
   }
 
   getInvoice() {
