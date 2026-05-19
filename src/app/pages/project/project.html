@@ -1,108 +1,161 @@
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <h5 class="mb-0">Data Proyek</h5>
+<div class="pb-4">
+  <div class="card tbl-card mb-4">
+    <div class="d-flex align-items-center justify-content-between p-3">
+      <h3 class="mb-0">Data Proyek</h3>
+      <button mat-raised-button style="background-color: #2563eb" aria-label="Tambah" (click)="openAdd()">
+        <mat-icon class="text-white">add</mat-icon>
+        <span style="padding-left: 5px; font-size: 14px; color: white">Tambah Proyek</span>
+      </button>
+    </div>
 
-  <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
-    <i class="bi bi-plus-lg me-1"></i>
-    Tambah Proyek
-  </button>
-</div>
+    <div class="d-flex justify-content-end p-3">
+      <div class="search-box">
+        <input type="text" class="search-input" [(ngModel)]="searchKeyword" placeholder="Cari proyek..." (keyup.enter)="searchData()" />
+        <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <button type="button" class="btn-search" (click)="searchData()">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </div>
 
-<div class="card tbl-card">
-  <div class="table-responsive">
-    <table class="table table-hover mb-0">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama Proyek</th>
-          <th>Alamat</th>
-          <th class="text-center">Action</th>
-        </tr>
-      </thead>
+    <div class="table-responsive">
+      <div class="table-wrapper">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama Proyek</th>
+              <th>Alamat</th>
+              <th>Penanggung Jawab 1</th>
+              <th>Penanggung Jawab 2</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-      <tbody>
-        @for (p of project; track p.id_project) {
-        <tr>
-          <td>{{ $index + 1 }}</td>
-          <td>{{ p.nama_project }}</td>
-          <td>{{ p.alamat }}</td>
+          <tbody>
+            @for (p of paginatedProject; track p.id_project; let i = $index) {
+            <tr>
+              <td>{{ (pageIndex * pageSize) + i + 1 }}</td>
+              <td>{{ p.nama_project || '-' }}</td>
+              <td>{{ p.alamat || '-' }}</td>
+              <td>{{ p.user_1_nama || '-' }}</td>
+              <td>{{ p.user_2_nama || '-' }}</td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-primary me-2" title="Edit" (click)="onEdit(p)">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" (click)="onDelete(p)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-          <td class="text-center">
-            <button class="btn btn-sm btn-outline-primary me-2" (click)="onEdit(p)">
-              <i class="bi bi-pencil-square"></i>
-            </button>
+    <div *ngIf="!isLoading && filteredProject.length === 0" class="empty-search text-center">
+      <i class="bi bi-search"></i>
+      <div class="mt-2 fw-semibold">Tidak ada proyek ditemukan</div>
+      <small class="text-muted">Coba gunakan kata kunci lain</small>
+    </div>
 
-            <button class="btn btn-sm btn-outline-danger" (click)="onDelete(p)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+    <mat-paginator
+      [length]="filteredProject.length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      [pageIndex]="pageIndex"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+    ></mat-paginator>
   </div>
-</div>
 
-<!-- ================= MODAL TAMBAH ================= -->
+  <div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
 
-<div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
-
-<div class="modal-custom" *ngIf="showAddModal">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h5>Tambah Proyek</h5>
-      <button class="btn-close" (click)="closeAdd()"></button>
-    </div>
-
-    <div class="modal-body">
-      <div class="mb-2">
-        <label>Nama Proyek</label>
-        <input class="form-control" [(ngModel)]="addForm.nama_project" />
+  <div class="modal-custom" *ngIf="showAddModal">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="mb-0">Tambah Proyek</h5>
+        <button type="button" class="btn-close" (click)="closeAdd()"></button>
       </div>
-
-      <div class="mb-2">
-        <label>Alamat</label>
-        <input class="form-control" [(ngModel)]="addForm.alamat" />
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label">Nama Proyek</label>
+          <input class="form-control" [(ngModel)]="addForm.nama_project" placeholder="Masukkan Nama Proyek" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Alamat</label>
+          <input class="form-control" [(ngModel)]="addForm.alamat" placeholder="Masukkan Alamat Proyek" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Penanggung Jawab 1</label>
+          <select class="form-select" [(ngModel)]="addForm.id_user1">
+            <option [ngValue]="null">-- Pilih Penanggung Jawab --</option>
+            @for (u of getAddUser1(); track u.id_user) {
+            <option [ngValue]="u.id_user">{{ u.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Penanggung Jawab 2</label>
+          <select class="form-select" [(ngModel)]="addForm.id_user2">
+            <option [ngValue]="null">-- Pilih Penanggung Jawab --</option>
+            @for (u of getAddUser2(); track u.id_user) {
+            <option [ngValue]="u.id_user">{{ u.name }}</option>
+            }
+          </select>
+        </div>
       </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeAdd()">Batal</button>
-      <button class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeAdd()">Batal</button>
+        <button type="button" class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ================= MODAL EDIT ================= -->
+  <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
 
-<div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
-
-<div class="modal-custom" *ngIf="showEditModal">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h5>Edit Proyek</h5>
-      <button class="btn-close" (click)="closeEdit()"></button>
-    </div>
-
-    <div class="modal-body">
-      <div class="mb-2">
-        <label>ID</label>
-        <input class="form-control" [value]="editForm.id_project" disabled />
+  <div class="modal-custom" *ngIf="showEditModal">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="mb-0">Edit Proyek</h5>
+        <button type="button" class="btn-close" (click)="closeEdit()"></button>
       </div>
-
-      <div class="mb-2">
-        <label>Nama Proyek</label>
-        <input class="form-control" [(ngModel)]="editForm.nama_project" />
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label">Nama Proyek</label>
+          <input class="form-control" [(ngModel)]="editForm.nama_project" placeholder="Masukkan Nama Proyek" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Alamat</label>
+          <input class="form-control" [(ngModel)]="editForm.alamat" placeholder="Masukkan Alamat Proyek" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Penanggung Jawab 1</label>
+          <select class="form-select" [(ngModel)]="editForm.id_user1">
+            <option [ngValue]="null">-- Pilih Penanggung Jawab --</option>
+            @for (u of getEditUser1(); track u.id_user) {
+            <option [ngValue]="u.id_user">{{ u.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Penanggung Jawab 2</label>
+          <select class="form-select" [(ngModel)]="editForm.id_user2">
+            <option [ngValue]="null">-- Pilih Penanggung Jawab --</option>
+            @for (u of getEditUser2(); track u.id_user) {
+            <option [ngValue]="u.id_user">{{ u.name }}</option>
+            }
+          </select>
+        </div>
       </div>
-
-      <div class="mb-2">
-        <label>Alamat</label>
-        <input class="form-control" [(ngModel)]="editForm.alamat" />
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeEdit()">Batal</button>
+        <button type="button" class="btn btn-primary" (click)="submitEdit()">Simpan</button>
       </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeEdit()">Batal</button>
-      <button class="btn btn-primary" (click)="submitEdit()">Simpan</button>
     </div>
   </div>
 </div>

@@ -1,13 +1,18 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from 'src/app/shared/services/api.service';
 import Swal from 'sweetalert2';
+import { ApiService } from 'src/app/shared/services/api.service';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatPaginatorModule, MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule],
   templateUrl: './user.html',
   styleUrl: './user.scss'
 })
@@ -16,28 +21,29 @@ export class User {
     private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
-
   users: any[] = [];
+  filteredUsers: any[] = [];
+  paginatedUsers: any[] = [];
   isLoading = false;
-
+  pageSize = 5;
+  pageIndex = 0;
+  searchKeyword = '';
   showAddModal = false;
   showEditModal = false;
 
   addForm: any = {
     name: '',
-    role: 1,
+    role: 'Admin Kantor',
     username: '',
-    password: '',
-    email: ''
+    password: ''
   };
 
   editForm: any = {
     id_user: null,
     name: '',
-    role: 1,
+    role: 'Admin Kantor',
     username: '',
-    password: '',
-    email: ''
+    password: ''
   };
 
   ngOnInit(): void {
@@ -49,32 +55,89 @@ export class User {
     this.api.getUsers().subscribe({
       next: (res: any) => {
         this.users = Array.isArray(res) ? res : (res?.val ?? []);
+        this.filteredUsers = [...this.users];
+        this.pageIndex = 0;
+        this.updatePaginatedData();
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error(err);
+      error: () => {
         this.users = [];
+        this.filteredUsers = [];
+        this.paginatedUsers = [];
         this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  // ===== Helpers =====
+  updatePaginatedData(): void {
+    const startIndex = this.pageIndex * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedUsers = this.filteredUsers.slice(startIndex, endIndex);
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.updatePaginatedData();
+  }
+
+  searchData(): void {
+    const keyword = this.searchKeyword.trim();
+    if (!keyword) {
+      this.filteredUsers = [...this.users];
+      this.pageIndex = 0;
+      this.updatePaginatedData();
+      this.cdr.detectChanges();
+      return;
+    }
+    this.api.searchUser({ keyword }).subscribe({
+      next: (res: any) => {
+        this.filteredUsers = Array.isArray(res) ? res : (res?.val ?? []);
+        this.pageIndex = 0;
+        this.updatePaginatedData();
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.filteredUsers = [];
+        this.pageIndex = 0;
+        this.updatePaginatedData();
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  clearSearch(): void {
+    this.searchKeyword = '';
+    this.filteredUsers = [...this.users];
+    this.pageIndex = 0;
+    this.updatePaginatedData();
+  }
+
   roleLabel(role: any): string {
-    const r = Number(role);
-    return r === 1 ? 'Admin' : r === 2 ? 'Gudang' : r === 3 ? 'Lapangan' : '-';
+    return role || '-';
   }
-
   roleBadgeClass(role: any): string {
-    const r = Number(role);
-    return r === 1 ? 'text-success' : r === 2 ? 'text-primary' : r === 3 ? 'text-warning' : 'text-secondary';
+    if (role === 'Admin Kantor') {
+      return 'text-success';
+    }
+    if (role === 'Gudang') {
+      return 'text-primary';
+    }
+    if (role === 'Lapangan') {
+      return 'text-warning';
+    }
+    return 'text-secondary';
   }
 
-  // ===== Add =====
   openAdd(): void {
-    this.addForm = { name: '', role: 1, username: '', password: '' };
+    this.addForm = {
+      name: '',
+      role: 'Admin Kantor',
+      username: '',
+      password: ''
+    };
     this.showAddModal = true;
   }
 
@@ -85,18 +148,15 @@ export class User {
   submitAdd(): void {
     const payload = {
       name: this.addForm.name,
-      role: Number(this.addForm.role),
+      role: this.addForm.role,
       username: this.addForm.username,
       password: this.addForm.password
     };
-
     this.api.addUser(payload).subscribe({
       next: () => {
         const nama = this.addForm.name;
-
         this.closeAdd();
         this.loadUsers();
-
         Swal.fire({
           icon: 'success',
           title: 'Berhasil',
@@ -106,7 +166,7 @@ export class User {
         });
       },
       error: (err) => {
-        const msg = err?.error?.message || err?.message || 'Pengguna gagal ditambahkan. Silakan coba lagi.';
+        const msg = err?.error?.message || err?.message || 'Pengguna gagal ditambahkan.';
 
         Swal.fire({
           icon: 'error',
@@ -117,13 +177,11 @@ export class User {
     });
   }
 
-  // ===== Edit =====
   onEdit(u: any): void {
-    // clone agar tidak langsung mengubah table sebelum save
     this.editForm = {
       id_user: u.id_user,
       name: u.name ?? '',
-      role: Number(u.role ?? 1),
+      role: u.role ?? 'Admin Kantor',
       username: u.username ?? '',
       password: u.password ?? ''
     };
@@ -138,7 +196,7 @@ export class User {
     const payload = {
       id_user: this.editForm.id_user,
       name: this.editForm.name,
-      role: Number(this.editForm.role),
+      role: this.editForm.role,
       username: this.editForm.username,
       password: this.editForm.password
     };
@@ -146,10 +204,8 @@ export class User {
     this.api.updateUser(payload).subscribe({
       next: () => {
         const nama = this.editForm.name;
-
         this.closeEdit();
         this.loadUsers();
-
         Swal.fire({
           icon: 'success',
           title: 'Berhasil',
@@ -158,8 +214,9 @@ export class User {
           showConfirmButton: false
         });
       },
+
       error: (err) => {
-        const msg = err?.error?.message || err?.message || 'Pengguna gagal diperbarui. Silakan coba lagi.';
+        const msg = err?.error?.message || err?.message || 'Pengguna gagal diperbarui.';
 
         Swal.fire({
           icon: 'error',
@@ -195,8 +252,7 @@ export class User {
             });
           },
           error: (err) => {
-            const msg = err?.error?.message || err?.message || 'Pengguna gagal dihapus. Silakan coba lagi.';
-
+            const msg = err?.error?.message || err?.message || 'Pengguna gagal dihapus.';
             Swal.fire({
               icon: 'error',
               title: 'Gagal',

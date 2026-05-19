@@ -1,13 +1,16 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from 'src/app/shared/services/api.service';
 import Swal from 'sweetalert2';
+import { ApiService } from 'src/app/shared/services/api.service';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-project',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatPaginatorModule, MatButtonModule, MatIconModule],
   templateUrl: './project.html',
   styleUrl: './project.scss'
 })
@@ -18,59 +21,155 @@ export class Project {
   ) {}
 
   project: any[] = [];
+  filteredProject: any[] = [];
+  paginatedProject: any[] = [];
+  userLapangan: any[] = [];
+
   isLoading = false;
+  pageSize = 10;
+  pageIndex = 0;
+  searchKeyword = '';
 
   showAddModal = false;
   showEditModal = false;
 
   addForm: any = {
     nama_project: '',
-    alamat: ''
+    alamat: '',
+    id_user1: null,
+    id_user2: null
   };
 
   editForm: any = {
     id_project: null,
     nama_project: '',
-    alamat: ''
+    alamat: '',
+    id_user1: null,
+    id_user2: null
   };
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadProject();
+    this.loadUserLapangan();
   }
 
-  // ================= LOAD DATA =================
+  getAddUser1() {
+    return this.userLapangan.filter((u) => u.id_user !== this.addForm.id_user2);
+  }
 
-  loadProject() {
+  getAddUser2() {
+    return this.userLapangan.filter((u) => u.id_user !== this.addForm.id_user1);
+  }
+
+  getEditUser1() {
+    return this.userLapangan.filter((u) => u.id_user !== this.editForm.id_user2);
+  }
+
+  getEditUser2() {
+    return this.userLapangan.filter((u) => u.id_user !== this.editForm.id_user1);
+  }
+
+  loadProject(): void {
+    this.isLoading = true;
+
     this.api.getProject().subscribe({
       next: (res: any) => {
         this.project = Array.isArray(res) ? res : (res?.val ?? []);
+        this.filteredProject = [...this.project];
+        this.pageIndex = 0;
 
+        this.updatePaginatedData();
+
+        this.isLoading = false;
         this.cdr.detectChanges();
-
-        console.log(this.project);
       },
-      error: (err) => {
-        console.log(err);
+      error: () => {
+        this.project = [];
+        this.filteredProject = [];
+        this.paginatedProject = [];
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
-  // ================= ADD =================
+  loadUserLapangan(): void {
+    this.api.getUserLapangan().subscribe({
+      next: (res: any) => {
+        this.userLapangan = Array.isArray(res) ? res : (res?.val ?? []);
+      },
+      error: () => {
+        this.userLapangan = [];
+      }
+    });
+  }
 
-  openAdd() {
+  updatePaginatedData(): void {
+    const startIndex = this.pageIndex * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+
+    this.paginatedProject = this.filteredProject.slice(startIndex, endIndex);
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+
+    this.updatePaginatedData();
+  }
+
+  searchData(): void {
+    const keyword = this.searchKeyword.trim().toLowerCase();
+
+    if (!keyword) {
+      this.filteredProject = [...this.project];
+      this.pageIndex = 0;
+
+      this.updatePaginatedData();
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+    this.filteredProject = this.project.filter(
+      (p: any) =>
+        (p.nama_project || '').toLowerCase().includes(keyword) ||
+        (p.alamat || '').toLowerCase().includes(keyword) ||
+        (p.user_1_nama || '').toLowerCase().includes(keyword) ||
+        (p.user_2_nama || '').toLowerCase().includes(keyword)
+    );
+
+    this.pageIndex = 0;
+
+    this.updatePaginatedData();
+    this.cdr.detectChanges();
+  }
+
+  clearSearch(): void {
+    this.searchKeyword = '';
+    this.filteredProject = [...this.project];
+    this.pageIndex = 0;
+
+    this.updatePaginatedData();
+  }
+
+  openAdd(): void {
     this.addForm = {
       nama_project: '',
-      alamat: ''
+      alamat: '',
+      id_user1: null,
+      id_user2: null
     };
 
     this.showAddModal = true;
   }
 
-  closeAdd() {
+  closeAdd(): void {
     this.showAddModal = false;
   }
 
-  submitAdd() {
+  submitAdd(): void {
     this.api.addProject(this.addForm).subscribe({
       next: () => {
         const nama = this.addForm.nama_project;
@@ -86,9 +185,8 @@ export class Project {
           showConfirmButton: false
         });
       },
-
       error: (err) => {
-        const msg = err?.error?.message || err?.message || 'Proyek gagal ditambahkan. Silakan coba lagi.';
+        const msg = err?.error?.message || err?.message || 'Proyek gagal ditambahkan.';
 
         Swal.fire({
           icon: 'error',
@@ -99,23 +197,23 @@ export class Project {
     });
   }
 
-  // ================= EDIT =================
-
-  onEdit(p: any) {
+  onEdit(p: any): void {
     this.editForm = {
       id_project: p.id_project,
-      nama_project: p.nama_project,
-      alamat: p.alamat
+      nama_project: p.nama_project ?? '',
+      alamat: p.alamat ?? '',
+      id_user1: p.id_user1 ?? null,
+      id_user2: p.id_user2 ?? null
     };
 
     this.showEditModal = true;
   }
 
-  closeEdit() {
+  closeEdit(): void {
     this.showEditModal = false;
   }
 
-  submitEdit() {
+  submitEdit(): void {
     this.api.updateProject(this.editForm).subscribe({
       next: () => {
         const nama = this.editForm.nama_project;
@@ -131,9 +229,8 @@ export class Project {
           showConfirmButton: false
         });
       },
-
       error: (err) => {
-        const msg = err?.error?.message || err?.message || 'Proyek gagal diperbarui. Silakan coba lagi.';
+        const msg = err?.error?.message || err?.message || 'Proyek gagal diperbarui.';
 
         Swal.fire({
           icon: 'error',
@@ -144,8 +241,7 @@ export class Project {
     });
   }
 
-  // ================= DELETE (SOFT DELETE) =================
-  onDelete(p: any) {
+  onDelete(p: any): void {
     Swal.fire({
       title: 'Konfirmasi Hapus',
       text: `Apakah Anda yakin ingin menghapus proyek "${p.nama_project}"?`,
@@ -169,9 +265,8 @@ export class Project {
               showConfirmButton: false
             });
           },
-
           error: (err) => {
-            const msg = err?.error?.message || err?.message || 'Proyek gagal dihapus. Silakan coba lagi.';
+            const msg = err?.error?.message || err?.message || 'Proyek gagal dihapus.';
 
             Swal.fire({
               icon: 'error',

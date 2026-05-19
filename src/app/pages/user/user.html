@@ -1,93 +1,109 @@
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <h5 class="mb-0">Daftar Pengguna</h5>
-
-  <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
-    <i class="bi bi-plus-lg me-1"></i>
-    Tambah Pengguna
-  </button>
-</div>
-
 <div class="card tbl-card">
-  <div class="table-responsive">
-    <table class="table table-hover mb-0">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama</th>
-          <th>Role</th>
-          <th>Username</th>
-          <th>Password</th>
-          <th class="text-center">Action</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        @for (u of users; track u.id_user) {
-        <tr>
-          <td>{{ $index + 1 }}</td>
-          <td>{{ u.name }}</td>
-
-          <td>
-            <span class="d-block">
-              <i class="badge-circle {{ roleBadgeClass(u.role) }} f-10 m-r-5"></i>
-              {{ roleLabel(u.role) }}
-            </span>
-          </td>
-
-          <td>{{ u.username }}</td>
-          <td>{{ u.password }}</td>
-
-          <td class="text-center">
-            <button type="button" class="btn btn-sm btn-outline-primary me-2" (click)="onEdit(u)" title="Edit">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-
-            <button type="button" class="btn btn-sm btn-outline-danger" (click)="onDelete(u)" title="Hapus">
-              <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+  <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+    <h3 class="mb-0">Daftar Pengguna</h3>
+    <button mat-raised-button style="background-color: #2563eb" aria-label="Tambah" (click)="openAdd()">
+      <mat-icon class="text-white">add</mat-icon>
+      <span style="padding-left: 5px; font-size: 14px; color: white">Tambah Pengguna</span>
+    </button>
   </div>
+
+  <div class="d-flex justify-content-end p-3 border-bottom">
+    <div class="search-box">
+      <input type="text" class="search-input" [(ngModel)]="searchKeyword" placeholder="Cari pengguna..." (keyup.enter)="searchData()" />
+      <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+      <button type="button" class="btn-search" (click)="searchData()">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <div class="table-wrapper">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Role</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of paginatedUsers; let i = index">
+            <td>{{ (pageIndex * pageSize) + i + 1 }}</td>
+            <td>{{ u.name }}</td>
+            <td>
+              <span class="d-block">
+                <i class="badge-circle {{ roleBadgeClass(u.role) }} f-10 m-r-5"></i>
+                {{ roleLabel(u.role) }}
+              </span>
+            </td>
+            <td>{{ u.username }}</td>
+            <td>{{ u.password }}</td>
+            <td class="text-center">
+              <button type="button" class="btn btn-sm btn-outline-primary me-2" title="Edit" (click)="onEdit(u)">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" (click)="onDelete(u)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && filteredUsers.length === 0" class="empty-search text-center">
+    <i class="bi bi-search"></i>
+    <div class="mt-2 fw-semibold">Tidak ada pengguna ditemukan</div>
+    <small class="text-muted">Coba gunakan kata kunci lain</small>
+  </div>
+
+  <mat-paginator
+    [length]="filteredUsers.length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, 25]"
+    [pageIndex]="pageIndex"
+    (page)="onPageChange($event)"
+    showFirstLastButtons
+  ></mat-paginator>
 </div>
 
-<!-- ========== MODAL TAMBAH ========== -->
 <div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
+
 <div class="modal-custom" *ngIf="showAddModal">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h5 class="mb-0">Tambah Pengguna</h5>
       <button type="button" class="btn-close" (click)="closeAdd()"></button>
     </div>
-
     <div class="modal-body">
       <div class="mb-2">
         <label class="form-label">Nama</label>
         <input class="form-control" [(ngModel)]="addForm.name" name="add_name" />
       </div>
-
       <div class="mb-2">
         <label class="form-label">Role</label>
         <select class="form-select" [(ngModel)]="addForm.role" name="add_role">
-          <option [ngValue]="1">Admin</option>
-          <option [ngValue]="2">Gudang</option>
-          <option [ngValue]="3">Lapangan</option>
+          <option value="Admin Kantor">Admin Kantor</option>
+          <option value="Gudang">Gudang</option>
+          <option value="Lapangan">Lapangan</option>
         </select>
       </div>
-
       <div class="mb-2">
         <label class="form-label">Username</label>
         <input class="form-control" [(ngModel)]="addForm.username" name="add_username" />
       </div>
-
       <div class="mb-2">
         <label class="form-label">Password</label>
         <input class="form-control" [(ngModel)]="addForm.password" name="add_password" />
       </div>
     </div>
-
     <div class="modal-footer">
       <button type="button" class="btn btn-light" (click)="closeAdd()">Batal</button>
       <button type="button" class="btn btn-primary" (click)="submitAdd()">Simpan</button>
@@ -95,46 +111,40 @@
   </div>
 </div>
 
-<!-- ========== MODAL EDIT ========== -->
 <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
+
 <div class="modal-custom" *ngIf="showEditModal">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h5 class="mb-0">Edit Pengguna</h5>
       <button type="button" class="btn-close" (click)="closeEdit()"></button>
     </div>
-
     <div class="modal-body">
       <div class="mb-2">
         <label class="form-label">ID</label>
         <input class="form-control" [value]="editForm.id_user" disabled />
       </div>
-
       <div class="mb-2">
         <label class="form-label">Nama</label>
         <input class="form-control" [(ngModel)]="editForm.name" name="edit_name" />
       </div>
-
       <div class="mb-2">
         <label class="form-label">Role</label>
         <select class="form-select" [(ngModel)]="editForm.role" name="edit_role">
-          <option [ngValue]="1">Admin</option>
-          <option [ngValue]="2">Gudang</option>
-          <option [ngValue]="3">Lapangan</option>
+          <option value="Admin Kantor">Admin Kantor</option>
+          <option value="Gudang">Gudang</option>
+          <option value="Lapangan">Lapangan</option>
         </select>
       </div>
-
       <div class="mb-2">
         <label class="form-label">Username</label>
         <input class="form-control" [(ngModel)]="editForm.username" name="edit_username" />
       </div>
-
       <div class="mb-2">
         <label class="form-label">Password</label>
         <input class="form-control" [(ngModel)]="editForm.password" name="edit_password" />
       </div>
     </div>
-
     <div class="modal-footer">
       <button type="button" class="btn btn-light" (click)="closeEdit()">Batal</button>
       <button type="button" class="btn btn-primary" (click)="submitEdit()">Update</button>

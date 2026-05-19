@@ -1,132 +1,162 @@
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <h5 class="mb-0">Data Barang</h5>
+<div class="pb-4">
+  <div class="card tbl-card mb-4">
+    <div class="d-flex align-items-center justify-content-between p-3">
+      <h3 class="mb-0">Data Barang</h3>
+      <button mat-raised-button style="background-color: #2563eb" aria-label="Tambah" (click)="openAdd()">
+        <mat-icon class="text-white">add</mat-icon>
+        <span style="padding-left: 5px; font-size: 14px; color: white">Tambah Barang</span>
+      </button>
+    </div>
 
-  <button type="button" class="btn btn-sm btn-primary" (click)="openAdd()">
-    <i class="bi bi-plus-lg me-1"></i>
-    Tambah Barang
-  </button>
-</div>
+    <div class="d-flex justify-content-end p-3">
+      <div class="search-box">
+        <input type="text" class="search-input" [(ngModel)]="searchKeyword" placeholder="Cari barang..." (keyup.enter)="searchData()" />
+        <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <button type="button" class="btn-search" (click)="searchData()">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </div>
 
-<div class="card tbl-card">
-  <div class="table-responsive">
-    <table class="table table-hover mb-0">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Nama Barang</th>
-          <th>Satuan</th>
-          <th>Jumlah</th>
-          <th>Harga Jual</th>
-          <th>HPP</th>
-          <th>Tanggal</th>
-          <th class="text-center">Action</th>
-        </tr>
-      </thead>
+    <div class="table-responsive">
+      <div class="table-wrapper">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Kode Barang</th>
+              <th>Nama Barang</th>
+              <th>Satuan</th>
+              <th>Jumlah</th>
+              <th>Harga Jual</th>
+              <th>HPP</th>
+              <th>Tanggal</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of paginatedBarang; track b.id_barang; let i = $index) {
+            <tr>
+              <td>{{ (pageIndex * pageSize) + i + 1 }}</td>
+              <td>{{ b.kode_barang }}</td>
+              <td>{{ b.nama_barang }}</td>
+              <td>{{ b.satuan }}</td>
+              <td>{{ b.jumlah }}</td>
+              <td>{{ b.harga_jual ? 'Rp ' + b.harga_jual.toLocaleString('id-ID') : '-' }}</td>
+              <td>{{ b.hpp ? 'Rp ' + b.hpp.toLocaleString('id-ID') : '-' }}</td>
+              <td>{{ b.datetime | date:'dd MMM yyyy • HH:mm':'':'id' }}</td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-primary me-2" title="Edit" (click)="onEdit(b)">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" (click)="onDelete(b)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-      <tbody>
-        @for (b of barang; track b.id_barang) {
-        <tr>
-          <td>{{ $index + 1 }}</td>
-          <td>{{ b.nama_barang }}</td>
-          <td>{{ b.satuan }}</td>
-          <td>{{ b.jumlah }}</td>
-          <td>{{ b.harga_jual }}</td>
-          <td>{{ b.hpp }}</td>
-          <td>{{ b.datetime | date:'dd/MM/yyyy HH:mm'}}</td>
+    <div *ngIf="!isLoading && filteredBarang.length === 0" class="empty-search text-center">
+      <i class="bi bi-search"></i>
+      <div class="mt-2 fw-semibold">Tidak ada barang ditemukan</div>
+      <small class="text-muted">Coba gunakan kata kunci lain</small>
+    </div>
 
-          <td class="text-center">
-            <button class="btn btn-sm btn-outline-primary me-2" (click)="onEdit(b)">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-
-            <button class="btn btn-sm btn-outline-danger" (click)="onDelete(b)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
+    <mat-paginator
+      [length]="filteredBarang.length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20, 50]"
+      [pageIndex]="pageIndex"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+    ></mat-paginator>
   </div>
-</div>
 
-<!-- MODAL TAMBAH -->
-<div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
-<div class="modal-custom" *ngIf="showAddModal">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h5>Tambah Barang</h5>
-      <button class="btn-close" (click)="closeAdd()"></button>
-    </div>
+  <div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
 
-    <div class="modal-body">
-      <div class="mb-2">
-        <label>Kode Barang</label>
-        <input class="form-control" [(ngModel)]="addForm.kode_barang" />
+  <div class="modal-custom" *ngIf="showAddModal">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="mb-0">Tambah Barang</h5>
+        <button type="button" class="btn-close" (click)="closeAdd()"></button>
       </div>
-
-      <div class="mb-2">
-        <label>Nama Barang</label>
-        <input class="form-control" [(ngModel)]="addForm.nama_barang" />
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label">Kode Barang</label>
+          <input class="form-control" [(ngModel)]="addForm.kode_barang" placeholder="Masukkan Kode Barang" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Nama Barang</label>
+          <input class="form-control" [(ngModel)]="addForm.nama_barang" placeholder="Masukkan Nama Barang" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Satuan</label>
+          <input class="form-control" [(ngModel)]="addForm.satuan" placeholder="Masukkan Satuan Barang" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Harga Jual</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="hargaJualDisplayAdd"
+            (input)="onHargaJualInput('add')"
+            placeholder="Masukkan Harga Jual"
+          />
+        </div>
       </div>
-
-      <div class="mb-2">
-        <label>Satuan</label>
-        <input class="form-control" [(ngModel)]="addForm.satuan" />
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeAdd()">Batal</button>
+        <button type="button" class="btn btn-primary" (click)="submitAdd()">Simpan</button>
       </div>
-
-      <div class="mb-2">
-        <label>Harga</label>
-        <input type="number" class="form-control" [(ngModel)]="addForm.harga_jual" />
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeAdd()">Batal</button>
-      <button class="btn btn-primary" (click)="submitAdd()">Simpan</button>
     </div>
   </div>
-</div>
 
-<!-- MODAL EDIT -->
-<div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
-<div class="modal-custom" *ngIf="showEditModal">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h5>Edit Barang</h5>
-      <button class="btn-close" (click)="closeEdit()"></button>
-    </div>
+  <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
 
-    <div class="modal-body">
-      <div class="mb-2">
-        <label>ID</label>
-        <input class="form-control" [value]="editForm.id_barang" disabled />
+  <div class="modal-custom" *ngIf="showEditModal">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h5 class="mb-0">Edit Barang</h5>
+        <button type="button" class="btn-close" (click)="closeEdit()"></button>
       </div>
-
-      <div class="mb-2">
-        <label>Kode Barang</label>
-        <input class="form-control" [(ngModel)]="editForm.kode_barang" />
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label">Kode Barang</label>
+          <input class="form-control" [(ngModel)]="editForm.kode_barang" placeholder="Masukkan Kode Barang" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Nama Barang</label>
+          <input class="form-control" [(ngModel)]="editForm.nama_barang" placeholder="Masukkan Nama Barang" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Satuan</label>
+          <input class="form-control" [(ngModel)]="editForm.satuan" placeholder="Masukkan Satuan Barang" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Harga Jual</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="hargaJualDisplayEdit"
+            (input)="onHargaJualInput('edit')"
+            placeholder="Masukkan Harga Jual"
+          />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">HPP</label>
+          <input type="text" class="form-control" [value]="editForm.hpp ? 'Rp ' + editForm.hpp.toLocaleString('id-ID') : '-'" disabled />
+        </div>
       </div>
-
-      <div class="mb-2">
-        <label>Nama Barang</label>
-        <input class="form-control" [(ngModel)]="editForm.nama_barang" />
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeEdit()">Batal</button>
+        <button type="button" class="btn btn-primary" (click)="submitEdit()">Simpan</button>
       </div>
-
-      <div class="mb-2">
-        <label>Satuan</label>
-        <input class="form-control" [(ngModel)]="editForm.satuan" />
-      </div>
-
-      <div class="mb-2">
-        <label>Harga</label>
-        <input type="number" class="form-control" [(ngModel)]="editForm.harga_jual" />
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeEdit()">Batal</button>
-      <button class="btn btn-primary" (click)="submitEdit()">Update</button>
     </div>
   </div>
 </div>
