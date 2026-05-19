@@ -1,24 +1,22 @@
 <div class="d-flex align-items-center justify-content-between mb-3">
-  <h5 class="mb-0">Unique Visitor</h5>
-  <div class="d-flex gap-2 chart-income">
-    <div class="chart-income month" (click)="toggleActive('month')">Month</div>
-    <div class="chart-income week" (click)="toggleActive('week')">Week</div>
-  </div>
+  <h5 class="mb-0">Penjualan 5 Bulan Terakhir</h5>
 </div>
+
 <div class="card">
   <div class="card-body">
-    <div id="chart">
+    @if (chartOptions) {
       <apx-chart
+        #chart
         [series]="chartOptions.series"
         [chart]="chartOptions.chart"
-        [dataLabels]="chartOptions.dataLabels"
         [xaxis]="chartOptions.xaxis"
         [colors]="chartOptions.colors"
         [stroke]="chartOptions.stroke"
         [yaxis]="chartOptions.yaxis"
         [grid]="chartOptions.grid"
-        [theme]="chartOptions.theme"
+        [tooltip]="chartOptions.tooltip"
+        [dataLabels]="chartOptions.dataLabels"
       ></apx-chart>
-    </div>
+    }
   </div>
 </div>

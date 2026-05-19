@@ -30,7 +30,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Dashboard',
         type: 'item',
         classes: 'nav-item',
-        url: '/dashboard/default',
+        url: '/dashboard',
         icon: 'dashboard',
         breadcrumbs: false
       }
@@ -66,7 +66,7 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         classes: 'nav-item',
         url: '/invoice',
-        icon: 'dollar',
+        icon: 'shopping-cart',
         breadcrumbs: false
       },
       {
@@ -79,24 +79,15 @@ export const NavigationItems: NavigationItem[] = [
         breadcrumbs: false
       },
       {
-        id: 'Order',
-        title: 'Order',
-        type: 'item',
-        classes: 'nav-item',
-        url: '/order',
-        icon: 'shopping-cart',
-        breadcrumbs: false
-      },
-        {
         id: 'Laporan',
         title: 'Laporan Penjualan',
         type: 'item',
         classes: 'nav-item',
         url: '/laporan',
-        icon: 'stock',
+        icon: 'dollar',
         breadcrumbs: false
       },
-       {
+      {
         id: 'User',
         title: 'Daftar Pengguna',
         type: 'item',
@@ -104,7 +95,7 @@ export const NavigationItems: NavigationItem[] = [
         url: '/user',
         icon: 'user',
         breadcrumbs: false
-      },
+      }
     ]
   },
   {

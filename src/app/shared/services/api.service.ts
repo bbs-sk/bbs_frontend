@@ -28,6 +28,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/barang`, {});
   }
 
+  getTotalBarang() {
+    return this.http.get<any>(`${environment.apiUrl}/barang/total`);
+  }
+
   addBarang(payload: any) {
     return this.http.post<any>(`${environment.apiUrl}/barang/add`, payload);
   }
@@ -58,6 +62,18 @@ export class ApiService {
 
   getInvoice() {
     return this.http.post<any>(`${environment.apiUrl}/invoice`, {});
+  }
+
+  getInvoiceRecent() {
+    return this.http.post<any>(`${environment.apiUrl}/invoice/recent`, {});
+  }
+
+  getMonthly() {
+    return this.http.get<any>(`${environment.apiUrl}/invoice/monthly`);
+  }
+
+  getWait() {
+    return this.http.get<any>(`${environment.apiUrl}/invoice/wait`);
   }
 
   addInvoice(payload: any) {
@@ -116,6 +132,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/brgMasuk`, {});
   }
 
+  getMonthlyBrgMasuk() {
+    return this.http.get<any>(`${environment.apiUrl}/brgMasuk/monthly`);
+  }
+
   addBrgMasuk(payload: any) {
     return this.http.post<any>(`${environment.apiUrl}/brgMasuk/add`, payload);
   }
@@ -131,10 +151,19 @@ export class ApiService {
   getBrgKeluar() {
     return this.http.post<any>(`${environment.apiUrl}/brgKeluar`, {});
   }
+
+  getMonthlyBrgKeluar() {
+    return this.http.get<any>(`${environment.apiUrl}/brgKeluar/monthly`);
+  }
+
   getBrgKeluarId(id_invoice: number) {
     return this.http.post<any>(`${environment.apiUrl}/brgKeluar/invoice`, { id_invoice });
   }
   getRetur() {
     return this.http.post<any>(`${environment.apiUrl}/brgRetur`, {});
+  }
+
+  getActivity() {
+    return this.http.get<any>(`${environment.apiUrl}/mix/activity`);
   }
 }

@@ -13,12 +13,12 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/dashboard/default',
+        redirectTo: '/dashboard',
         pathMatch: 'full'
       },
       {
-        path: 'dashboard/default',
-        loadComponent: () => import('./demo/dashboard/default/default.component').then((c) => c.DefaultComponent)
+        path: 'dashboard',
+        loadComponent: () => import('./pages/dashboard/dashboard').then((c) => c.Dashboard)
       },
       {
         path: 'user',
@@ -37,10 +37,6 @@ const routes: Routes = [
         loadComponent: () => import('./pages/invoice/invoice').then((c) => c.Invoice)
       },
       {
-        path: 'order',
-        loadComponent: () => import('./pages/order/order').then((c) => c.Order)
-      },
-      {
         path: 'stock',
         loadComponent: () => import('./pages/stock/stock').then((c) => c.Stock)
       },
@@ -48,7 +44,7 @@ const routes: Routes = [
         path: 'transaksi',
         loadComponent: () => import('./pages/transaksi/transaksi').then((c) => c.Transaksi)
       },
-       {
+      {
         path: 'laporan',
         loadComponent: () => import('./pages/laporan/laporan').then((c) => c.Laporan)
       },

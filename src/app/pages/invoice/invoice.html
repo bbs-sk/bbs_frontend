@@ -29,7 +29,10 @@
           <td>{{ i.name }}</td>
           <td>{{ i.nama_project }}</td>
           <td>{{ i.total_harga }}</td>
-          <td>{{ i.status }}</td>
+          <td>
+            <i class="badge-circle {{ getStatusColor(i.status) }} f-10 m-r-5"></i>
+            {{ i.status }}
+          </td>
           <td>{{ i.pembayaran }}</td>
 
           <td class="text-center">

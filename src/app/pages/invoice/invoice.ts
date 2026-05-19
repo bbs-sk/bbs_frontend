@@ -47,6 +47,25 @@ export class Invoice {
     this.loadInvoice();
   }
 
+  getStatusColor(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'menunggu':
+        return 'bg-warning';
+
+      case 'disetujui':
+        return 'bg-primary';
+
+      case 'selesai':
+        return 'bg-success';
+
+      case 'ditolak':
+        return 'bg-danger';
+
+      default:
+        return 'bg-secondary';
+    }
+  }
+
   loadInvoice() {
     this.api.getInvoice().subscribe({
       next: (res: any) => {
