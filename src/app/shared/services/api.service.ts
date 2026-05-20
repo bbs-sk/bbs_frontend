@@ -176,7 +176,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/brgKeluar/invoice`, { id_invoice });
   }
   getRetur() {
-    return this.http.post<any>(`${environment.apiUrl}/brgRetur`, {});
+    return this.http.post<any>(`${environment.apiUrl}/retur/`, {});
+  }
+  addRetur(data: any) {
+    return this.http.post(`${environment.apiUrl}/retur/add`, data);
   }
 
   getActivity() {
