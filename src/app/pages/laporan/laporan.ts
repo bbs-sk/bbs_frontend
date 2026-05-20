@@ -4,8 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-laporan',
   imports: [],
   templateUrl: './laporan.html',
-  styleUrl: './laporan.scss',
+  styleUrl: './laporan.scss'
 })
-export class Laporan {
-
-}
+export class Laporan {}
