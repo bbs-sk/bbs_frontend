@@ -4,15 +4,14 @@ import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { ApiService } from 'src/app/shared/services/api.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatPaginatorModule, MatIconModule, MatButtonModule, MatFormFieldModule, MatInputModule],
+  imports: [CommonModule, FormsModule, MatPaginatorModule, MatButtonModule, MatIconModule, NgSelectModule],
   templateUrl: './user.html',
   styleUrl: './user.scss'
 })
@@ -25,7 +24,7 @@ export class User {
   filteredUsers: any[] = [];
   paginatedUsers: any[] = [];
   isLoading = false;
-  pageSize = 5;
+  pageSize = 20;
   pageIndex = 0;
   searchKeyword = '';
   showAddModal = false;
@@ -262,10 +261,5 @@ export class User {
         });
       }
     });
-  }
-
-  closeAllModals(): void {
-    this.showAddModal = false;
-    this.showEditModal = false;
   }
 }

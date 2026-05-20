@@ -1,1 +1,101 @@
-<p>laporan works!</p>
+<div class="pb-4">
+  <div class="card tbl-card mb-4">
+    <div class="d-flex align-items-center justify-content-between p-3">
+      <h3 class="mb-0">Laporan Penjualan</h3>
+      <button mat-raised-button style="background-color: #2563eb" aria-label="Tambah">
+        <mat-icon class="text-white">download</mat-icon>
+        <span style="padding-left: 5px; font-size: 14px; color: white">Export Laporan Penjualan</span>
+      </button>
+    </div>
+    <div class="filter-group">
+      <label class="form-label">Pilih Tanggal</label>
+      <input type="date" class="form-control" />
+    </div>
+  </div>
+  <div class="summary-grid">
+    <!-- TOTAL TRANSAKSI -->
+    <div class="summary-card transaksi">
+      <div class="card-icon">
+        <i class="bi bi-receipt"></i>
+      </div>
+
+      <div>
+        <p class="card-title">Total Transaksi</p>
+        <h3>120</h3>
+      </div>
+    </div>
+
+    <!-- TOTAL KEUNTUNGAN -->
+    <div class="summary-card keuntungan">
+      <div class="card-icon">
+        <i class="bi bi-cash-stack"></i>
+      </div>
+
+      <div>
+        <p class="card-title">Total Penjualan</p>
+        <h3>Rp 12.500.000</h3>
+      </div>
+    </div>
+
+    <!-- PRODUK TERJUAL -->
+    <div class="summary-card produk">
+      <div class="card-icon">
+        <i class="bi bi-box-seam"></i>
+      </div>
+
+      <div>
+        <p class="card-title">Produk Terjual</p>
+        <h3>540</h3>
+      </div>
+    </div>
+  </div>
+  <div class="table-card">
+    <div class="table-header">
+      <h5 class="mb-0">Daftar Transaksi</h5>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Invoice</th>
+            <th>Tanggal</th>
+            <th>Total Produk</th>
+            <th>Total Harga</th>
+            <th>Keuntungan</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>INV-001</td>
+            <td>19 Mei 2026</td>
+            <td>12</td>
+            <td>Rp 1.200.000</td>
+            <td>Rp 320.000</td>
+          </tr>
+
+          <tr>
+            <td>2</td>
+            <td>INV-002</td>
+            <td>19 Mei 2026</td>
+            <td>8</td>
+            <td>Rp 870.000</td>
+            <td>Rp 210.000</td>
+          </tr>
+
+          <tr>
+            <td>3</td>
+            <td>INV-003</td>
+            <td>19 Mei 2026</td>
+            <td>15</td>
+            <td>Rp 1.750.000</td>
+            <td>Rp 500.000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

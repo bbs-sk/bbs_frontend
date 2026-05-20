@@ -33,11 +33,18 @@
   padding: 12px 16px;
 }
 
+.modal-header h5 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
 .modal-body {
   padding: 16px;
 }
 
 .tbl-card {
+  margin-bottom: 20px;
   overflow: hidden;
   border: none;
   border-radius: 16px;
@@ -55,11 +62,24 @@
 }
 
 .table-wrapper {
-  min-width: 800px;
+  min-width: 1000px;
 }
 
 table {
   width: 100%;
+}
+
+table thead th {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+table tbody td {
+  font-size: 14px;
+  vertical-align: middle;
 }
 
 mat-paginator {
@@ -70,12 +90,13 @@ mat-paginator {
 .search-box {
   display: flex;
   align-items: center;
-  width: 250px;
-  height: 36px;
+  width: 100%;
+  max-width: 420px;
+  height: 38px;
   overflow: hidden;
   background: #fff;
   border: 1px solid #dbe1e8;
-  border-radius: 5px;
+  border-radius: 6px;
   transition: all 0.2s ease;
 }
 
@@ -152,4 +173,41 @@ mat-paginator {
 .empty-search .fw-semibold {
   font-size: 15px;
   color: #475569;
+}
+
+.form-label,
+label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.form-control,
+.form-select {
+  font-size: 14px;
+  border-radius: 8px;
+  min-height: 40px;
+}
+
+.form-control::placeholder {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+::ng-deep .ng-select .ng-select-container {
+  min-height: 40px !important;
+  border-radius: 8px !important;
+  border: 1px solid #ced4da !important;
+  font-size: 14px;
+}
+
+::ng-deep .ng-select.ng-select-focused .ng-select-container {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+::ng-deep .ng-select .ng-placeholder {
+  color: #9ca3af !important;
+  font-size: 13px;
 }

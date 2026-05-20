@@ -92,21 +92,20 @@
         </div>
         <div class="mb-2">
           <label class="form-label">Penanggung Jawab 1</label>
-          <select class="form-select" [(ngModel)]="addForm.id_user1">
-            <option [ngValue]="null">-- Pilih Penanggung Jawab --</option>
+          <ng-select [(ngModel)]="addForm.id_user1" placeholder="Pilih Penanggung Jawab 1" [searchable]="true" [clearable]="true">
             @for (u of getAddUser1(); track u.id_user) {
-            <option [ngValue]="u.id_user">{{ u.name }}</option>
+            <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
             }
-          </select>
+          </ng-select>
         </div>
+
         <div class="mb-2">
           <label class="form-label">Penanggung Jawab 2</label>
-          <select class="form-select" [(ngModel)]="addForm.id_user2">
-            <option [ngValue]="null">-- Pilih Penanggung Jawab --</option>
+          <ng-select [(ngModel)]="addForm.id_user2" placeholder="Pilih Penanggung Jawab 2" [searchable]="true" [clearable]="true">
             @for (u of getAddUser2(); track u.id_user) {
-            <option [ngValue]="u.id_user">{{ u.name }}</option>
+            <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
             }
-          </select>
+          </ng-select>
         </div>
       </div>
       <div class="modal-footer">
@@ -135,21 +134,20 @@
         </div>
         <div class="mb-2">
           <label class="form-label">Penanggung Jawab 1</label>
-          <select class="form-select" [(ngModel)]="editForm.id_user1">
-            <option [ngValue]="null">-- Pilih Penanggung Jawab --</option>
+          <ng-select [(ngModel)]="editForm.id_user1" placeholder="Pilih Penanggung Jawab 1" [searchable]="true" [clearable]="true">
             @for (u of getEditUser1(); track u.id_user) {
-            <option [ngValue]="u.id_user">{{ u.name }}</option>
+            <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
             }
-          </select>
+          </ng-select>
         </div>
+
         <div class="mb-2">
           <label class="form-label">Penanggung Jawab 2</label>
-          <select class="form-select" [(ngModel)]="editForm.id_user2">
-            <option [ngValue]="null">-- Pilih Penanggung Jawab --</option>
+          <ng-select [(ngModel)]="editForm.id_user2" placeholder="Pilih Penanggung Jawab 2" [searchable]="true" [clearable]="true">
             @for (u of getEditUser2(); track u.id_user) {
-            <option [ngValue]="u.id_user">{{ u.name }}</option>
+            <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
             }
-          </select>
+          </ng-select>
         </div>
       </div>
       <div class="modal-footer">

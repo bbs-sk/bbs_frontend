@@ -1,59 +1,109 @@
-<div class="pb-4">
-  <div class="card tbl-card mb-4">
-    <div class="d-flex align-items-center justify-content-between p-3">
-      <h3 class="mb-0">Data Barang</h3>
-      <button mat-raised-button style="background-color: #2563eb" aria-label="Tambah" (click)="openAdd()">
-        <mat-icon class="text-white">add</mat-icon>
-        <span style="padding-left: 5px; font-size: 14px; color: white">Tambah Barang</span>
+<div class="page-wrapper">
+  <!-- ───── CARD UTAMA ───── -->
+  <div class="tbl-card">
+    <!-- Header -->
+    <div class="card-header">
+      <div class="card-title">
+        <div class="title-icon">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <div>
+          <h3 class="mb-0">Data Barang</h3>
+          <p class="subtitle">Kelola inventaris barang</p>
+        </div>
+      </div>
+      <button class="btn-add" mat-raised-button (click)="openAdd()">
+        <mat-icon>add</mat-icon>
+        <span>Tambah Barang</span>
       </button>
     </div>
 
-    <div class="d-flex justify-content-end p-3">
-      <div class="search-box">
-        <input type="text" class="search-input" [(ngModel)]="searchKeyword" placeholder="Cari barang..." (keyup.enter)="searchData()" />
-        <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()">
-          <i class="bi bi-x-lg"></i>
+    <!-- Toolbar: statistik + search -->
+    <div class="toolbar">
+      <div class="toolbar-stats">
+        <div class="stat-chip">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ filteredBarang.length }}</span>
+          <span class="stat-label">barang</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-chip">
+          <span class="stat-label">Halaman</span>
+          <span class="stat-value">{{ pageIndex + 1 }}</span>
+          <span class="stat-label">dari {{ totalPages }}</span>
+        </div>
+      </div>
+
+      <div class="search-box" [class.focused]="searchFocused">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchKeyword"
+          placeholder="Cari kode atau nama barang..."
+          (keyup.enter)="searchData()"
+          (focus)="searchFocused = true"
+          (blur)="searchFocused = false"
+        />
+        <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()" aria-label="Hapus pencarian">
+          <mat-icon>close</mat-icon>
         </button>
-        <button type="button" class="btn-search" (click)="searchData()">
-          <i class="bi bi-search"></i>
+        <button type="button" class="btn-search" (click)="searchData()" aria-label="Cari">
+          <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
     </div>
 
+    <!-- Tabel -->
     <div class="table-responsive">
       <div class="table-wrapper">
-        <table class="table table-hover mb-0">
+        <table class="table mb-0">
           <thead>
             <tr>
-              <th>No</th>
+              <th class="col-no">No</th>
               <th>Kode Barang</th>
               <th>Nama Barang</th>
               <th>Satuan</th>
-              <th>Jumlah</th>
-              <th>Harga Jual</th>
-              <th>HPP</th>
+              <th class="col-num">Jumlah</th>
+              <th class="col-num">Harga Jual</th>
+              <th class="col-num">HPP</th>
               <th>Tanggal</th>
-              <th>Action</th>
+              <th class="col-action">Aksi</th>
             </tr>
           </thead>
           <tbody>
             @for (b of paginatedBarang; track b.id_barang; let i = $index) {
-            <tr>
-              <td>{{ (pageIndex * pageSize) + i + 1 }}</td>
-              <td>{{ b.kode_barang }}</td>
-              <td>{{ b.nama_barang }}</td>
-              <td>{{ b.satuan }}</td>
-              <td>{{ b.jumlah }}</td>
-              <td>{{ b.harga_jual ? 'Rp ' + b.harga_jual.toLocaleString('id-ID') : '-' }}</td>
-              <td>{{ b.hpp ? 'Rp ' + b.hpp.toLocaleString('id-ID') : '-' }}</td>
-              <td>{{ b.datetime | date:'dd MMM yyyy • HH:mm':'':'id' }}</td>
+            <tr class="table-row">
+              <td class="col-no text-muted-sm">{{ (pageIndex * pageSize) + i + 1 }}</td>
               <td>
-                <button type="button" class="btn btn-sm btn-outline-primary me-2" title="Edit" (click)="onEdit(b)">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" (click)="onDelete(b)">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <span class="badge-kode">{{ b.kode_barang }}</span>
+              </td>
+              <td class="nama-barang">{{ b.nama_barang }}</td>
+              <td>
+                <span class="badge-satuan">{{ b.satuan }}</span>
+              </td>
+              <td class="col-num">
+                <span class="qty-value">{{ b.jumlah | number }}</span>
+              </td>
+              <td class="col-num">
+                <span class="price-value">{{ b.harga_jual ? 'Rp ' + b.harga_jual.toLocaleString('id-ID') : '—' }}</span>
+              </td>
+              <td class="col-num">
+                <span class="hpp-value">{{ b.hpp ? 'Rp ' + b.hpp.toLocaleString('id-ID') : '—' }}</span>
+              </td>
+              <td class="date-cell">
+                <span class="date-main">{{ b.datetime | date:'dd MMM yyyy':'':'id' }}</span>
+                <span class="date-time">{{ b.datetime | date:'HH:mm':'':'id' }}</span>
+              </td>
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(b)" aria-label="Edit barang">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(b)" aria-label="Hapus barang">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
               </td>
             </tr>
             }
@@ -62,100 +112,151 @@
       </div>
     </div>
 
-    <div *ngIf="!isLoading && filteredBarang.length === 0" class="empty-search text-center">
-      <i class="bi bi-search"></i>
-      <div class="mt-2 fw-semibold">Tidak ada barang ditemukan</div>
-      <small class="text-muted">Coba gunakan kata kunci lain</small>
+    <!-- Empty state -->
+    <div *ngIf="!isLoading && filteredBarang.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>search_off</mat-icon>
+      </div>
+      <p class="empty-title">Barang tidak ditemukan</p>
+      <p class="empty-sub">Coba gunakan kata kunci yang berbeda</p>
+      <button class="btn-reset-search" (click)="clearSearch()">Reset Pencarian</button>
     </div>
 
-    <mat-paginator
-      [length]="filteredBarang.length"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[5, 10, 20, 50]"
-      [pageIndex]="pageIndex"
-      (page)="onPageChange($event)"
-      showFirstLastButtons
-    ></mat-paginator>
+    <!-- Paginator -->
+    <div class="paginator-wrapper">
+      <mat-paginator
+        [length]="filteredBarang.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        [pageIndex]="pageIndex"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
   </div>
 
-  <div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
+  <!-- ───── BACKDROP ───── -->
+  <div class="modal-backdrop-custom" *ngIf="showAddModal || showEditModal" (click)="showAddModal ? closeAdd() : closeEdit()"></div>
 
+  <!-- ───── MODAL TAMBAH ───── -->
   <div class="modal-custom" *ngIf="showAddModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h5 class="mb-0">Tambah Barang</h5>
-        <button type="button" class="btn-close" (click)="closeAdd()"></button>
+        <div class="modal-title-wrap">
+          <div class="modal-icon add-icon">
+            <mat-icon>add_box</mat-icon>
+          </div>
+          <h5>Tambah Barang</h5>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeAdd()" aria-label="Tutup">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
+
       <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">Kode Barang</label>
-          <input class="form-control" [(ngModel)]="addForm.kode_barang" placeholder="Masukkan Kode Barang" />
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Kode Barang</label>
+            <input class="form-control" [(ngModel)]="addForm.kode_barang" placeholder="cth. BRG-001" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Satuan</label>
+            <input class="form-control" [(ngModel)]="addForm.satuan" placeholder="cth. kg, ltr, pcs" />
+          </div>
         </div>
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Nama Barang</label>
-          <input class="form-control" [(ngModel)]="addForm.nama_barang" placeholder="Masukkan Nama Barang" />
+          <input class="form-control" [(ngModel)]="addForm.nama_barang" placeholder="Masukkan nama barang" />
         </div>
-        <div class="mb-2">
-          <label class="form-label">Satuan</label>
-          <input class="form-control" [(ngModel)]="addForm.satuan" placeholder="Masukkan Satuan Barang" />
-        </div>
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Harga Jual</label>
-          <input
-            type="text"
-            class="form-control"
-            [(ngModel)]="hargaJualDisplayAdd"
-            (input)="onHargaJualInput('add')"
-            placeholder="Masukkan Harga Jual"
-          />
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">Rp</span>
+            <input
+              type="text"
+              class="form-control has-prefix"
+              [(ngModel)]="hargaJualDisplayAdd"
+              (input)="onHargaJualInput('add')"
+              placeholder="0"
+            />
+          </div>
         </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-light" (click)="closeAdd()">Batal</button>
-        <button type="button" class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+        <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
+        <button type="button" class="btn-modal-save" (click)="submitAdd()">
+          <mat-icon>save</mat-icon>
+          Simpan Barang
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
-
+  <!-- ───── MODAL EDIT ───── -->
   <div class="modal-custom" *ngIf="showEditModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h5 class="mb-0">Edit Barang</h5>
-        <button type="button" class="btn-close" (click)="closeEdit()"></button>
+        <div class="modal-title-wrap">
+          <div class="modal-icon edit-icon">
+            <mat-icon>edit_note</mat-icon>
+          </div>
+          <h5>Edit Barang</h5>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeEdit()" aria-label="Tutup">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
+
       <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">Kode Barang</label>
-          <input class="form-control" [(ngModel)]="editForm.kode_barang" placeholder="Masukkan Kode Barang" />
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Kode Barang</label>
+            <input class="form-control" [(ngModel)]="editForm.kode_barang" placeholder="Kode Barang" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Satuan</label>
+            <input class="form-control" [(ngModel)]="editForm.satuan" placeholder="Satuan" />
+          </div>
         </div>
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Nama Barang</label>
-          <input class="form-control" [(ngModel)]="editForm.nama_barang" placeholder="Masukkan Nama Barang" />
+          <input class="form-control" [(ngModel)]="editForm.nama_barang" placeholder="Nama Barang" />
         </div>
-        <div class="mb-2">
-          <label class="form-label">Satuan</label>
-          <input class="form-control" [(ngModel)]="editForm.satuan" placeholder="Masukkan Satuan Barang" />
-        </div>
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Harga Jual</label>
-          <input
-            type="text"
-            class="form-control"
-            [(ngModel)]="hargaJualDisplayEdit"
-            (input)="onHargaJualInput('edit')"
-            placeholder="Masukkan Harga Jual"
-          />
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">Rp</span>
+            <input
+              type="text"
+              class="form-control has-prefix"
+              [(ngModel)]="hargaJualDisplayEdit"
+              (input)="onHargaJualInput('edit')"
+              placeholder="0"
+            />
+          </div>
         </div>
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">HPP</label>
-          <input type="text" class="form-control" [value]="editForm.hpp ? 'Rp ' + editForm.hpp.toLocaleString('id-ID') : '-'" disabled />
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">Rp</span>
+            <input
+              type="text"
+              class="form-control has-prefix"
+              [value]="editForm.hpp ? editForm.hpp.toLocaleString('id-ID') : '—'"
+              disabled
+            />
+          </div>
+          <p class="form-hint">HPP dihitung otomatis dari transaksi masuk</p>
         </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-light" (click)="closeEdit()">Batal</button>
-        <button type="button" class="btn btn-primary" (click)="submitEdit()">Simpan</button>
+        <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
+        <button type="button" class="btn-modal-save" (click)="submitEdit()">
+          <mat-icon>save</mat-icon>
+          Simpan Perubahan
+        </button>
       </div>
     </div>
   </div>

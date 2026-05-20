@@ -6,11 +6,12 @@ import { ApiService } from 'src/app/shared/services/api.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-project',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatPaginatorModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatPaginatorModule, MatButtonModule, MatIconModule, NgSelectModule],
   templateUrl: './project.html',
   styleUrl: './project.scss'
 })
@@ -26,7 +27,7 @@ export class Project {
   userLapangan: any[] = [];
 
   isLoading = false;
-  pageSize = 10;
+  pageSize = 20;
   pageIndex = 0;
   searchKeyword = '';
 
@@ -108,42 +109,41 @@ export class Project {
   updatePaginatedData(): void {
     const startIndex = this.pageIndex * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-
     this.paginatedProject = this.filteredProject.slice(startIndex, endIndex);
   }
 
   onPageChange(event: PageEvent): void {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
-
     this.updatePaginatedData();
   }
 
   searchData(): void {
-    const keyword = this.searchKeyword.trim().toLowerCase();
+    const keyword = this.searchKeyword.trim();
 
     if (!keyword) {
       this.filteredProject = [...this.project];
       this.pageIndex = 0;
-
       this.updatePaginatedData();
       this.cdr.detectChanges();
-
       return;
     }
 
-    this.filteredProject = this.project.filter(
-      (p: any) =>
-        (p.nama_project || '').toLowerCase().includes(keyword) ||
-        (p.alamat || '').toLowerCase().includes(keyword) ||
-        (p.user_1_nama || '').toLowerCase().includes(keyword) ||
-        (p.user_2_nama || '').toLowerCase().includes(keyword)
-    );
+    this.api.searchProject({ keyword }).subscribe({
+      next: (res: any) => {
+        this.filteredProject = Array.isArray(res) ? res : (res?.val ?? []);
+        this.pageIndex = 0;
+        this.updatePaginatedData();
+        this.cdr.detectChanges();
+      },
 
-    this.pageIndex = 0;
-
-    this.updatePaginatedData();
-    this.cdr.detectChanges();
+      error: () => {
+        this.filteredProject = [];
+        this.pageIndex = 0;
+        this.updatePaginatedData();
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   clearSearch(): void {

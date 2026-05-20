@@ -31,6 +31,8 @@ export class Barang {
   pageSize = 20;
   pageIndex = 0;
   searchKeyword = '';
+  searchFocused = false; // ← baru: untuk styling focus state search box
+
   showAddModal = false;
   showEditModal = false;
   hargaJualDisplayAdd = '';
@@ -52,12 +54,18 @@ export class Barang {
     hpp: null
   };
 
+  // ← baru: getter untuk total halaman di toolbar
+  get totalPages(): number {
+    return Math.ceil(this.filteredBarang.length / this.pageSize) || 1;
+  }
+
   ngOnInit(): void {
     this.loadBarang();
   }
 
   loadBarang(): void {
     this.isLoading = true;
+    this.loadingAnimation();
     this.api.getBarang().subscribe({
       next: (res: any) => {
         this.barang = Array.isArray(res) ? res : (res?.val ?? []);
@@ -65,6 +73,7 @@ export class Barang {
         this.pageIndex = 0;
         this.updatePaginatedData();
         this.isLoading = false;
+        Swal.close();
         this.cdr.detectChanges();
       },
       error: () => {
@@ -72,6 +81,8 @@ export class Barang {
         this.filteredBarang = [];
         this.paginatedBarang = [];
         this.isLoading = false;
+        Swal.close();
+        Swal.fire({ icon: 'error', title: 'Gagal', text: 'Data barang gagal dimuat.' });
         this.cdr.detectChanges();
       }
     });
@@ -100,17 +111,22 @@ export class Barang {
       return;
     }
 
+    this.loadingAnimation();
+
     this.api.searchBarang({ keyword }).subscribe({
       next: (res: any) => {
         this.filteredBarang = Array.isArray(res) ? res : (res?.val ?? []);
         this.pageIndex = 0;
         this.updatePaginatedData();
+        Swal.close();
         this.cdr.detectChanges();
       },
       error: () => {
         this.filteredBarang = [];
         this.pageIndex = 0;
         this.updatePaginatedData();
+        Swal.close();
+        Swal.fire({ icon: 'error', title: 'Gagal', text: 'Pencarian gagal dilakukan.' });
         this.cdr.detectChanges();
       }
     });
@@ -130,8 +146,8 @@ export class Barang {
       satuan: '',
       harga_jual: 0
     };
-    this.showAddModal = true;
     this.hargaJualDisplayAdd = '';
+    this.showAddModal = true;
   }
 
   closeAdd(): void {
@@ -144,7 +160,6 @@ export class Barang {
         const nama = this.addForm.nama_barang;
         this.closeAdd();
         this.loadBarang();
-
         Swal.fire({
           icon: 'success',
           title: 'Berhasil',
@@ -153,14 +168,9 @@ export class Barang {
           showConfirmButton: false
         });
       },
-      error: (err) => {
+      error: (err: any) => {
         const msg = err?.error?.message || err?.message || 'Barang gagal ditambahkan.';
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Gagal',
-          text: msg
-        });
+        Swal.fire({ icon: 'error', title: 'Gagal', text: msg });
       }
     });
   }
@@ -174,8 +184,8 @@ export class Barang {
       harga_jual: b.harga_jual ?? null,
       hpp: b.hpp ?? null
     };
+    this.hargaJualDisplayEdit = this.editForm.harga_jual ? Number(this.editForm.harga_jual).toLocaleString('id-ID') : '';
     this.showEditModal = true;
-    this.hargaJualDisplayEdit = this.editForm.harga_jual ? 'Rp ' + Number(this.editForm.harga_jual).toLocaleString('id-ID') : '';
   }
 
   closeEdit(): void {
@@ -188,7 +198,6 @@ export class Barang {
         const nama = this.editForm.nama_barang;
         this.closeEdit();
         this.loadBarang();
-
         Swal.fire({
           icon: 'success',
           title: 'Berhasil',
@@ -197,14 +206,9 @@ export class Barang {
           showConfirmButton: false
         });
       },
-      error: (err) => {
+      error: (err: any) => {
         const msg = err?.error?.message || err?.message || 'Barang gagal diperbarui.';
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Gagal',
-          text: msg
-        });
+        Swal.fire({ icon: 'error', title: 'Gagal', text: msg });
       }
     });
   }
@@ -224,7 +228,6 @@ export class Barang {
         this.api.deleteBarang(b.id_barang).subscribe({
           next: () => {
             this.loadBarang();
-
             Swal.fire({
               icon: 'success',
               title: 'Berhasil',
@@ -233,23 +236,13 @@ export class Barang {
               showConfirmButton: false
             });
           },
-          error: (err) => {
+          error: (err: any) => {
             const msg = err?.error?.message || err?.message || 'Barang gagal dihapus.';
-
-            Swal.fire({
-              icon: 'error',
-              title: 'Gagal',
-              text: msg
-            });
+            Swal.fire({ icon: 'error', title: 'Gagal', text: msg });
           }
         });
       }
     });
-  }
-
-  formatRupiah(value: any): string {
-    if (!value) return '';
-    return 'Rp ' + Number(value).toLocaleString('id-ID');
   }
 
   onHargaJualInput(type: 'add' | 'edit'): void {
@@ -257,11 +250,25 @@ export class Barang {
     if (type === 'add') {
       rawValue = this.hargaJualDisplayAdd.replace(/\D/g, '');
       this.addForm.harga_jual = rawValue ? Number(rawValue) : null;
-      this.hargaJualDisplayAdd = rawValue ? 'Rp ' + Number(rawValue).toLocaleString('id-ID') : '';
+      this.hargaJualDisplayAdd = rawValue ? Number(rawValue).toLocaleString('id-ID') : '';
     } else {
       rawValue = this.hargaJualDisplayEdit.replace(/\D/g, '');
       this.editForm.harga_jual = rawValue ? Number(rawValue) : null;
-      this.hargaJualDisplayEdit = rawValue ? 'Rp ' + Number(rawValue).toLocaleString('id-ID') : '';
+      this.hargaJualDisplayEdit = rawValue ? Number(rawValue).toLocaleString('id-ID') : '';
     }
+  }
+
+  loadingAnimation(): void {
+    Swal.fire({
+      text: 'Sedang Mengambil Data',
+      icon: 'info',
+      timerProgressBar: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
   }
 }
