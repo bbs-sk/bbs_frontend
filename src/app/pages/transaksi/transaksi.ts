@@ -28,7 +28,6 @@ export class Transaksi {
     jumlah: 0,
     harga_beli: 0
   };
-  editMasukForm: any = {};
   deleteMasukTarget: any = null;
 
   ngOnInit() {
@@ -104,25 +103,6 @@ export class Transaksi {
     this.api.addBrgMasuk(this.addMasukForm).subscribe({
       next: () => {
         this.closeAddMasuk();
-        this.loadBarangMasuk();
-      },
-      error: (err) => console.log(err)
-    });
-  }
-
-  onEditMasuk(data: any) {
-    this.editMasukForm = { ...data };
-    this.showEditMasukModal = true;
-  }
-
-  closeEditMasuk() {
-    this.showEditMasukModal = false;
-  }
-
-  submitEditMasuk() {
-    this.api.updateBrgMasuk(this.editMasukForm).subscribe({
-      next: () => {
-        this.closeEditMasuk();
         this.loadBarangMasuk();
       },
       error: (err) => console.log(err)

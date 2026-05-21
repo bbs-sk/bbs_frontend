@@ -1,6 +1,5 @@
-// angular import
 import { Component, output, inject, input } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 // project import
 import { SharedModule } from 'src/app/theme/shared/shared.module';
@@ -26,7 +25,7 @@ import {
   CommentOutline,
   UnorderedListOutline,
   ArrowRightOutline,
-  GithubOutline,
+  GithubOutline
 } from '@ant-design/icons-angular/icons';
 
 @Component({
@@ -44,9 +43,11 @@ export class NavRightComponent {
   windowWidth: number;
   screenFull: boolean = true;
   direction: string = 'ltr';
+  userName: string = '';
+  userRole: string = '';
 
   // constructor
-  constructor() {
+  constructor(private router: Router) {
     this.windowWidth = window.innerWidth;
     this.iconService.addIcon(
       ...[
@@ -67,9 +68,13 @@ export class NavRightComponent {
         ArrowRightOutline,
         BellOutline,
         GithubOutline,
-        WalletOutline,
+        WalletOutline
       ]
     );
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    this.userName = user.name || 'Guest';
+    this.userRole = user.role || '-';
   }
 
   profile = [
@@ -117,4 +122,12 @@ export class NavRightComponent {
       title: 'History'
     }
   ];
+
+  logout() {
+    localStorage.removeItem('token');
+
+    localStorage.removeItem('user');
+
+    this.router.navigate(['/login']);
+  }
 }

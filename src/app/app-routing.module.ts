@@ -1,12 +1,17 @@
-// angular import
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
-// Project import
 import { AdminLayout } from './theme/layouts/admin-layout/admin-layout.component';
 import { GuestLayoutComponent } from './theme/layouts/guest-layout/guest-layout.component';
+import { authGuard } from '../app/shared/services/auth.guard';
+import { redirectGuard } from '../app/shared/services/redirect.guard';
 
 const routes: Routes = [
+  {
+    path: '',
+    canActivate: [redirectGuard],
+    pathMatch: 'full',
+    children: []
+  },
   {
     path: '',
     component: AdminLayout,
@@ -18,34 +23,42 @@ const routes: Routes = [
       },
       {
         path: 'dashboard',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/dashboard/dashboard').then((c) => c.Dashboard)
       },
       {
         path: 'user',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/user/user').then((c) => c.User)
       },
       {
         path: 'project',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/project/project').then((c) => c.Project)
       },
       {
         path: 'barang',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/barang/barang').then((c) => c.Barang)
       },
       {
         path: 'invoice',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/invoice/invoice').then((c) => c.Invoice)
       },
       {
         path: 'stock',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/stock/stock').then((c) => c.Stock)
       },
       {
         path: 'transaksi',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/transaksi/transaksi').then((c) => c.Transaksi)
       },
       {
         path: 'laporan',
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/laporan/laporan').then((c) => c.Laporan)
       },
       {
@@ -68,7 +81,7 @@ const routes: Routes = [
     children: [
       {
         path: 'login',
-        loadComponent: () => import('./demo/pages/authentication/auth-login/auth-login.component').then((c) => c.AuthLoginComponent)
+        loadComponent: () => import('./pages/login/login').then((c) => c.Login)
       },
       {
         path: 'register',

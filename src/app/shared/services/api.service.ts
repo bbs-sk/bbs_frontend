@@ -24,6 +24,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/user/delete`, { id_user });
   }
 
+  login(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/user/login`, payload);
+  }
+
   searchUser(payload: any) {
     return this.http.post<any>(`${environment.apiUrl}/user/search`, payload);
   }

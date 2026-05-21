@@ -34,10 +34,6 @@
           <td>{{ m.harga_beli | number }}</td>
           <td>{{ m.datetime | date:'dd/MM/yyyy HH:mm' }}</td>
           <td class="text-center">
-            <button class="btn btn-sm btn-outline-primary me-2" (click)="onEditMasuk(m)">
-              <i class="bi bi-pencil-square"></i>
-            </button>
-
             <button class="btn btn-sm btn-outline-danger" (click)="onDeleteMasuk(m)">
               <i class="bi bi-trash"></i>
             </button>
@@ -160,45 +156,6 @@
       <button class="btn btn-light" (click)="closeAddMasuk()">Batal</button>
 
       <button class="btn btn-primary" (click)="submitAddMasuk()">Simpan</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL EDIT -->
-<div class="modal-backdrop-custom" *ngIf="showEditMasukModal"></div>
-
-<div class="modal-custom" *ngIf="showEditMasukModal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h5>Edit Barang Masuk</h5>
-
-      <button class="btn-close" (click)="closeEditMasuk()"></button>
-    </div>
-
-    <div class="modal-body">
-      <div class="mb-2">
-        <label>ID</label>
-
-        <input class="form-control" [value]="editMasukForm.id_brg_masuk" disabled />
-      </div>
-
-      <div class="mb-2">
-        <label>Jumlah</label>
-
-        <input type="number" class="form-control" [(ngModel)]="editMasukForm.jumlah" />
-      </div>
-
-      <div class="mb-2">
-        <label>Harga Beli</label>
-
-        <input type="number" class="form-control" [(ngModel)]="editMasukForm.harga_beli" />
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeEditMasuk()">Batal</button>
-
-      <button class="btn btn-primary" (click)="submitEditMasuk()">Update</button>
     </div>
   </div>
 </div>
