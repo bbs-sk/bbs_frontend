@@ -1,164 +1,388 @@
-.report-wrapper {
-  padding: 20px;
+// ─────────────────────────────────────────────────────────────────
+//  Sales Dashboard — Component Styles
+//  Font: Plus Jakarta Sans (add to index.html or angular.json)
+//  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+// ─────────────────────────────────────────────────────────────────
+
+// ── Design tokens ─────────────────────────────────────────────────
+$font: 'Plus Jakarta Sans', sans-serif;
+
+$blue: #2563eb;
+$blue-dark: #1d4ed8;
+$blue-50: #eff6ff;
+$blue-100: #dbeafe;
+
+$green: #16a34a;
+$green-50: #f0fdf4;
+
+$purple: #7c3aed;
+$purple-50: #f5f3ff;
+
+$gray-50: #f8fafc;
+$gray-100: #f1f5f9;
+$gray-200: #e2e8f0;
+$gray-300: #cbd5e1;
+$gray-400: #94a3b8;
+$gray-500: #64748b;
+$gray-700: #334155;
+$gray-900: #0f172a;
+$white: #ffffff;
+
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 20px;
+
+$shadow-sm:
+  0 1px 3px rgba(0, 0, 0, 0.07),
+  0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md:
+  0 4px 12px rgba(0, 0, 0, 0.08),
+  0 2px 4px rgba(0, 0, 0, 0.04);
+$shadow-lg:
+  0 10px 25px rgba(0, 0, 0, 0.1),
+  0 4px 10px rgba(0, 0, 0, 0.05);
+$shadow-blue: 0 6px 20px rgba(37, 99, 235, 0.32);
+
+// ── Page wrapper ──────────────────────────────────────────────────
+.sd-page {
+  font-family: $font;
+  background: $gray-50;
+  min-height: 100vh;
+  padding: 28px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  * {
+    box-sizing: border-box;
+  }
 }
 
-/* HEADER */
-.report-header {
+// ── Header ────────────────────────────────────────────────────────
+.sd-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.report-header h3 {
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.report-header p {
-  font-size: 14px;
-}
-
-/* BUTTON DOWNLOAD */
-.btn-download {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 10px 16px;
-  color: white;
-  background: #2563eb;
-  border: none;
-  border-radius: 10px;
-  transition: all 0.2s ease;
-}
-
-.btn-download:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-}
-
-/* FILTER */
-.filter-card {
-  padding: 18px;
-  margin-bottom: 22px;
-  background: white;
-  border-radius: 16px;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.04),
-    0 2px 4px rgba(0, 0, 0, 0.03);
-}
-
-.filter-group {
-  max-width: 260px;
-}
-
-/* SUMMARY GRID */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  margin-bottom: 24px;
-}
-
-/* CARD */
-.summary-card {
-  display: flex;
   gap: 16px;
-  align-items: center;
-  padding: 22px;
-  background: white;
-  border-radius: 18px;
-  transition: all 0.2s ease;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.04),
-    0 2px 4px rgba(0, 0, 0, 0.03);
+  flex-wrap: wrap;
+
+  &__title {
+    font-size: 26px;
+    font-weight: 700;
+    color: $gray-900;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: 13.5px;
+    color: $gray-500;
+    margin-top: 6px;
+    margin-bottom: 0;
+  }
 }
 
-.summary-card:hover {
-  transform: translateY(-2px);
+// ── Export button ─────────────────────────────────────────────────
+.sd-export-btn.mat-mdc-button,
+.sd-export-btn {
+  background: $blue !important;
+  color: $white !important;
+  border-radius: 10px !important;
+  padding: 0 20px !important;
+  height: 44px !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  font-family: $font !important;
+  letter-spacing: 0 !important;
+  box-shadow: $shadow-sm !important;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.18s ease !important;
+  white-space: nowrap;
+
+  .mat-icon,
+  .mat-mdc-icon {
+    font-family: 'Material Icons' !important;
+    font-size: 19px;
+    width: 19px;
+    height: 19px;
+    margin-right: 6px;
+    color: $white;
+  }
+
+  &:hover {
+    background: $blue-dark !important;
+    box-shadow: $shadow-blue !important;
+    transform: translateY(-2px) !important;
+  }
+
+  &:active {
+    transform: translateY(0) !important;
+  }
 }
 
-/* ICON */
-.card-icon {
+// ── Filter card ───────────────────────────────────────────────────
+.sd-filter-card {
+  &.mat-mdc-card {
+    border-radius: $radius-lg !important;
+    border: 1px solid $gray-200 !important;
+    box-shadow: $shadow-sm !important;
+    background: $white !important;
+  }
+
+  .mat-mdc-card-content {
+    padding: 20px 22px !important;
+  }
+}
+
+.sd-filter-label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 58px;
-  height: 58px;
-  font-size: 24px;
-  color: white;
-  border-radius: 14px;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: $gray-500;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 0 0 12px;
+
+  &__icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
 }
 
-/* COLORS */
-.transaksi .card-icon {
-  background: #2563eb;
+// ── Angular Material Range Picker ────────────────────────────────
+
+/* DATE RANGE PICKER */
+
+.sd-range-picker {
+  width: 100%;
+  max-width: 340px;
 }
 
-.keuntungan .card-icon {
-  background: #16a34a;
+::ng-deep .sd-range-picker .mat-mdc-text-field-wrapper {
+  background: #f8fafc;
+  border-radius: 10px;
 }
 
-.produk .card-icon {
-  background: #f59e0b;
+::ng-deep .sd-range-picker .mat-mdc-form-field-flex {
+  min-height: 48px;
+  align-items: center;
 }
 
-/* TEXT */
-.card-title {
-  margin-bottom: 4px;
+::ng-deep .sd-range-picker input {
   font-size: 14px;
+  color: #334155;
+}
+
+::ng-deep .sd-range-picker input::placeholder {
+  color: #94a3b8;
+}
+
+::ng-deep .sd-range-picker .mat-datepicker-toggle {
   color: #64748b;
 }
 
-.summary-card h3 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: #0f172a;
-}
+// ── Summary grid ──────────────────────────────────────────────────
+.sd-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
 
-/* TABLE */
-.table-card {
-  overflow: hidden;
-  background: white;
-  border-radius: 16px;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.04),
-    0 2px 4px rgba(0, 0, 0, 0.03);
-}
-
-.table-header {
-  padding: 18px 20px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.table-header h5 {
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.table thead th {
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  background: #f8fafc;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.table td {
-  vertical-align: middle;
-}
-
-/* RESPONSIVE */
-@media (max-width: 992px) {
-  .summary-grid {
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 540px) {
     grid-template-columns: 1fr;
   }
+}
 
-  .report-header {
-    gap: 12px;
-    align-items: flex-start;
-    flex-direction: column;
+// ── Summary card ──────────────────────────────────────────────────
+.sd-summary-card {
+  &__icon-wrap {
+    width: 46px;
+    height: 46px;
+    border-radius: $radius-md;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .mat-icon,
+    .mat-mdc-icon {
+      font-family: 'Material Icons' !important;
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    &--blue {
+      background: $blue-50;
+
+      .mat-icon,
+      .mat-mdc-icon {
+        color: $blue;
+      }
+    }
+
+    &--green {
+      background: $green-50;
+
+      .mat-icon,
+      .mat-mdc-icon {
+        color: $green;
+      }
+    }
+
+    &--purple {
+      background: $purple-50;
+
+      .mat-icon,
+      .mat-mdc-icon {
+        color: $purple;
+      }
+    }
+
+    &--orange {
+      background: #fff7ed;
+
+      .mat-icon,
+      .mat-mdc-icon {
+        color: #ea580c;
+      }
+    }
+  }
+}
+
+// ── Table card ────────────────────────────────────────────────────
+.sd-table-card {
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: $gray-900;
+
+    .mat-icon,
+    .mat-mdc-icon {
+      font-family: 'Material Icons' !important;
+      font-size: 19px;
+      width: 19px;
+      height: 19px;
+      color: $blue;
+    }
+  }
+}
+
+// ── Table wrap + mat-table ────────────────────────────────────────
+.sd-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sd-table {
+  width: 100%;
+
+  // Header row
+  .mat-mdc-header-row {
+    background: $gray-50 !important;
+    border-bottom: 1px solid $gray-200 !important;
+  }
+
+  .mat-mdc-header-cell {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    color: $gray-500 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    white-space: nowrap;
+    padding: 12px 16px !important;
+    border-bottom: none !important;
+  }
+
+  // Data rows
+  .mat-mdc-row {
+    border-bottom: 1px solid $gray-100 !important;
+    transition: background 0.14s ease;
+
+    &:last-child {
+      border-bottom: none !important;
+    }
+
+    &:hover {
+      background: $gray-50 !important;
+    }
+  }
+
+  .mat-mdc-cell {
+    padding: 12px 16px !important;
+    color: $gray-700;
+    font-size: 13px !important;
+    border-bottom: none !important;
+    white-space: nowrap;
+  }
+
+  // Column modifiers
+  .col-no {
+    width: 52px;
+  }
+  .col-center {
+    text-align: center !important;
+  }
+
+  .cell-muted {
+    color: $gray-400 !important;
+    font-size: 12px !important;
+  }
+  .cell-invoice {
+    font-family: 'Courier New', monospace !important;
+    font-size: 12px !important;
+    color: $blue !important;
+    font-weight: 600 !important;
+  }
+  .cell-name {
+    font-weight: 600 !important;
+    color: $gray-900 !important;
+  }
+  .cell-price {
+    font-weight: 700 !important;
+    color: $gray-900 !important;
+  }
+}
+
+// NG-ZORRO tag inside table
+.sd-table nz-tag .ant-tag {
+  font-family: $font !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  border-radius: 20px !important;
+  padding: 2px 10px !important;
+}
+
+// ── Empty state ───────────────────────────────────────────────────
+.sd-empty {
+  padding: 48px 20px;
+  text-align: center;
+
+  .mat-icon,
+  .mat-mdc-icon {
+    font-family: 'Material Icons' !important;
+    font-size: 52px;
+    width: 52px;
+    height: 52px;
+    color: $gray-300;
+    margin-bottom: 10px;
+  }
+
+  p {
+    color: $gray-400;
+    font-size: 14px;
+    margin: 0;
   }
 }

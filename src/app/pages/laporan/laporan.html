@@ -1,101 +1,223 @@
-<div class="pb-4">
-  <div class="card tbl-card mb-4">
-    <div class="d-flex align-items-center justify-content-between p-3">
-      <h3 class="mb-0">Laporan Penjualan</h3>
-      <button mat-raised-button style="background-color: #2563eb" aria-label="Tambah">
-        <mat-icon class="text-white">download</mat-icon>
-        <span style="padding-left: 5px; font-size: 14px; color: white">Export Laporan Penjualan</span>
-      </button>
+<section class="sd-page">
+  <!-- ═══════════════════════════════════════════════════════ HEADER -->
+  <div class="sd-header">
+    <div class="sd-header__left">
+      <h1 class="sd-header__title">Laporan Penjualan</h1>
+      <p class="sd-header__desc">Monitoring dan analisis data penjualan berdasarkan periode tertentu</p>
     </div>
-    <div class="filter-group">
-      <label class="form-label">Pilih Tanggal</label>
-      <input type="date" class="form-control" />
-    </div>
+
+    <button
+      mat-flat-button
+      class="sd-export-btn"
+      (click)="onExport()"
+      [disabled]="filteredTransactions.length === 0"
+      matTooltip="Export ke file Excel / PDF"
+    >
+      <mat-icon>download</mat-icon>
+      Export Laporan Penjualan
+    </button>
   </div>
-  <div class="summary-grid">
-    <!-- TOTAL TRANSAKSI -->
-    <div class="summary-card transaksi">
-      <div class="card-icon">
-        <i class="bi bi-receipt"></i>
-      </div>
 
-      <div>
-        <p class="card-title">Total Transaksi</p>
-        <h3>120</h3>
-      </div>
-    </div>
+  <!-- ═══════════════════════════════════════════════════════ FILTER -->
+  <mat-card class="sd-filter-card" appearance="outlined">
+    <mat-card-content>
+      <p class="sd-filter-label">
+        <mat-icon class="sd-filter-label__icon">filter_list</mat-icon>
+        Pilih Tanggal
+      </p>
 
-    <!-- TOTAL KEUNTUNGAN -->
-    <div class="summary-card keuntungan">
-      <div class="card-icon">
-        <i class="bi bi-cash-stack"></i>
-      </div>
+      <form [formGroup]="filterForm">
+        <mat-form-field appearance="outline" class="sd-range-picker">
+          <mat-date-range-input [rangePicker]="picker">
+            <input
+              matStartDate
+              formControlName="startDate"
+              placeholder="Tanggal Awal"
+              (keydown)="isTyping = true"
+              (keyup.enter)="onManualEnter()"
+            />
 
-      <div>
-        <p class="card-title">Total Penjualan</p>
-        <h3>Rp 12.500.000</h3>
-      </div>
-    </div>
+            <input
+              matEndDate
+              formControlName="endDate"
+              placeholder="Tanggal Akhir"
+              (keydown)="isTyping = true"
+              (keyup.enter)="onManualEnter()"
+            />
+          </mat-date-range-input>
 
-    <!-- PRODUK TERJUAL -->
-    <div class="summary-card produk">
-      <div class="card-icon">
-        <i class="bi bi-box-seam"></i>
-      </div>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
 
-      <div>
-        <p class="card-title">Produk Terjual</p>
-        <h3>540</h3>
-      </div>
-    </div>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ═══════════════════════════════════════════════════════ SUMMARY -->
+  <div class="sd-summary-grid">
+    <!-- Total Transaksi -->
+    <mat-card class="sd-summary-card sd-summary-card--blue" appearance="outlined">
+      <mat-card-content class="sd-summary-card__inner">
+        <div class="sd-summary-card__icon-wrap sd-summary-card__icon-wrap--blue">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+
+        <div class="sd-summary-card__info">
+          <span class="sd-summary-card__label">Total Transaksi</span>
+
+          <span class="sd-summary-card__value">{{ summary.totalTransaksi | number }}</span>
+
+          <span class="sd-summary-card__sub">transaksi tercatat</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Total Penjualan -->
+    <mat-card class="sd-summary-card sd-summary-card--green" appearance="outlined">
+      <mat-card-content class="sd-summary-card__inner">
+        <div class="sd-summary-card__icon-wrap sd-summary-card__icon-wrap--green">
+          <mat-icon>payments</mat-icon>
+        </div>
+
+        <div class="sd-summary-card__info">
+          <span class="sd-summary-card__label">Total Penjualan</span>
+
+          <span class="sd-summary-card__value sd-summary-card__value--sm">{{ formatRupiah(summary.totalPenjualan) }}</span>
+
+          <span class="sd-summary-card__sub">pendapatan periode ini</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Produk Terjual -->
+    <mat-card class="sd-summary-card sd-summary-card--purple" appearance="outlined">
+      <mat-card-content class="sd-summary-card__inner">
+        <div class="sd-summary-card__icon-wrap sd-summary-card__icon-wrap--purple">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+
+        <div class="sd-summary-card__info">
+          <span class="sd-summary-card__label">Produk Terjual</span>
+
+          <span class="sd-summary-card__value">{{ summary.produkTerjual | number }}</span>
+
+          <span class="sd-summary-card__sub">unit terjual</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Total Profit -->
+    <mat-card class="sd-summary-card sd-summary-card--orange" appearance="outlined">
+      <mat-card-content class="sd-summary-card__inner">
+        <div class="sd-summary-card__icon-wrap sd-summary-card__icon-wrap--orange">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+
+        <div class="sd-summary-card__info">
+          <span class="sd-summary-card__label">Total Keuntungan</span>
+
+          <span class="sd-summary-card__value sd-summary-card__value--sm">{{ formatRupiah(summary.totalKeuntungan) }}</span>
+
+          <span class="sd-summary-card__sub">profit penjualan</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
-  <div class="table-card">
-    <div class="table-header">
-      <h5 class="mb-0">Daftar Transaksi</h5>
-    </div>
 
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Invoice</th>
-            <th>Tanggal</th>
-            <th>Total Produk</th>
-            <th>Total Harga</th>
-            <th>Keuntungan</th>
-          </tr>
-        </thead>
+  <!-- ═══════════════════════════════════════════════════════ TABLE -->
+  <mat-card class="sd-table-card" appearance="outlined">
+    <mat-card-header class="sd-table-card__header">
+      <div class="sd-table-card__title">
+        <mat-icon>table_chart</mat-icon>
+        Detail Transaksi
+      </div>
 
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>INV-001</td>
-            <td>19 Mei 2026</td>
-            <td>12</td>
-            <td>Rp 1.200.000</td>
-            <td>Rp 320.000</td>
-          </tr>
+      <span class="sd-table-card__badge">{{ filteredTransactions.length }} data</span>
+    </mat-card-header>
 
-          <tr>
-            <td>2</td>
-            <td>INV-002</td>
-            <td>19 Mei 2026</td>
-            <td>8</td>
-            <td>Rp 870.000</td>
-            <td>Rp 210.000</td>
-          </tr>
+    <mat-card-content class="sd-table-card__content">
+      <!-- EMPTY STATE -->
+      <div class="sd-empty" *ngIf="filteredTransactions.length === 0">
+        <mat-icon>inventory_2</mat-icon>
 
-          <tr>
-            <td>3</td>
-            <td>INV-003</td>
-            <td>19 Mei 2026</td>
-            <td>15</td>
-            <td>Rp 1.750.000</td>
-            <td>Rp 500.000</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+        <p>Tidak ada transaksi dalam periode ini</p>
+      </div>
+
+      <!-- TABLE -->
+      <div class="sd-table-wrap" *ngIf="filteredTransactions.length > 0">
+        <table mat-table [dataSource]="filteredTransactions" class="sd-table">
+          <!-- NO -->
+          <ng-container matColumnDef="no">
+            <th mat-header-cell *matHeaderCellDef class="col-no">No</th>
+
+            <td mat-cell *matCellDef="let row" class="col-no cell-muted">{{ getRowIndex(row) }}</td>
+          </ng-container>
+
+          <!-- TANGGAL -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Tanggal</th>
+
+            <td mat-cell *matCellDef="let row">{{ row.date.split('-').reverse().join('-') }}</td>
+          </ng-container>
+
+          <!-- INVOICE -->
+          <ng-container matColumnDef="invoice">
+            <th mat-header-cell *matHeaderCellDef>Invoice</th>
+
+            <td mat-cell *matCellDef="let row" class="cell-invoice">{{ row.id_invoice }}</td>
+          </ng-container>
+
+          <!-- PROJECT -->
+          <ng-container matColumnDef="project">
+            <th mat-header-cell *matHeaderCellDef>Nama Project</th>
+
+            <td mat-cell *matCellDef="let row" class="cell-name">{{ row.nama_project }}</td>
+          </ng-container>
+
+          <!-- TOTAL BARANG -->
+          <ng-container matColumnDef="totalItems">
+            <th mat-header-cell *matHeaderCellDef class="col-center">Total Barang</th>
+
+            <td mat-cell *matCellDef="let row" class="col-center">{{ row.total_items }} pcs</td>
+          </ng-container>
+
+          <!-- TOTAL HARGA -->
+          <ng-container matColumnDef="totalPrice">
+            <th mat-header-cell *matHeaderCellDef>Total Harga</th>
+
+            <td mat-cell *matCellDef="let row" class="cell-price">{{ formatRupiah(row.total_price) }}</td>
+          </ng-container>
+
+          <!-- PROFIT -->
+          <ng-container matColumnDef="profit">
+            <th mat-header-cell *matHeaderCellDef>Keuntungan</th>
+
+            <td mat-cell *matCellDef="let row" class="cell-price">{{ formatRupiah(row.total_profit) }}</td>
+          </ng-container>
+
+          <!-- STATUS -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="col-center">Status</th>
+
+            <td mat-cell *matCellDef="let row" class="col-center">
+              <span
+                class="status-badge"
+                [ngClass]="{
+                  'status-success': row.status_pembayaran?.toLowerCase() === 'lunas',
+                  'status-warning': row.status_pembayaran?.toLowerCase() === 'pending'
+                }"
+              >
+                {{ row.status_pembayaran }}
+              </span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</section>

@@ -179,6 +179,11 @@ export class ApiService {
   getBrgKeluarId(id_invoice: number) {
     return this.http.post<any>(`${environment.apiUrl}/brgKeluar/invoice`, { id_invoice });
   }
+
+  laporanPenjualan() {
+    return this.http.get<any>(`${environment.apiUrl}/brgKeluar/laporan_penjualan`);
+  }
+
   getRetur() {
     return this.http.post<any>(`${environment.apiUrl}/retur/`, {});
   }
