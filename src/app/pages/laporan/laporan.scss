@@ -1,210 +1,236 @@
-// ─────────────────────────────────────────────────────────────────
-//  Sales Dashboard — Component Styles
-//  Font: Plus Jakarta Sans (add to index.html or angular.json)
-//  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-// ─────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Variables
+// ─────────────────────────────────────────────
+$navy: #185fa5;
+$navy-hover: #0c447c;
+$navy-dark: #042c53;
+$navy-light: #e6f1fb;
+$navy-mid: #b5d4f4;
 
-// ── Design tokens ─────────────────────────────────────────────────
-$font: 'Plus Jakarta Sans', sans-serif;
+$green: #3b6d11;
+$green-light: #eaf3de;
 
-$blue: #2563eb;
-$blue-dark: #1d4ed8;
-$blue-50: #eff6ff;
-$blue-100: #dbeafe;
+$purple: #534ab7;
+$purple-light: #eeedfe;
 
-$green: #16a34a;
-$green-50: #f0fdf4;
+$amber: #854f0b;
+$amber-light: #faeeda;
 
-$purple: #7c3aed;
-$purple-50: #f5f3ff;
+$danger: #a32d2d;
+$danger-light: #fcebeb;
 
-$gray-50: #f8fafc;
-$gray-100: #f1f5f9;
-$gray-200: #e2e8f0;
-$gray-300: #cbd5e1;
-$gray-400: #94a3b8;
-$gray-500: #64748b;
-$gray-700: #334155;
-$gray-900: #0f172a;
-$white: #ffffff;
+$border: #e2e8f0;
+$border-light: #f1f5f9;
+$surface: #f8fafc;
+$muted: #64748b;
+$muted-light: #94a3b8;
+$text-main: #0f172a;
+$text-body: #334155;
 
-$radius-sm: 8px;
-$radius-md: 12px;
-$radius-lg: 16px;
-$radius-xl: 20px;
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
 
-$shadow-sm:
-  0 1px 3px rgba(0, 0, 0, 0.07),
-  0 1px 2px rgba(0, 0, 0, 0.05);
-$shadow-md:
-  0 4px 12px rgba(0, 0, 0, 0.08),
-  0 2px 4px rgba(0, 0, 0, 0.04);
-$shadow-lg:
-  0 10px 25px rgba(0, 0, 0, 0.1),
-  0 4px 10px rgba(0, 0, 0, 0.05);
-$shadow-blue: 0 6px 20px rgba(37, 99, 235, 0.32);
-
-// ── Page wrapper ──────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Page
+// ─────────────────────────────────────────────
 .sd-page {
-  font-family: $font;
-  background: $gray-50;
-  min-height: 100vh;
-  padding: 28px 24px 48px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-
-  * {
-    box-sizing: border-box;
-  }
+  padding: 4px 0 32px;
 }
 
-// ── Header ────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Header
+// ─────────────────────────────────────────────
 .sd-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  padding: 20px 24px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
 
   &__title {
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 700;
-    color: $gray-900;
-    letter-spacing: -0.4px;
+    color: $text-main;
+    letter-spacing: -0.3px;
     line-height: 1.2;
     margin: 0;
   }
 
   &__desc {
-    font-size: 13.5px;
-    color: $gray-500;
-    margin-top: 6px;
-    margin-bottom: 0;
+    font-size: 13px;
+    color: $muted;
+    margin: 5px 0 0;
   }
 }
 
-// ── Export button ─────────────────────────────────────────────────
-.sd-export-btn.mat-mdc-button,
-.sd-export-btn {
-  background: $blue !important;
-  color: $white !important;
-  border-radius: 10px !important;
-  padding: 0 20px !important;
+// ─────────────────────────────────────────────
+// Export button
+// ─────────────────────────────────────────────
+.sd-export-btn,
+.sd-export-btn.mat-mdc-button {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px !important;
   height: 44px !important;
-  font-size: 13.5px !important;
+  background: $navy !important;
+  color: #fff !important;
+  border-radius: $radius-md !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
-  font-family: $font !important;
-  letter-spacing: 0 !important;
-  box-shadow: $shadow-sm !important;
+  box-shadow: 0 2px 8px rgba($navy, 0.25) !important;
   transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease,
-    background 0.18s ease !important;
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s !important;
   white-space: nowrap;
 
-  .mat-icon,
-  .mat-mdc-icon {
-    font-family: 'Material Icons' !important;
-    font-size: 19px;
-    width: 19px;
-    height: 19px;
-    margin-right: 6px;
-    color: $white;
+  mat-icon,
+  .mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    color: #fff !important;
   }
 
-  &:hover {
-    background: $blue-dark !important;
-    box-shadow: $shadow-blue !important;
-    transform: translateY(-2px) !important;
+  &:hover:not([disabled]) {
+    background: $navy-hover !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba($navy, 0.3) !important;
   }
 
   &:active {
     transform: translateY(0) !important;
   }
+
+  &[disabled] {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+  }
 }
 
-// ── Filter card ───────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Filter card
+// ─────────────────────────────────────────────
 .sd-filter-card {
-  &.mat-mdc-card {
-    border-radius: $radius-lg !important;
-    border: 1px solid $gray-200 !important;
-    box-shadow: $shadow-sm !important;
-    background: $white !important;
-  }
-
-  .mat-mdc-card-content {
-    padding: 20px 22px !important;
-  }
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  padding: 18px 24px;
 }
 
 .sd-filter-label {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 700;
-  color: $gray-500;
+  color: $navy-hover;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.06em;
   margin: 0 0 12px;
 
-  &__icon {
-    font-size: 15px;
-    width: 15px;
-    height: 15px;
+  mat-icon {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    color: $navy;
   }
 }
 
-// ── Angular Material Range Picker ────────────────────────────────
-
-/* DATE RANGE PICKER */
-
+// ── Date range picker styles ──
 .sd-range-picker {
   width: 100%;
-  max-width: 340px;
+  max-width: 360px;
 }
 
-::ng-deep .sd-range-picker .mat-mdc-text-field-wrapper {
-  background: #f8fafc;
-  border-radius: 10px;
+::ng-deep .sd-range-picker {
+  .mat-mdc-text-field-wrapper {
+    background: $surface;
+    border-radius: $radius-md !important;
+  }
+
+  .mat-mdc-form-field-flex {
+    min-height: 46px;
+    align-items: center;
+  }
+
+  input {
+    font-size: 13.5px;
+    color: $text-body;
+  }
+
+  input::placeholder {
+    color: $muted-light;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: $border !important;
+  }
+
+  &:hover .mdc-notched-outline__leading,
+  &:hover .mdc-notched-outline__notch,
+  &:hover .mdc-notched-outline__trailing {
+    border-color: $navy-mid !important;
+  }
+
+  .mat-datepicker-toggle {
+    color: $muted;
+  }
+
+  .mdc-notched-outline--upgraded .mdc-notched-outline__leading,
+  .mdc-notched-outline--upgraded .mdc-notched-outline__notch,
+  .mdc-notched-outline--upgraded .mdc-notched-outline__trailing {
+    border-color: $navy !important;
+  }
 }
 
-::ng-deep .sd-range-picker .mat-mdc-form-field-flex {
-  min-height: 48px;
-  align-items: center;
-}
-
-::ng-deep .sd-range-picker input {
-  font-size: 14px;
-  color: #334155;
-}
-
-::ng-deep .sd-range-picker input::placeholder {
-  color: #94a3b8;
-}
-
-::ng-deep .sd-range-picker .mat-datepicker-toggle {
-  color: #64748b;
-}
-
-// ── Summary grid ──────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Summary grid
+// ─────────────────────────────────────────────
 .sd-summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
 
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
   }
-  @media (max-width: 540px) {
+  @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }
 }
 
-// ── Summary card ──────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Summary card
+// ─────────────────────────────────────────────
 .sd-summary-card {
-  &__icon-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  transition: box-shadow 0.15s;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  // Icon container
+  &__icon {
     width: 46px;
     height: 46px;
     border-radius: $radius-md;
@@ -213,176 +239,314 @@ $shadow-blue: 0 6px 20px rgba(37, 99, 235, 0.32);
     align-items: center;
     justify-content: center;
 
-    .mat-icon,
-    .mat-mdc-icon {
-      font-family: 'Material Icons' !important;
-      font-size: 22px;
-      width: 22px;
-      height: 22px;
+    mat-icon {
+      font-size: 22px !important;
+      width: 22px !important;
+      height: 22px !important;
     }
 
-    &--blue {
-      background: $blue-50;
-
-      .mat-icon,
-      .mat-mdc-icon {
-        color: $blue;
+    &.blue {
+      background: $navy-light;
+      mat-icon {
+        color: $navy;
       }
     }
-
-    &--green {
-      background: $green-50;
-
-      .mat-icon,
-      .mat-mdc-icon {
+    &.green {
+      background: $green-light;
+      mat-icon {
         color: $green;
       }
     }
-
-    &--purple {
-      background: $purple-50;
-
-      .mat-icon,
-      .mat-mdc-icon {
+    &.purple {
+      background: $purple-light;
+      mat-icon {
         color: $purple;
       }
     }
-
-    &--orange {
-      background: #fff7ed;
-
-      .mat-icon,
-      .mat-mdc-icon {
-        color: #ea580c;
+    &.amber {
+      background: $amber-light;
+      mat-icon {
+        color: $amber;
       }
     }
   }
-}
 
-// ── Table card ────────────────────────────────────────────────────
-.sd-table-card {
-  &__title {
+  &__info {
+    flex: 1;
+    min-width: 0;
     display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 15.5px;
-    font-weight: 700;
-    color: $gray-900;
+    flex-direction: column;
+    gap: 1px;
+  }
 
-    .mat-icon,
-    .mat-mdc-icon {
-      font-family: 'Material Icons' !important;
-      font-size: 19px;
-      width: 19px;
-      height: 19px;
-      color: $blue;
+  &__label {
+    font-size: 11.5px;
+    color: $muted;
+    font-weight: 500;
+  }
+
+  &__value {
+    font-size: 22px;
+    font-weight: 700;
+    color: $text-main;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.value-sm {
+      font-size: 15px;
     }
+  }
+
+  &__sub {
+    font-size: 11px;
+    color: $muted-light;
   }
 }
 
-// ── Table wrap + mat-table ────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Table card
+// ─────────────────────────────────────────────
+.sd-table-card {
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid $border;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: $text-main;
+
+    mat-icon {
+      font-size: 19px !important;
+      width: 19px !important;
+      height: 19px !important;
+      color: $navy;
+    }
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 12px;
+    background: $navy-light;
+    color: $navy-hover;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  &__footer {
+    padding: 12px 24px;
+    border-top: 1px solid $border-light;
+    background: $surface;
+    font-size: 12px;
+    color: $muted;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Table wrap
+// ─────────────────────────────────────────────
 .sd-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
+// ─────────────────────────────────────────────
+// Mat Table
+// ─────────────────────────────────────────────
 .sd-table {
   width: 100%;
 
-  // Header row
+  // ── Header: navy solid ──
   .mat-mdc-header-row {
-    background: $gray-50 !important;
-    border-bottom: 1px solid $gray-200 !important;
+    background: $surface !important;
+    border-bottom: 1px solid $border !important;
   }
 
   .mat-mdc-header-cell {
-    font-size: 11.5px !important;
-    font-weight: 700 !important;
-    color: $gray-500 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.7px;
+    padding: 10px 16px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
     white-space: nowrap;
-    padding: 12px 16px !important;
-    border-bottom: none !important;
+    border-bottom: 1px solid $border !important;
   }
 
-  // Data rows
+  // ── Rows ──
   .mat-mdc-row {
-    border-bottom: 1px solid $gray-100 !important;
-    transition: background 0.14s ease;
+    border-bottom: 1px solid $border-light !important;
+    transition: background 0.12s ease;
 
     &:last-child {
       border-bottom: none !important;
     }
 
     &:hover {
-      background: $gray-50 !important;
+      background: $navy-light !important;
     }
   }
 
   .mat-mdc-cell {
-    padding: 12px 16px !important;
-    color: $gray-700;
+    padding: 13px 16px !important;
+    color: $text-body;
     font-size: 13px !important;
     border-bottom: none !important;
     white-space: nowrap;
   }
 
-  // Column modifiers
   .col-no {
     width: 52px;
   }
+
   .col-center {
     text-align: center !important;
   }
 
   .cell-muted {
-    color: $gray-400 !important;
+    color: $muted-light !important;
     font-size: 12px !important;
   }
-  .cell-invoice {
-    font-family: 'Courier New', monospace !important;
-    font-size: 12px !important;
-    color: $blue !important;
-    font-weight: 600 !important;
+
+  .badge-invoice {
+    display: inline-block;
+    padding: 3px 9px;
+    background: $navy-light;
+    color: $navy-hover;
+    border-radius: $radius-sm;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    font-family: 'Courier New', monospace;
   }
+
   .cell-name {
-    font-weight: 600 !important;
-    color: $gray-900 !important;
+    color: $text-main !important;
   }
+
   .cell-price {
-    font-weight: 700 !important;
-    color: $gray-900 !important;
+    color: $text-main !important;
+  }
+
+  .cell-profit {
+    color: $text-main !important;
   }
 }
 
-// NG-ZORRO tag inside table
-.sd-table nz-tag .ant-tag {
-  font-family: $font !important;
-  font-size: 11.5px !important;
-  font-weight: 600 !important;
-  border-radius: 20px !important;
-  padding: 2px 10px !important;
+// ─────────────────────────────────────────────
+// Status badge
+// ─────────────────────────────────────────────
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+
+  &.status-lunas {
+    background: $green-light;
+    color: $green;
+  }
+
+  &.status-pending {
+    background: $amber-light;
+    color: $amber;
+  }
 }
 
-// ── Empty state ───────────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Empty state
+// ─────────────────────────────────────────────
 .sd-empty {
-  padding: 48px 20px;
+  padding: 56px 20px;
   text-align: center;
 
-  .mat-icon,
-  .mat-mdc-icon {
-    font-family: 'Material Icons' !important;
-    font-size: 52px;
-    width: 52px;
-    height: 52px;
-    color: $gray-300;
-    margin-bottom: 10px;
+  &__icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: $surface;
+    border: 1px solid $border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+
+    mat-icon {
+      font-size: 28px !important;
+      width: 28px !important;
+      height: 28px !important;
+      color: $muted-light;
+    }
   }
 
-  p {
-    color: $gray-400;
-    font-size: 14px;
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: $text-main;
+    margin: 0 0 4px;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: $muted;
     margin: 0;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Responsive
+// ─────────────────────────────────────────────
+@media (max-width: 640px) {
+  .sd-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sd-export-btn {
+    width: 100%;
+    justify-content: center !important;
+  }
+}
+
+// ─────────────────────────────────────────────
+// HEADER TITLE WITH ICON
+// ─────────────────────────────────────────────
+.sd-header__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sd-header__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: $radius-md;
+  background: $navy-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    color: $navy !important;
   }
 }

@@ -29,7 +29,9 @@ export class Project {
   isLoading = false;
   pageSize = 20;
   pageIndex = 0;
+
   searchKeyword = '';
+  searchFocused = false;
 
   showAddModal = false;
   showEditModal = false;
@@ -48,6 +50,10 @@ export class Project {
     id_user1: null,
     id_user2: null
   };
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredProject.length / this.pageSize) || 1;
+  }
 
   ngOnInit(): void {
     this.loadProject();
@@ -70,26 +76,49 @@ export class Project {
     return this.userLapangan.filter((u) => u.id_user !== this.editForm.id_user1);
   }
 
-  loadProject(): void {
+  loadProject(showLoading: boolean = true): void {
     this.isLoading = true;
+
+    if (showLoading) {
+      this.loadingAnimation();
+    }
 
     this.api.getProject().subscribe({
       next: (res: any) => {
         this.project = Array.isArray(res) ? res : (res?.val ?? []);
+
         this.filteredProject = [...this.project];
+
         this.pageIndex = 0;
 
         this.updatePaginatedData();
 
         this.isLoading = false;
+
+        if (showLoading) {
+          Swal.close();
+        }
+
         this.cdr.detectChanges();
       },
+
       error: () => {
         this.project = [];
         this.filteredProject = [];
         this.paginatedProject = [];
 
         this.isLoading = false;
+
+        if (showLoading) {
+          Swal.close();
+        }
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Data proyek gagal dimuat.'
+        });
+
         this.cdr.detectChanges();
       }
     });
@@ -100,6 +129,7 @@ export class Project {
       next: (res: any) => {
         this.userLapangan = Array.isArray(res) ? res : (res?.val ?? []);
       },
+
       error: () => {
         this.userLapangan = [];
       }
@@ -109,12 +139,14 @@ export class Project {
   updatePaginatedData(): void {
     const startIndex = this.pageIndex * this.pageSize;
     const endIndex = startIndex + this.pageSize;
+
     this.paginatedProject = this.filteredProject.slice(startIndex, endIndex);
   }
 
   onPageChange(event: PageEvent): void {
     this.pageIndex = event.pageIndex;
     this.pageSize = event.pageSize;
+
     this.updatePaginatedData();
   }
 
@@ -123,24 +155,46 @@ export class Project {
 
     if (!keyword) {
       this.filteredProject = [...this.project];
+
       this.pageIndex = 0;
+
       this.updatePaginatedData();
+
       this.cdr.detectChanges();
+
       return;
     }
+
+    this.loadingAnimation();
 
     this.api.searchProject({ keyword }).subscribe({
       next: (res: any) => {
         this.filteredProject = Array.isArray(res) ? res : (res?.val ?? []);
+
         this.pageIndex = 0;
+
         this.updatePaginatedData();
+
+        Swal.close();
+
         this.cdr.detectChanges();
       },
 
       error: () => {
         this.filteredProject = [];
+
         this.pageIndex = 0;
+
         this.updatePaginatedData();
+
+        Swal.close();
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Pencarian gagal dilakukan.'
+        });
+
         this.cdr.detectChanges();
       }
     });
@@ -148,7 +202,9 @@ export class Project {
 
   clearSearch(): void {
     this.searchKeyword = '';
+
     this.filteredProject = [...this.project];
+
     this.pageIndex = 0;
 
     this.updatePaginatedData();
@@ -175,17 +231,23 @@ export class Project {
         const nama = this.addForm.nama_project;
 
         this.closeAdd();
-        this.loadProject();
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: `Proyek "${nama}" berhasil ditambahkan.`,
-          timer: 2500,
-          showConfirmButton: false
-        });
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: `Proyek "${nama}" berhasil ditambahkan.`,
+            timer: 2500,
+            showConfirmButton: false
+          }).then(() => {
+            this.loadProject(false);
+          });
+        }, 100);
       },
-      error: (err) => {
+
+      error: (err: any) => {
         const msg = err?.error?.message || err?.message || 'Proyek gagal ditambahkan.';
 
         Swal.fire({
@@ -198,12 +260,17 @@ export class Project {
   }
 
   onEdit(p: any): void {
+    const user1Exist = this.userLapangan.some((u) => u.id_user === p.id_user1);
+
+    const user2Exist = this.userLapangan.some((u) => u.id_user === p.id_user2);
+
     this.editForm = {
       id_project: p.id_project,
       nama_project: p.nama_project ?? '',
       alamat: p.alamat ?? '',
-      id_user1: p.id_user1 ?? null,
-      id_user2: p.id_user2 ?? null
+
+      id_user1: user1Exist ? p.id_user1 : null,
+      id_user2: user2Exist ? p.id_user2 : null
     };
 
     this.showEditModal = true;
@@ -219,17 +286,23 @@ export class Project {
         const nama = this.editForm.nama_project;
 
         this.closeEdit();
-        this.loadProject();
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: `Proyek "${nama}" berhasil diperbarui.`,
-          timer: 3000,
-          showConfirmButton: false
-        });
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: `Proyek "${nama}" berhasil diperbarui.`,
+            timer: 3000,
+            showConfirmButton: false
+          }).then(() => {
+            this.loadProject(false);
+          });
+        }, 100);
       },
-      error: (err) => {
+
+      error: (err: any) => {
         const msg = err?.error?.message || err?.message || 'Proyek gagal diperbarui.';
 
         Swal.fire({
@@ -255,17 +328,18 @@ export class Project {
       if (result.isConfirmed) {
         this.api.deleteProject(p.id_project).subscribe({
           next: () => {
-            this.loadProject();
-
             Swal.fire({
               icon: 'success',
               title: 'Berhasil',
               text: `Proyek "${p.nama_project}" berhasil dihapus.`,
               timer: 2500,
               showConfirmButton: false
+            }).then(() => {
+              this.loadProject(false);
             });
           },
-          error: (err) => {
+
+          error: (err: any) => {
             const msg = err?.error?.message || err?.message || 'Proyek gagal dihapus.';
 
             Swal.fire({
@@ -275,6 +349,20 @@ export class Project {
             });
           }
         });
+      }
+    });
+  }
+
+  loadingAnimation(): void {
+    Swal.fire({
+      text: 'Sedang Mengambil Data',
+      icon: 'info',
+      timerProgressBar: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
       }
     });
   }

@@ -1,133 +1,599 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
+import { CommonModule, registerLocaleData } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+import localeId from '@angular/common/locales/id';
+
+import Swal from 'sweetalert2';
+
 import { ApiService } from 'src/app/shared/services/api.service';
+
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+
+import { NgSelectModule } from '@ng-select/ng-select';
+
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+
+registerLocaleData(localeId);
 
 @Component({
   selector: 'app-transaksi',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, NgSelectModule, MatPaginatorModule],
   templateUrl: './transaksi.html',
   styleUrl: './transaksi.scss'
 })
-export class Transaksi {
+export class Transaksi implements OnInit {
   constructor(
     private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
 
+  // =====================================================
+  // DATA
+  // =====================================================
+
   barangMasuk: any[] = [];
   barangKeluar: any[] = [];
   retur: any[] = [];
   barangList: any[] = [];
+  selectedView: string = 'all';
+
+  // =====================================================
+  // FILTERED
+  // =====================================================
+
+  filteredBarangMasuk: any[] = [];
+  filteredBarangKeluar: any[] = [];
+  filteredRetur: any[] = [];
+
+  // =====================================================
+  // PAGINATED
+  // =====================================================
+
+  paginatedBarangMasuk: any[] = [];
+  paginatedBarangKeluar: any[] = [];
+  paginatedRetur: any[] = [];
+
+  // =====================================================
+  // STATE
+  // =====================================================
+
+  isLoading = false;
+
   showAddMasukModal = false;
-  showEditMasukModal = false;
-  showDeleteMasukModal = false;
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
+  searchMasukKeyword = '';
+
+  searchKeluarKeyword = '';
+
+  searchReturKeyword = '';
+
+  searchMasukFocused = false;
+
+  searchKeluarFocused = false;
+
+  searchReturFocused = false;
+  // =====================================================
+  // PAGINATION
+  // =====================================================
+
+  pageSizeMasuk = 10;
+  pageIndexMasuk = 0;
+
+  pageSizeKeluar = 10;
+  pageIndexKeluar = 0;
+
+  pageSizeRetur = 10;
+  pageIndexRetur = 0;
+
+  // =====================================================
+  // FORM
+  // =====================================================
+
+  hargaBeliDisplay = '';
+
   addMasukForm: any = {
     id_barang: null,
-    jumlah: 0,
-    harga_beli: 0
+    jumlah: null,
+    harga_beli: null
   };
-  deleteMasukTarget: any = null;
 
-  ngOnInit() {
-    this.loadBarang();
-    this.loadBarangMasuk();
-    this.loadBarangKeluar();
-    this.loadRetur();
+  // =====================================================
+  // GETTER
+  // =====================================================
+
+  get totalPagesMasuk(): number {
+    return Math.ceil(this.filteredBarangMasuk.length / this.pageSizeMasuk) || 1;
   }
 
-  loadBarang() {
-    this.api.getBarang().subscribe({
-      next: (res: any) => {
-        this.barangList = Array.isArray(res) ? res : (res?.val ?? []);
-      },
-      error: (err) => console.log(err)
-    });
+  get totalPagesKeluar(): number {
+    return Math.ceil(this.filteredBarangKeluar.length / this.pageSizeKeluar) || 1;
   }
 
-  loadBarangMasuk() {
-    this.api.getBrgMasuk().subscribe({
+  get totalPagesRetur(): number {
+    return Math.ceil(this.filteredRetur.length / this.pageSizeRetur) || 1;
+  }
+
+  // =====================================================
+  // INIT
+  // =====================================================
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  // =====================================================
+  // LOAD DATA
+  // =====================================================
+
+  loadData(showLoading: boolean = true): void {
+    this.isLoading = true;
+
+    if (showLoading) {
+      this.loadingAnimation();
+    }
+
+    Promise.all([
+      this.api.getBarang().toPromise(),
+      this.api.getBrgMasuk().toPromise(),
+      this.api.getBrgKeluar().toPromise(),
+      this.api.getRetur().toPromise()
+    ])
+      .then(([barang, masuk, keluar, retur]) => {
+        this.barangList = Array.isArray(barang) ? barang : (barang?.val ?? []);
+
+        this.barangMasuk = Array.isArray(masuk) ? masuk : (masuk?.val ?? []);
+
+        this.barangKeluar = Array.isArray(keluar) ? keluar : (keluar?.val ?? []);
+
+        this.retur = Array.isArray(retur) ? retur : (retur?.val ?? []);
+
+        this.filteredBarangMasuk = [...this.barangMasuk];
+        this.filteredBarangKeluar = [...this.barangKeluar];
+        this.filteredRetur = [...this.retur];
+
+        this.pageIndexMasuk = 0;
+        this.pageIndexKeluar = 0;
+        this.pageIndexRetur = 0;
+
+        this.updatePaginatedMasuk();
+        this.updatePaginatedKeluar();
+        this.updatePaginatedRetur();
+
+        this.isLoading = false;
+
+        if (showLoading) {
+          Swal.close();
+        }
+
+        this.cdr.detectChanges();
+      })
+
+      .catch(() => {
+        this.barangList = [];
+
+        this.barangMasuk = [];
+        this.barangKeluar = [];
+        this.retur = [];
+
+        this.filteredBarangMasuk = [];
+        this.filteredBarangKeluar = [];
+        this.filteredRetur = [];
+
+        this.paginatedBarangMasuk = [];
+        this.paginatedBarangKeluar = [];
+        this.paginatedRetur = [];
+
+        this.isLoading = false;
+
+        if (showLoading) {
+          Swal.close();
+        }
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Data transaksi gagal dimuat.'
+        });
+
+        this.cdr.detectChanges();
+      });
+  }
+
+  isView(view: string): boolean {
+    return this.selectedView === 'all' || this.selectedView === view;
+  }
+
+  // =====================================================
+  // PAGINATION
+  // =====================================================
+
+  updatePaginatedMasuk(): void {
+    const startIndex = this.pageIndexMasuk * this.pageSizeMasuk;
+    const endIndex = startIndex + this.pageSizeMasuk;
+
+    this.paginatedBarangMasuk = this.filteredBarangMasuk.slice(startIndex, endIndex);
+  }
+
+  updatePaginatedKeluar(): void {
+    const startIndex = this.pageIndexKeluar * this.pageSizeKeluar;
+    const endIndex = startIndex + this.pageSizeKeluar;
+
+    this.paginatedBarangKeluar = this.filteredBarangKeluar.slice(startIndex, endIndex);
+  }
+
+  updatePaginatedRetur(): void {
+    const startIndex = this.pageIndexRetur * this.pageSizeRetur;
+    const endIndex = startIndex + this.pageSizeRetur;
+
+    this.paginatedRetur = this.filteredRetur.slice(startIndex, endIndex);
+  }
+
+  onPageMasukChange(event: PageEvent): void {
+    this.pageIndexMasuk = event.pageIndex;
+    this.pageSizeMasuk = event.pageSize;
+
+    this.updatePaginatedMasuk();
+  }
+
+  onPageKeluarChange(event: PageEvent): void {
+    this.pageIndexKeluar = event.pageIndex;
+    this.pageSizeKeluar = event.pageSize;
+
+    this.updatePaginatedKeluar();
+  }
+
+  onPageReturChange(event: PageEvent): void {
+    this.pageIndexRetur = event.pageIndex;
+    this.pageSizeRetur = event.pageSize;
+
+    this.updatePaginatedRetur();
+  }
+
+  // =====================================================
+  // SEARCH BARANG MASUK
+  // =====================================================
+
+  searchBarangMasuk(): void {
+    const keyword = this.searchMasukKeyword.trim();
+
+    if (!keyword) {
+      this.filteredBarangMasuk = [...this.barangMasuk];
+
+      this.pageIndexMasuk = 0;
+
+      this.updatePaginatedMasuk();
+
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+    this.loadingAnimation();
+
+    this.api.searchBarangMasuk({ keyword }).subscribe({
       next: (res: any) => {
-        this.barangMasuk = Array.isArray(res) ? res : (res?.val ?? []);
+        this.filteredBarangMasuk = Array.isArray(res) ? res : (res?.val ?? []);
+
+        this.pageIndexMasuk = 0;
+
+        this.updatePaginatedMasuk();
+
+        Swal.close();
 
         this.cdr.detectChanges();
       },
-      error: (err) => console.log(err)
+
+      error: () => {
+        this.filteredBarangMasuk = [];
+
+        this.updatePaginatedMasuk();
+
+        Swal.close();
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Pencarian barang masuk gagal.'
+        });
+      }
     });
   }
+  // =====================================================
+  // SEARCH BARANG KELUAR
+  // =====================================================
 
-  loadBarangKeluar() {
-    this.api.getBrgKeluar().subscribe({
+  searchBarangKeluar(): void {
+    const keyword = this.searchKeluarKeyword.trim();
+
+    if (!keyword) {
+      this.filteredBarangKeluar = [...this.barangKeluar];
+
+      this.pageIndexKeluar = 0;
+
+      this.updatePaginatedKeluar();
+
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+    this.loadingAnimation();
+
+    this.api.searchBarangKeluar({ keyword }).subscribe({
       next: (res: any) => {
-        this.barangKeluar = Array.isArray(res) ? res : (res?.val ?? []);
+        this.filteredBarangKeluar = Array.isArray(res) ? res : (res?.val ?? []);
+
+        this.pageIndexKeluar = 0;
+
+        this.updatePaginatedKeluar();
+
+        Swal.close();
 
         this.cdr.detectChanges();
       },
-      error: (err) => console.log(err)
+
+      error: () => {
+        this.filteredBarangKeluar = [];
+
+        this.updatePaginatedKeluar();
+
+        Swal.close();
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Pencarian barang keluar gagal.'
+        });
+      }
     });
   }
 
-  loadRetur() {
-    this.api.getRetur().subscribe({
+  // =====================================================
+  // SEARCH RETUR
+  // =====================================================
+
+  searchRetur(): void {
+    const keyword = this.searchReturKeyword.trim();
+
+    if (!keyword) {
+      this.filteredRetur = [...this.retur];
+
+      this.pageIndexRetur = 0;
+
+      this.updatePaginatedRetur();
+
+      this.cdr.detectChanges();
+
+      return;
+    }
+
+    this.loadingAnimation();
+
+    this.api.searchRetur({ keyword }).subscribe({
       next: (res: any) => {
-        this.retur = Array.isArray(res) ? res : (res?.val ?? []);
+        this.filteredRetur = Array.isArray(res) ? res : (res?.val ?? []);
+
+        this.pageIndexRetur = 0;
+
+        this.updatePaginatedRetur();
+
+        Swal.close();
 
         this.cdr.detectChanges();
       },
-      error: (err) => console.log(err)
+
+      error: () => {
+        this.filteredRetur = [];
+
+        this.updatePaginatedRetur();
+
+        Swal.close();
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Pencarian retur gagal.'
+        });
+      }
     });
   }
 
-  getNamaBarang(id: number) {
-    const barang = this.barangList.find((b) => b.id_barang === id);
+  // =====================================================
+  // CLEAR SEARCH
+  // =====================================================
 
-    return barang ? barang.nama_barang : id;
+  clearSearchMasuk(): void {
+    this.searchMasukKeyword = '';
+
+    this.filteredBarangMasuk = [...this.barangMasuk];
+
+    this.pageIndexMasuk = 0;
+
+    this.updatePaginatedMasuk();
+
+    this.cdr.detectChanges();
   }
 
-  openAddMasuk() {
+  clearSearchKeluar(): void {
+    this.searchKeluarKeyword = '';
+
+    this.filteredBarangKeluar = [...this.barangKeluar];
+
+    this.pageIndexKeluar = 0;
+
+    this.updatePaginatedKeluar();
+
+    this.cdr.detectChanges();
+  }
+
+  clearSearchRetur(): void {
+    this.searchReturKeyword = '';
+
+    this.filteredRetur = [...this.retur];
+
+    this.pageIndexRetur = 0;
+
+    this.updatePaginatedRetur();
+
+    this.cdr.detectChanges();
+  }
+
+  // =====================================================
+  // UTIL
+  // =====================================================
+
+  getNamaBarang(id: number): string {
+    const barang = this.barangList.find((b) => Number(b.id_barang) === Number(id));
+
+    return barang ? barang.nama_barang : '-';
+  }
+
+  onHargaBeliInput(): void {
+    const rawValue = this.hargaBeliDisplay.replace(/\D/g, '');
+
+    this.addMasukForm.harga_beli = rawValue ? Number(rawValue) : null;
+
+    this.hargaBeliDisplay = rawValue ? Number(rawValue).toLocaleString('id-ID') : '';
+  }
+
+  // =====================================================
+  // MODAL
+  // =====================================================
+
+  openAddMasuk(): void {
     this.addMasukForm = {
       id_barang: null,
-      jumlah: 0,
-      harga_beli: 0
+      jumlah: null,
+      harga_beli: null
     };
+
+    this.hargaBeliDisplay = '';
 
     this.showAddMasukModal = true;
   }
 
-  closeAddMasuk() {
+  closeAddMasuk(): void {
     this.showAddMasukModal = false;
   }
 
-  submitAddMasuk() {
+  // =====================================================
+  // ADD
+  // =====================================================
+
+  submitAddMasuk(): void {
+    if (!this.addMasukForm.id_barang || !this.addMasukForm.jumlah || !this.addMasukForm.harga_beli) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Peringatan',
+        text: 'Semua field wajib diisi.'
+      });
+
+      return;
+    }
+
     this.api.addBrgMasuk(this.addMasukForm).subscribe({
       next: () => {
         this.closeAddMasuk();
-        this.loadBarangMasuk();
+
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Barang masuk berhasil ditambahkan.',
+            timer: 2500,
+            showConfirmButton: false
+          })
+
+            .then(() => {
+              this.loadData(false);
+            });
+        }, 100);
       },
-      error: (err) => console.log(err)
+
+      error: (err: any) => {
+        const msg = err?.error?.message || err?.message || 'Barang masuk gagal ditambahkan.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
     });
   }
 
-  onDeleteMasuk(data: any) {
-    this.deleteMasukTarget = data;
-    this.showDeleteMasukModal = true;
+  // =====================================================
+  // DELETE
+  // =====================================================
+
+  onDeleteMasuk(data: any): void {
+    Swal.fire({
+      title: 'Konfirmasi Hapus',
+      text: 'Apakah Anda yakin ingin menghapus transaksi ini?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Hapus',
+      cancelButtonText: 'Batal'
+    })
+
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.api.deleteBrgMasuk(data.id_brg_masuk).subscribe({
+            next: () => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'Data transaksi berhasil dihapus.',
+                timer: 2500,
+                showConfirmButton: false
+              })
+
+                .then(() => {
+                  this.loadData(false);
+                });
+            },
+
+            error: (err: any) => {
+              const msg = err?.error?.message || err?.message || 'Data transaksi gagal dihapus.';
+
+              Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: msg
+              });
+            }
+          });
+        }
+      });
   }
 
-  closeDeleteMasuk() {
-    this.showDeleteMasukModal = false;
-    this.deleteMasukTarget = null;
-  }
+  // =====================================================
+  // LOADING
+  // =====================================================
 
-  confirmDeleteMasuk() {
-    const id_brg_masuk = this.deleteMasukTarget?.id_brg_masuk;
+  loadingAnimation(): void {
+    Swal.fire({
+      text: 'Sedang Mengambil Data',
+      icon: 'info',
+      timerProgressBar: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      showConfirmButton: false,
 
-    this.api.deleteBrgMasuk(id_brg_masuk).subscribe({
-      next: () => {
-        this.closeDeleteMasuk();
-        this.loadBarangMasuk();
-      },
-      error: (err) => console.log(err)
+      didOpen: () => {
+        Swal.showLoading();
+      }
     });
   }
 }

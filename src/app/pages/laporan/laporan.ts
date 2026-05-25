@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, LOCALE_ID } from '@angular/core';
+import { CommonModule, CurrencyPipe, DatePipe, registerLocaleData } from '@angular/common';
+import localeId from '@angular/common/locales/id';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Subject, takeUntil, debounceTime } from 'rxjs';
-import { ChangeDetectorRef } from '@angular/core';
+import { Subject } from 'rxjs';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -17,16 +18,14 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 
-import { registerLocaleData } from '@angular/common';
-import localeId from '@angular/common/locales/id';
-import { LOCALE_ID } from '@angular/core';
+import Swal from 'sweetalert2';
 
 import { ApiService } from 'src/app/shared/services/api.service';
 
-registerLocaleData(localeId);
-
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+
+registerLocaleData(localeId);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // INTERFACES
@@ -86,7 +85,10 @@ export class Laporan implements OnInit, OnDestroy {
   allTransactions: Transaction[] = [];
 
   filteredTransactions: Transaction[] = [];
+
   isTyping = false;
+
+  isLoading = false;
 
   summary: SummaryData = {
     totalTransaksi: 0,
@@ -96,25 +98,20 @@ export class Laporan implements OnInit, OnDestroy {
   };
 
   private destroy$ = new Subject<void>();
-  private lastStartDate: string | null = null;
-  private lastEndDate: string | null = null;
 
-  readonly statusConfig: Record<string, { label: string; color: string }> = {
-    lunas: {
-      label: 'Lunas',
-      color: 'success'
-    },
-    pending: {
-      label: 'Pending',
-      color: 'warning'
-    }
-  };
+  private lastStartDate: string | null = null;
+
+  private lastEndDate: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // INIT
+  // ───────────────────────────────────────────────────────────────────────────
 
   ngOnInit(): void {
     const today = new Date();
@@ -127,28 +124,30 @@ export class Laporan implements OnInit, OnDestroy {
     });
 
     this.lastStartDate = this.localDateToString(today);
+
     this.lastEndDate = this.localDateToString(today);
 
     this.filterForm.valueChanges.subscribe((value) => {
-      // kalau user lagi ngetik manual
-      // jangan auto filter
       if (this.isTyping) return;
 
       const start = value.startDate;
+
       const end = value.endDate;
 
       if (!start || !end) return;
 
       const startStr = this.localDateToString(start);
+
       const endStr = this.localDateToString(end);
 
-      // jangan filter kalau baru start date yg berubah
+      // hindari trigger filter saat baru start date berubah
       if (this.lastStartDate !== null && this.lastEndDate !== null && startStr !== this.lastStartDate && endStr === this.lastEndDate) {
         this.lastStartDate = startStr;
         return;
       }
 
       this.lastStartDate = startStr;
+
       this.lastEndDate = endStr;
 
       this.applyFilter();
@@ -159,21 +158,27 @@ export class Laporan implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.destroy$.next();
+
     this.destroy$.complete();
   }
+
   // ───────────────────────────────────────────────────────────────────────────
   // LOAD DATA
   // ───────────────────────────────────────────────────────────────────────────
+
   onManualEnter(): void {
     this.isTyping = false;
 
     this.applyFilter();
   }
+
   loadLaporanPenjualan(): void {
+    this.isLoading = true;
+
+    this.loadingAnimation();
+
     this.api.laporanPenjualan().subscribe({
       next: (res: any[]) => {
-        console.log('RAW API RESPONSE => ', res);
-
         this.allTransactions = res.map((item: any) => ({
           id_invoice: item.id_invoice,
           nama_project: item.nama_project,
@@ -181,21 +186,39 @@ export class Laporan implements OnInit, OnDestroy {
           date: item.date,
 
           total_items: Number(item.total_items),
+
           total_produk: Number(item.total_produk),
+
           total_price: Number(item.total_price),
+
           total_profit: Number(item.total_profit ?? 0),
+
           status_pembayaran: item.status_pembayaran
         }));
 
-        console.log('MAPPED DATA => ', this.allTransactions);
-
         this.applyFilter();
+
+        this.isLoading = false;
+
+        Swal.close();
 
         this.cdr.detectChanges();
       },
 
       error: (err) => {
         console.error('Gagal mengambil laporan penjualan', err);
+
+        this.isLoading = false;
+
+        Swal.close();
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Data laporan penjualan gagal dimuat.'
+        });
+
+        this.cdr.detectChanges();
       }
     });
   }
@@ -219,14 +242,6 @@ export class Laporan implements OnInit, OnDestroy {
       return t.date >= startStr && t.date <= endStr;
     });
 
-    console.log('FILTER RESULT => ', this.filteredTransactions);
-    console.log('START =>', startStr);
-    console.log('END =>', endStr);
-
-    this.allTransactions.forEach((t) => {
-      console.log('DATA DATE =>', t.date);
-    });
-
     this.recalcSummary();
   }
 
@@ -240,6 +255,15 @@ export class Laporan implements OnInit, OnDestroy {
     return `${year}-${month}-${day}`;
   }
 
+  private formatFileDate(date: Date): string {
+    const year = date.getFullYear();
+
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${day}-${month}-${year}`;
+  }
   // ───────────────────────────────────────────────────────────────────────────
   // SUMMARY
   // ───────────────────────────────────────────────────────────────────────────
@@ -260,22 +284,6 @@ export class Laporan implements OnInit, OnDestroy {
   // UTILITIES
   // ───────────────────────────────────────────────────────────────────────────
 
-  private startOfDay(date: Date): Date {
-    const d = new Date(date);
-
-    d.setHours(0, 0, 0, 0);
-
-    return d;
-  }
-
-  private endOfDay(date: Date): Date {
-    const d = new Date(date);
-
-    d.setHours(23, 59, 59, 999);
-
-    return d;
-  }
-
   formatRupiah(value: number): string {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -289,7 +297,7 @@ export class Laporan implements OnInit, OnDestroy {
   }
 
   // ───────────────────────────────────────────────────────────────────────────
-  // EXPORT
+  // EXPORT EXCEL
   // ───────────────────────────────────────────────────────────────────────────
 
   onExport(): void {
@@ -301,17 +309,15 @@ export class Laporan implements OnInit, OnDestroy {
       No: index + 1,
       Tanggal: item.date,
       Invoice: item.id_invoice,
-      Project: item.nama_project,
+      Proyek: item.nama_project,
       'Total Barang': item.total_items,
       'Total Harga': item.total_price,
       Keuntungan: item.total_profit,
       Status: item.status_pembayaran
     }));
 
-    // worksheet
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
 
-    // workbook
     const workbook: XLSX.WorkBook = {
       Sheets: {
         'Laporan Penjualan': worksheet
@@ -319,21 +325,44 @@ export class Laporan implements OnInit, OnDestroy {
       SheetNames: ['Laporan Penjualan']
     };
 
-    // buffer
     const excelBuffer: any = XLSX.write(workbook, {
       bookType: 'xlsx',
       type: 'array'
     });
 
-    // blob
     const data: Blob = new Blob([excelBuffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
     });
 
-    // filename
-    const fileName = `laporan-penjualan-${Date.now()}.xlsx`;
+    const start: Date | null = this.filterForm.get('startDate')?.value;
 
-    // download
+    const end: Date | null = this.filterForm.get('endDate')?.value;
+
+    const startDate = start ? this.formatFileDate(start) : 'unknown';
+
+    const endDate = end ? this.formatFileDate(end) : 'unknown';
+
+    const fileName = `laporan-penjualan-${startDate}_sampai_${endDate}.xlsx`;
+
     FileSaver.saveAs(data, fileName);
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // LOADING
+  // ───────────────────────────────────────────────────────────────────────────
+
+  loadingAnimation(): void {
+    Swal.fire({
+      text: 'Sedang Mengambil Data',
+      icon: 'info',
+      timerProgressBar: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      showConfirmButton: false,
+
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
   }
 }

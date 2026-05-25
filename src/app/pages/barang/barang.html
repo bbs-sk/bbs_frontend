@@ -89,7 +89,7 @@
                 <span class="price-value">{{ b.harga_jual ? 'Rp ' + b.harga_jual.toLocaleString('id-ID') : '—' }}</span>
               </td>
               <td class="col-num">
-                <span class="hpp-value">{{ b.hpp ? 'Rp ' + b.hpp.toLocaleString('id-ID') : '—' }}</span>
+                <span class="hpp-value">{{ b.hpp ? ('Rp ' + (b.hpp | number:'1.0-0':'id')) : '—' }}</span>
               </td>
               <td class="date-cell">
                 <span class="date-main">{{ b.datetime | date:'dd MMM yyyy':'':'id' }}</span>
@@ -157,11 +157,11 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Kode Barang</label>
-            <input class="form-control" [(ngModel)]="addForm.kode_barang" placeholder="cth. BRG-001" />
+            <input class="form-control" [(ngModel)]="addForm.kode_barang" placeholder="Masukkan kode barang" />
           </div>
           <div class="form-group">
             <label class="form-label">Satuan</label>
-            <input class="form-control" [(ngModel)]="addForm.satuan" placeholder="cth. kg, ltr, pcs" />
+            <input class="form-control" [(ngModel)]="addForm.satuan" placeholder="Masukkan satuan barang" />
           </div>
         </div>
         <div class="form-group">
@@ -240,12 +240,8 @@
           <label class="form-label">HPP</label>
           <div class="input-prefix-wrap">
             <span class="input-prefix">Rp</span>
-            <input
-              type="text"
-              class="form-control has-prefix"
-              [value]="editForm.hpp ? editForm.hpp.toLocaleString('id-ID') : '—'"
-              disabled
-            />
+
+            <input type="text" class="form-control has-prefix" [value]="editForm.hpp ? formatNumber(editForm.hpp) : '—'" disabled />
           </div>
           <p class="form-hint">HPP dihitung otomatis dari transaksi masuk</p>
         </div>

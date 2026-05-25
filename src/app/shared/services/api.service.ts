@@ -172,6 +172,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/brgMasuk/delete`, { id_brg_masuk });
   }
 
+  searchBarangMasuk(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/brgMasuk/search`, payload);
+  }
+
   getBrgKeluar() {
     return this.http.post<any>(`${environment.apiUrl}/brgKeluar`, {});
   }
@@ -184,6 +188,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/brgKeluar/invoice`, { id_invoice });
   }
 
+  searchBarangKeluar(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/brgKeluar/search`, payload);
+  }
+
   laporanPenjualan() {
     return this.http.get<any>(`${environment.apiUrl}/brgKeluar/laporan_penjualan`);
   }
@@ -191,8 +199,13 @@ export class ApiService {
   getRetur() {
     return this.http.post<any>(`${environment.apiUrl}/retur/`, {});
   }
+
   addRetur(data: any) {
     return this.http.post(`${environment.apiUrl}/retur/add`, data);
+  }
+
+  searchRetur(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/retur/search`, payload);
   }
 
   getActivity() {

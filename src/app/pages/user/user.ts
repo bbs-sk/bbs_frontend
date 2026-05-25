@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
@@ -15,20 +15,22 @@ import { NgSelectModule } from '@ng-select/ng-select';
   templateUrl: './user.html',
   styleUrl: './user.scss'
 })
-export class User {
+export class User implements OnInit {
   constructor(
     private api: ApiService,
     private cdr: ChangeDetectorRef
   ) {}
+
   users: any[] = [];
   filteredUsers: any[] = [];
   paginatedUsers: any[] = [];
   isLoading = false;
-  pageSize = 20;
+  pageSize = 10;
   pageIndex = 0;
   searchKeyword = '';
   showAddModal = false;
   showEditModal = false;
+  searchFocused = false;
 
   addForm: any = {
     name: '',
@@ -49,8 +51,11 @@ export class User {
     this.loadUsers();
   }
 
-  loadUsers(): void {
+  loadUsers(showLoading: boolean = true): void {
     this.isLoading = true;
+    if (showLoading) {
+      this.loadingAnimation();
+    }
     this.api.getUsers().subscribe({
       next: (res: any) => {
         this.users = Array.isArray(res) ? res : (res?.val ?? []);
@@ -58,16 +63,32 @@ export class User {
         this.pageIndex = 0;
         this.updatePaginatedData();
         this.isLoading = false;
+        if (showLoading) {
+          Swal.close();
+        }
         this.cdr.detectChanges();
       },
+
       error: () => {
         this.users = [];
         this.filteredUsers = [];
         this.paginatedUsers = [];
         this.isLoading = false;
+        if (showLoading) {
+          Swal.close();
+        }
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Data pengguna gagal dimuat.'
+        });
         this.cdr.detectChanges();
       }
     });
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredUsers.length / this.pageSize) || 1;
   }
 
   updatePaginatedData(): void {
@@ -91,17 +112,25 @@ export class User {
       this.cdr.detectChanges();
       return;
     }
+    this.loadingAnimation();
     this.api.searchUser({ keyword }).subscribe({
       next: (res: any) => {
         this.filteredUsers = Array.isArray(res) ? res : (res?.val ?? []);
         this.pageIndex = 0;
         this.updatePaginatedData();
+        Swal.close();
         this.cdr.detectChanges();
       },
       error: () => {
         this.filteredUsers = [];
         this.pageIndex = 0;
         this.updatePaginatedData();
+        Swal.close();
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Pencarian gagal dilakukan.'
+        });
         this.cdr.detectChanges();
       }
     });
@@ -114,20 +143,21 @@ export class User {
     this.updatePaginatedData();
   }
 
-  roleLabel(role: any): string {
+  roleLabel(role: string): string {
     return role || '-';
   }
-  roleBadgeClass(role: any): string {
+
+  roleBadgeClass(role: string): string {
     if (role === 'Admin Kantor') {
-      return 'text-success';
+      return 'admin';
     }
     if (role === 'Gudang') {
-      return 'text-primary';
+      return 'gudang';
     }
     if (role === 'Lapangan') {
-      return 'text-warning';
+      return 'lapangan';
     }
-    return 'text-secondary';
+    return 'default';
   }
 
   openAdd(): void {
@@ -145,6 +175,14 @@ export class User {
   }
 
   submitAdd(): void {
+    if (!this.addForm.name || !this.addForm.role || !this.addForm.username || !this.addForm.password) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Peringatan',
+        text: 'Semua field wajib diisi.'
+      });
+      return;
+    }
     const payload = {
       name: this.addForm.name,
       role: this.addForm.role,
@@ -155,7 +193,7 @@ export class User {
       next: () => {
         const nama = this.addForm.name;
         this.closeAdd();
-        this.loadUsers();
+        this.loadUsers(false);
         Swal.fire({
           icon: 'success',
           title: 'Berhasil',
@@ -166,7 +204,6 @@ export class User {
       },
       error: (err) => {
         const msg = err?.error?.message || err?.message || 'Pengguna gagal ditambahkan.';
-
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
@@ -192,6 +229,15 @@ export class User {
   }
 
   submitEdit(): void {
+    if (!this.editForm.name || !this.editForm.role || !this.editForm.username || !this.editForm.password) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Peringatan',
+        text: 'Semua field wajib diisi.'
+      });
+      return;
+    }
+
     const payload = {
       id_user: this.editForm.id_user,
       name: this.editForm.name,
@@ -204,19 +250,18 @@ export class User {
       next: () => {
         const nama = this.editForm.name;
         this.closeEdit();
-        this.loadUsers();
+        this.loadUsers(false);
         Swal.fire({
           icon: 'success',
           title: 'Berhasil',
           text: `Pengguna "${nama}" berhasil diperbarui.`,
-          timer: 3000,
+          timer: 2500,
           showConfirmButton: false
         });
       },
 
       error: (err) => {
         const msg = err?.error?.message || err?.message || 'Pengguna gagal diperbarui.';
-
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
@@ -232,16 +277,15 @@ export class User {
       text: `Apakah Anda yakin ingin menghapus pengguna "${u.name}"?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
       confirmButtonText: 'Hapus',
       cancelButtonText: 'Batal'
     }).then((result) => {
       if (result.isConfirmed) {
         this.api.deleteUser(u.id_user).subscribe({
           next: () => {
-            this.loadUsers();
-
+            this.loadUsers(false);
             Swal.fire({
               icon: 'success',
               title: 'Berhasil',
@@ -259,6 +303,20 @@ export class User {
             });
           }
         });
+      }
+    });
+  }
+
+  loadingAnimation(): void {
+    Swal.fire({
+      text: 'Sedang Mengambil Data',
+      icon: 'info',
+      timerProgressBar: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
       }
     });
   }
