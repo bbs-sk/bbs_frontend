@@ -12,12 +12,13 @@
     <table class="table table-hover mb-0">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>No.</th>
           <th>User</th>
           <th>Proyek</th>
           <th>Total</th>
           <th>Status</th>
           <th>Pembayaran</th>
+          <th>Detail</th>
           <th class="text-center">Action</th>
         </tr>
       </thead>
@@ -34,23 +35,26 @@
             {{ i.status }}
           </td>
           <td>{{ i.pembayaran }}</td>
+          <td>{{ i.detail }}</td>
 
           <td class="text-center">
             <button class="btn btn-sm btn-success rounded m-1" (click)="openDetail(i)">
               <i class="bi bi-eye"></i>
             </button>
 
+            @if (canEdit(i)) {
             <button class="btn btn-sm btn-warning rounded m-1" (click)="onEdit(i)">
               <i class="bi bi-pencil-square"></i>
             </button>
-
+            } @if (canDelete(i)) {
             <button class="btn btn-sm btn-danger rounded m-1" (click)="onDelete(i)">
               <i class="bi bi-trash"></i>
             </button>
-
+            } @if (canUpdateStatus(i)) {
             <button class="btn btn-sm btn-secondary rounded m-1" (click)="openStatus(i)">
               <i class="bi bi-file-check-fill"></i>
             </button>
+            }
           </td>
         </tr>
         }
@@ -158,12 +162,31 @@
       </div>
 
       <div class="row mt-4 mb-4">
-        <div class="col-md-9 d-flex flex-column">
-          <label class="form-label mb-2">Pembayaran</label>
+        <!-- DETAIL -->
+        <div class="col-md-12 mb-3">
+          <label class="form-label mb-2">Detail Pemesanan</label>
 
-          <input class="form-control" [(ngModel)]="addForm.pembayaran" placeholder="Contoh: Transfer Bank" style="height: 38px" />
+          <textarea
+            class="form-control"
+            rows="3"
+            [(ngModel)]="addForm.detail"
+            placeholder="Contoh: Barang dikirim sebelum tanggal 10"
+          ></textarea>
         </div>
-        <div class="col-md-3 d-flex flex-column">
+
+        <!-- PEMBAYARAN -->
+        <div class="col-md-6 d-flex flex-column">
+          <label class="form-label mb-2">Status Pembayaran</label>
+
+          <select class="form-select" [(ngModel)]="addForm.pembayaran">
+            <option value="">-- Pilih Pembayaran --</option>
+            <option value="belum">Belum</option>
+            <option value="lunas">Lunas</option>
+          </select>
+        </div>
+
+        <!-- TOTAL -->
+        <div class="col-md-6 d-flex flex-column">
           <label class="form-label mb-2">Total Harga</label>
 
           <div class="d-flex align-items-center" style="height: 38px">Rp {{ addForm.total_harga | number:'1.0-0' }}</div>
@@ -274,15 +297,26 @@
 
       <!-- FOOTER FORM -->
       <div class="row mt-4 mb-4">
-        <!-- PEMBAYARAN -->
-        <div class="col-md-9 d-flex flex-column">
-          <label class="form-label mb-2">Pembayaran</label>
+        <!-- DETAIL -->
+        <div class="col-md-12 mb-3">
+          <label class="form-label mb-2">Detail Pemesanan</label>
 
-          <input class="form-control" [(ngModel)]="editForm.pembayaran" placeholder="Contoh: Transfer Bank" style="height: 38px" />
+          <textarea class="form-control" rows="3" [(ngModel)]="editForm.detail" placeholder="Detail pemesanan"></textarea>
+        </div>
+
+        <!-- PEMBAYARAN -->
+        <div class="col-md-6 d-flex flex-column">
+          <label class="form-label mb-2">Status Pembayaran</label>
+
+          <select class="form-select" [(ngModel)]="editForm.pembayaran">
+            <option value="">-- Pilih Pembayaran --</option>
+            <option value="belum">Belum</option>
+            <option value="lunas">Lunas</option>
+          </select>
         </div>
 
         <!-- TOTAL -->
-        <div class="col-md-3 d-flex flex-column">
+        <div class="col-md-6 d-flex flex-column">
           <label class="form-label mb-2">Total Harga</label>
 
           <div class="d-flex align-items-center" style="height: 38px">Rp {{ editForm.total_harga | number:'1.0-0' }}</div>
@@ -358,6 +392,11 @@
         <div class="col-md-6">
           <b>Pembayaran:</b>
           {{ detailInvoice?.pembayaran }}
+        </div>
+
+        <div class="col-md-12">
+          <b>Detail:</b>
+          {{ detailInvoice?.detail }}
         </div>
       </div>
 
@@ -464,15 +503,11 @@
 
               <div class="col-md-4">
                 <select class="form-select" [(ngModel)]="statusForm.status">
-                  <option value="pending">Pending</option>
+                  @for (s of getAvailableStatus(); track s) {
 
-                  <option value="approved">Approved</option>
+                  <option [value]="s">{{ s }}</option>
 
-                  <option value="delivery">Delivery</option>
-
-                  <option value="finish">Finish</option>
-
-                  <option value="rejected">Rejected</option>
+                  }
                 </select>
               </div>
             </div>

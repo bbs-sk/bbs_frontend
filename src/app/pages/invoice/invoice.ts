@@ -25,7 +25,8 @@ export class Invoice {
   returBarang: any[] = [];
   jumlahJenisBarang = 0;
   idUser = 1;
-  status = 'menunggu';
+  status = '';
+  userLogin: any = null;
 
   showAddModal = false;
   showEditModal = false;
@@ -45,13 +46,29 @@ export class Invoice {
     id_user: null,
     id_project: null,
     total_harga: 0,
-    pembayaran: ''
+    pembayaran: '',
+    detail: ''
   };
 
   editForm: any = {};
   deleteTarget: any = null;
 
   ngOnInit() {
+    const userData = localStorage.getItem('user');
+
+    if (userData) {
+      this.userLogin = JSON.parse(userData);
+
+      this.idUser = this.userLogin.id_user;
+
+      if (this.userLogin.role === 'Admin Kantor') {
+        this.status = 'approved';
+      } else if (this.userLogin.role === 'Lapangan') {
+        this.status = 'pending';
+      } else if (this.userLogin.role === 'Gudang') {
+        this.status = 'finish';
+      }
+    }
     this.loadInvoice();
     this.getProject();
     this.getBarang();
@@ -80,7 +97,12 @@ export class Invoice {
   }
 
   loadInvoice() {
-    this.api.getInvoice().subscribe({
+    const payload = {
+      role: this.userLogin?.role,
+      id_user: this.userLogin?.id_user
+    };
+
+    this.api.getInvoiceRole(payload).subscribe({
       next: (res: any) => {
         this.invoice = Array.isArray(res) ? res : (res?.val ?? []);
         this.cdr.detectChanges();
@@ -94,7 +116,8 @@ export class Invoice {
       id_user: this.idUser,
       id_project: null,
       total_harga: 0,
-      pembayaran: ''
+      pembayaran: '',
+      detail: ''
     };
     this.jumlahJenisBarang = 0;
     this.selectedBarang = [];
@@ -127,11 +150,18 @@ export class Invoice {
     });
   }
 
+  canEdit(invoice: any): boolean {
+    const isOwner = invoice.id_user === this.userLogin?.id_user;
+    const allowedStatus = invoice.status === 'pending' || invoice.status === 'ordered';
+    return isOwner && allowedStatus;
+  }
+
   onEdit(i: any) {
     this.editForm = {
       id_invoice: i.id_invoice,
       id_project: i.id_project,
       pembayaran: i.pembayaran,
+      detail: i.detail,
       total_harga: i.total_harga
     };
 
@@ -186,6 +216,12 @@ export class Invoice {
         console.log(err);
       }
     });
+  }
+
+  canDelete(invoice: any): boolean {
+    const isOwner = invoice.id_user === this.userLogin?.id_user;
+    const allowedStatus = invoice.status === 'pending' || invoice.status === 'ordered';
+    return isOwner && allowedStatus;
   }
 
   onDelete(i: any) {
@@ -425,5 +461,42 @@ export class Invoice {
 
   isBarangSelectedEdit(id_barang: any, currentItem: any): boolean {
     return this.editBarang.some((item: any) => item !== currentItem && item.id_barang == id_barang);
+  }
+
+  canUpdateStatus(invoice: any): boolean {
+    const role = this.userLogin?.role;
+    const status = invoice.status;
+
+    if (role === 'Admin Kantor') {
+      return status === 'pending' || status === 'approved' || status === 'rejected';
+    }
+
+    if (role === 'Gudang') {
+      return status === 'approved' || status === 'delivery';
+    }
+
+    if (role === 'Lapangan') {
+      return status === 'delivery' || status === 'finish';
+    }
+
+    return false;
+  }
+
+  getAvailableStatus(): string[] {
+    const role = this.userLogin?.role;
+
+    if (role === 'Admin Kantor') {
+      return ['pending', 'approved', 'rejected'];
+    }
+
+    if (role === 'Gudang') {
+      return ['approved', 'delivery'];
+    }
+
+    if (role === 'Lapangan') {
+      return ['delivery', 'finish'];
+    }
+
+    return [];
   }
 }

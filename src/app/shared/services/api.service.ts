@@ -84,6 +84,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/invoice`, {});
   }
 
+  getInvoiceRole(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/invoice/role`, payload);
+  }
+
   getInvoiceRecent() {
     return this.http.post<any>(`${environment.apiUrl}/invoice/recent`, {});
   }
