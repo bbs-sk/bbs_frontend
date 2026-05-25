@@ -63,9 +63,13 @@ export class Barang {
     this.loadBarang();
   }
 
-  loadBarang(): void {
+  loadBarang(showLoading: boolean = true): void {
     this.isLoading = true;
-    this.loadingAnimation();
+
+    if (showLoading) {
+      this.loadingAnimation();
+    }
+
     this.api.getBarang().subscribe({
       next: (res: any) => {
         this.barang = Array.isArray(res) ? res : (res?.val ?? []);
@@ -73,16 +77,30 @@ export class Barang {
         this.pageIndex = 0;
         this.updatePaginatedData();
         this.isLoading = false;
-        Swal.close();
+
+        if (showLoading) {
+          Swal.close();
+        }
+
         this.cdr.detectChanges();
       },
+
       error: () => {
         this.barang = [];
         this.filteredBarang = [];
         this.paginatedBarang = [];
         this.isLoading = false;
-        Swal.close();
-        Swal.fire({ icon: 'error', title: 'Gagal', text: 'Data barang gagal dimuat.' });
+
+        if (showLoading) {
+          Swal.close();
+        }
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Data barang gagal dimuat.'
+        });
+
         this.cdr.detectChanges();
       }
     });
@@ -154,27 +172,6 @@ export class Barang {
     this.showAddModal = false;
   }
 
-  submitAdd(): void {
-    this.api.addBarang(this.addForm).subscribe({
-      next: () => {
-        const nama = this.addForm.nama_barang;
-        this.closeAdd();
-        this.loadBarang();
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: `Barang "${nama}" berhasil ditambahkan.`,
-          timer: 2500,
-          showConfirmButton: false
-        });
-      },
-      error: (err: any) => {
-        const msg = err?.error?.message || err?.message || 'Barang gagal ditambahkan.';
-        Swal.fire({ icon: 'error', title: 'Gagal', text: msg });
-      }
-    });
-  }
-
   onEdit(b: any): void {
     this.editForm = {
       id_barang: b.id_barang,
@@ -192,23 +189,78 @@ export class Barang {
     this.showEditModal = false;
   }
 
+  submitAdd(): void {
+    this.api.addBarang(this.addForm).subscribe({
+      next: () => {
+        const nama = this.addForm.nama_barang;
+
+        // tutup modal
+        this.closeAdd();
+
+        // paksa render angular
+        this.cdr.detectChanges();
+
+        // tampilkan alert sukses
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: `Barang "${nama}" berhasil ditambahkan.`,
+            timer: 2500,
+            showConfirmButton: false
+          }).then(() => {
+            // reload data TANPA loading animation
+            this.loadBarang(false);
+          });
+        }, 100);
+      },
+
+      error: (err: any) => {
+        const msg = err?.error?.message || err?.message || 'Barang gagal ditambahkan.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
+    });
+  }
+
   submitEdit(): void {
     this.api.updateBarang(this.editForm).subscribe({
       next: () => {
         const nama = this.editForm.nama_barang;
+
+        // tutup modal
         this.closeEdit();
-        this.loadBarang();
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: `Barang "${nama}" berhasil diperbarui.`,
-          timer: 3000,
-          showConfirmButton: false
-        });
+
+        // paksa angular render perubahan
+        this.cdr.detectChanges();
+
+        // delay kecil agar modal benar-benar hilang
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: `Barang "${nama}" berhasil diperbarui.`,
+            timer: 3000,
+            showConfirmButton: false
+          }).then(() => {
+            // reload data TANPA loading animation
+            this.loadBarang(false);
+          });
+        }, 100);
       },
+
       error: (err: any) => {
         const msg = err?.error?.message || err?.message || 'Barang gagal diperbarui.';
-        Swal.fire({ icon: 'error', title: 'Gagal', text: msg });
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
       }
     });
   }
@@ -227,18 +279,26 @@ export class Barang {
       if (result.isConfirmed) {
         this.api.deleteBarang(b.id_barang).subscribe({
           next: () => {
-            this.loadBarang();
             Swal.fire({
               icon: 'success',
               title: 'Berhasil',
               text: `Barang "${b.nama_barang}" berhasil dihapus.`,
               timer: 2500,
               showConfirmButton: false
+            }).then(() => {
+              // reload data TANPA loading animation
+              this.loadBarang(false);
             });
           },
+
           error: (err: any) => {
             const msg = err?.error?.message || err?.message || 'Barang gagal dihapus.';
-            Swal.fire({ icon: 'error', title: 'Gagal', text: msg });
+
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal',
+              text: msg
+            });
           }
         });
       }
@@ -270,5 +330,19 @@ export class Barang {
         Swal.showLoading();
       }
     });
+  }
+
+  formatRupiah(value: any): string {
+    if (value === null || value === undefined || value === '') {
+      return '—';
+    }
+    return 'Rp ' + Number(value).toLocaleString('id-ID');
+  }
+
+  formatNumber(value: any): string {
+    if (value === null || value === undefined || value === '') {
+      return '';
+    }
+    return Number(value).toLocaleString('id-ID');
   }
 }

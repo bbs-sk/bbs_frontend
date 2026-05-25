@@ -1,174 +1,280 @@
-<div class="pb-4">
-  <div class="card tbl-card mb-4">
-    <div class="d-flex align-items-center justify-content-between p-3">
-      <h3 class="mb-0">Data Pengguna</h3>
+<div class="page-wrapper">
+  <div class="tbl-card">
+    <!-- HEADER -->
+    <div class="card-header">
+      <div class="card-title">
+        <div class="title-icon">
+          <mat-icon>group</mat-icon>
+        </div>
 
-      <button mat-raised-button style="background-color: #2563eb" aria-label="Tambah" (click)="openAdd()">
-        <mat-icon class="text-white">add</mat-icon>
-        <span style="padding-left: 5px; font-size: 14px; color: white">Tambah Pengguna</span>
+        <div>
+          <h3 class="mb-0">Data Pengguna</h3>
+          <p class="subtitle">Kelola data pengguna sistem</p>
+        </div>
+      </div>
+
+      <button mat-raised-button class="btn-add" (click)="openAdd()">
+        <mat-icon>add</mat-icon>
+        <span>Tambah Pengguna</span>
       </button>
     </div>
 
-    <div class="d-flex justify-content-end p-3">
-      <div class="search-box">
-        <input type="text" class="search-input" [(ngModel)]="searchKeyword" placeholder="Cari pengguna..." (keyup.enter)="searchData()" />
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-stats">
+        <div class="stat-chip">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ filteredUsers.length }}</span>
+          <span class="stat-label">pengguna</span>
+        </div>
+
+        <div class="stat-divider"></div>
+
+        <div class="stat-chip">
+          <span class="stat-label">Halaman</span>
+          <span class="stat-value">{{ pageIndex + 1 }}</span>
+          <span class="stat-label">dari {{ totalPages }}</span>
+        </div>
+      </div>
+
+      <!-- SEARCH -->
+      <div class="search-box" [class.focused]="searchFocused">
+        <mat-icon class="search-icon">search</mat-icon>
+
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchKeyword"
+          placeholder="Cari pengguna..."
+          (keyup.enter)="searchData()"
+          (focus)="searchFocused = true"
+          (blur)="searchFocused = false"
+        />
 
         <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()">
-          <i class="bi bi-x-lg"></i>
+          <mat-icon>close</mat-icon>
         </button>
 
         <button type="button" class="btn-search" (click)="searchData()">
-          <i class="bi bi-search"></i>
+          <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
     </div>
 
+    <!-- TABLE -->
     <div class="table-responsive">
       <div class="table-wrapper">
-        <table class="table table-hover mb-0">
+        <table class="table mb-0">
           <thead>
             <tr>
-              <th>No</th>
-              <th>Nama</th>
+              <th class="col-no">No</th>
+              <th>Nama Pengguna</th>
               <th>Role</th>
               <th>Username</th>
               <th>Password</th>
-              <th>Action</th>
+              <th class="col-action">Aksi</th>
             </tr>
           </thead>
 
           <tbody>
             @for (u of paginatedUsers; track u.id_user; let i = $index) {
-            <tr>
-              <td>{{ (pageIndex * pageSize) + i + 1 }}</td>
-              <td>{{ u.name || '-' }}</td>
+
+            <tr class="table-row">
+              <td class="col-no">{{ (pageIndex * pageSize) + i + 1 }}</td>
 
               <td>
-                <span class="d-block">
-                  <i class="badge-circle {{ roleBadgeClass(u.role) }} f-10 m-r-5"></i>
-                  {{ roleLabel(u.role) }}
-                </span>
+                <div class="user-name">{{ u.name || '-' }}</div>
               </td>
 
-              <td>{{ u.username || '-' }}</td>
-              <td>{{ u.password || '-' }}</td>
+              <td>
+                <span class="badge-role">{{ roleLabel(u.role) }}</span>
+              </td>
 
               <td>
-                <button type="button" class="btn btn-sm btn-outline-primary me-2" title="Edit" (click)="onEdit(u)">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
+                <span class="username-text">{{ u.username || '-' }}</span>
+              </td>
 
-                <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" (click)="onDelete(u)">
-                  <i class="bi bi-trash"></i>
-                </button>
+              <td>
+                <span class="password-text">{{ u.password || '-' }}</span>
+              </td>
+
+              <td class="col-action">
+                <div class="action-btns">
+                  <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(u)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(u)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
               </td>
             </tr>
+
             }
           </tbody>
         </table>
       </div>
     </div>
 
-    <div *ngIf="!isLoading && filteredUsers.length === 0" class="empty-search text-center">
-      <i class="bi bi-search"></i>
-      <div class="mt-2 fw-semibold">Tidak ada pengguna ditemukan</div>
-      <small class="text-muted">Coba gunakan kata kunci lain</small>
+    <!-- EMPTY -->
+    <div *ngIf="!isLoading && filteredUsers.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>group_off</mat-icon>
+      </div>
+
+      <h5 class="empty-title">Data pengguna tidak ditemukan</h5>
+
+      <p class="empty-sub">Coba gunakan kata kunci yang berbeda</p>
+
+      <button type="button" class="btn-reset-search" (click)="clearSearch()">Reset Pencarian</button>
     </div>
 
-    <mat-paginator
-      [length]="filteredUsers.length"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[5, 10, 20, 50]"
-      [pageIndex]="pageIndex"
-      (page)="onPageChange($event)"
-      showFirstLastButtons
-    ></mat-paginator>
+    <!-- PAGINATOR -->
+    <div class="paginator-wrapper">
+      <mat-paginator
+        [length]="filteredUsers.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        [pageIndex]="pageIndex"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
   </div>
+
+  <!-- ============================= -->
+  <!-- MODAL ADD -->
+  <!-- ============================= -->
 
   <div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
 
   <div class="modal-custom" *ngIf="showAddModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
+      <!-- HEADER -->
       <div class="modal-header">
-        <h5 class="mb-0">Tambah Pengguna</h5>
+        <div class="modal-title-wrap">
+          <div class="modal-icon add-icon">
+            <mat-icon>person_add</mat-icon>
+          </div>
 
-        <button type="button" class="btn-close" (click)="closeAdd()"></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">Nama</label>
-          <input class="form-control" [(ngModel)]="addForm.name" placeholder="Masukkan Nama Pengguna" />
+          <h5>Tambah Pengguna</h5>
         </div>
 
-        <div class="mb-2">
-          <label class="form-label">Role</label>
+        <button type="button" class="btn-close-modal" (click)="closeAdd()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
 
-          <ng-select [(ngModel)]="addForm.role" placeholder="Pilih Role" [searchable]="true" [clearable]="true">
+      <!-- BODY -->
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Nama Pengguna</label>
+
+          <input type="text" class="form-control" [(ngModel)]="addForm.name" placeholder="Masukkan nama pengguna" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Role Pengguna</label>
+
+          <ng-select [(ngModel)]="addForm.role" placeholder="Pilih role pengguna" [searchable]="true" [clearable]="true">
             <ng-option value="Admin Kantor">Admin Kantor</ng-option>
+
             <ng-option value="Gudang">Gudang</ng-option>
+
             <ng-option value="Lapangan">Lapangan</ng-option>
           </ng-select>
         </div>
 
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Username</label>
-          <input class="form-control" [(ngModel)]="addForm.username" placeholder="Masukkan Username" />
+
+          <input type="text" class="form-control" [(ngModel)]="addForm.username" placeholder="Masukkan username" />
         </div>
 
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Password</label>
-          <input class="form-control" [(ngModel)]="addForm.password" placeholder="Masukkan Password" />
+
+          <input type="text" class="form-control" [(ngModel)]="addForm.password" placeholder="Masukkan password" />
         </div>
       </div>
 
+      <!-- FOOTER -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-light" (click)="closeAdd()">Batal</button>
-        <button type="button" class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+        <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
+
+        <button type="button" class="btn-modal-save" (click)="submitAdd()">
+          <mat-icon>save</mat-icon>
+          <span>Simpan</span>
+        </button>
       </div>
     </div>
   </div>
+
+  <!-- ============================= -->
+  <!-- MODAL EDIT -->
+  <!-- ============================= -->
 
   <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
 
   <div class="modal-custom" *ngIf="showEditModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
+      <!-- HEADER -->
       <div class="modal-header">
-        <h5 class="mb-0">Edit Pengguna</h5>
+        <div class="modal-title-wrap">
+          <div class="modal-icon edit-icon">
+            <mat-icon>edit</mat-icon>
+          </div>
 
-        <button type="button" class="btn-close" (click)="closeEdit()"></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="mb-2">
-          <label class="form-label">Nama</label>
-          <input class="form-control" [(ngModel)]="editForm.name" placeholder="Masukkan Nama Pengguna" />
+          <h5>Edit Pengguna</h5>
         </div>
 
-        <div class="mb-2">
-          <label class="form-label">Role</label>
+        <button type="button" class="btn-close-modal" (click)="closeEdit()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
 
-          <ng-select [(ngModel)]="editForm.role" placeholder="Pilih Role" [searchable]="true" [clearable]="true">
+      <!-- BODY -->
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Nama Pengguna</label>
+
+          <input type="text" class="form-control" [(ngModel)]="editForm.name" placeholder="Masukkan nama pengguna" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Role Pengguna</label>
+
+          <ng-select [(ngModel)]="editForm.role" placeholder="Pilih role pengguna" [searchable]="true" [clearable]="true">
             <ng-option value="Admin Kantor">Admin Kantor</ng-option>
+
             <ng-option value="Gudang">Gudang</ng-option>
+
             <ng-option value="Lapangan">Lapangan</ng-option>
           </ng-select>
         </div>
 
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Username</label>
-          <input class="form-control" [(ngModel)]="editForm.username" placeholder="Masukkan Username" />
+
+          <input type="text" class="form-control" [(ngModel)]="editForm.username" placeholder="Masukkan username" />
         </div>
 
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Password</label>
-          <input class="form-control" [(ngModel)]="editForm.password" placeholder="Masukkan Password" />
+
+          <input type="text" class="form-control" [(ngModel)]="editForm.password" placeholder="Masukkan password" />
         </div>
       </div>
 
+      <!-- FOOTER -->
       <div class="modal-footer">
-        <button type="button" class="btn btn-light" (click)="closeEdit()">Batal</button>
-        <button type="button" class="btn btn-primary" (click)="submitEdit()">Simpan</button>
+        <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
+
+        <button type="button" class="btn-modal-save" (click)="submitEdit()">
+          <mat-icon>save</mat-icon>
+          <span>Simpan Perubahan</span>
+        </button>
       </div>
     </div>
   </div>

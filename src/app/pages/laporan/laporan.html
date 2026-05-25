@@ -1,9 +1,16 @@
 <section class="sd-page">
-  <!-- ═══════════════════════════════════════════════════════ HEADER -->
   <div class="sd-header">
     <div class="sd-header__left">
-      <h1 class="sd-header__title">Laporan Penjualan</h1>
-      <p class="sd-header__desc">Monitoring dan analisis data penjualan berdasarkan periode tertentu</p>
+      <div class="sd-header__title-wrap">
+        <div class="sd-header__icon">
+          <mat-icon>monitoring</mat-icon>
+        </div>
+
+        <div>
+          <h1 class="sd-header__title">Laporan Penjualan</h1>
+          <p class="sd-header__desc">Monitoring dan analisis data penjualan berdasarkan periode tertentu</p>
+        </div>
+      </div>
     </div>
 
     <button
@@ -11,213 +18,176 @@
       class="sd-export-btn"
       (click)="onExport()"
       [disabled]="filteredTransactions.length === 0"
-      matTooltip="Export ke file Excel / PDF"
+      matTooltip="Export ke file Excel"
     >
       <mat-icon>download</mat-icon>
-      Export Laporan Penjualan
+      Export Laporan
     </button>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════ FILTER -->
-  <mat-card class="sd-filter-card" appearance="outlined">
-    <mat-card-content>
-      <p class="sd-filter-label">
-        <mat-icon class="sd-filter-label__icon">filter_list</mat-icon>
-        Pilih Tanggal
-      </p>
-
-      <form [formGroup]="filterForm">
-        <mat-form-field appearance="outline" class="sd-range-picker">
-          <mat-date-range-input [rangePicker]="picker">
-            <input
-              matStartDate
-              formControlName="startDate"
-              placeholder="Tanggal Awal"
-              (keydown)="isTyping = true"
-              (keyup.enter)="onManualEnter()"
-            />
-
-            <input
-              matEndDate
-              formControlName="endDate"
-              placeholder="Tanggal Akhir"
-              (keydown)="isTyping = true"
-              (keyup.enter)="onManualEnter()"
-            />
-          </mat-date-range-input>
-
-          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-
-          <mat-date-range-picker #picker></mat-date-range-picker>
-        </mat-form-field>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- ═══════════════════════════════════════════════════════ SUMMARY -->
-  <div class="sd-summary-grid">
-    <!-- Total Transaksi -->
-    <mat-card class="sd-summary-card sd-summary-card--blue" appearance="outlined">
-      <mat-card-content class="sd-summary-card__inner">
-        <div class="sd-summary-card__icon-wrap sd-summary-card__icon-wrap--blue">
-          <mat-icon>receipt_long</mat-icon>
-        </div>
-
-        <div class="sd-summary-card__info">
-          <span class="sd-summary-card__label">Total Transaksi</span>
-
-          <span class="sd-summary-card__value">{{ summary.totalTransaksi | number }}</span>
-
-          <span class="sd-summary-card__sub">transaksi tercatat</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Total Penjualan -->
-    <mat-card class="sd-summary-card sd-summary-card--green" appearance="outlined">
-      <mat-card-content class="sd-summary-card__inner">
-        <div class="sd-summary-card__icon-wrap sd-summary-card__icon-wrap--green">
-          <mat-icon>payments</mat-icon>
-        </div>
-
-        <div class="sd-summary-card__info">
-          <span class="sd-summary-card__label">Total Penjualan</span>
-
-          <span class="sd-summary-card__value sd-summary-card__value--sm">{{ formatRupiah(summary.totalPenjualan) }}</span>
-
-          <span class="sd-summary-card__sub">pendapatan periode ini</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Produk Terjual -->
-    <mat-card class="sd-summary-card sd-summary-card--purple" appearance="outlined">
-      <mat-card-content class="sd-summary-card__inner">
-        <div class="sd-summary-card__icon-wrap sd-summary-card__icon-wrap--purple">
-          <mat-icon>inventory_2</mat-icon>
-        </div>
-
-        <div class="sd-summary-card__info">
-          <span class="sd-summary-card__label">Produk Terjual</span>
-
-          <span class="sd-summary-card__value">{{ summary.produkTerjual | number }}</span>
-
-          <span class="sd-summary-card__sub">unit terjual</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Total Profit -->
-    <mat-card class="sd-summary-card sd-summary-card--orange" appearance="outlined">
-      <mat-card-content class="sd-summary-card__inner">
-        <div class="sd-summary-card__icon-wrap sd-summary-card__icon-wrap--orange">
-          <mat-icon>trending_up</mat-icon>
-        </div>
-
-        <div class="sd-summary-card__info">
-          <span class="sd-summary-card__label">Total Keuntungan</span>
-
-          <span class="sd-summary-card__value sd-summary-card__value--sm">{{ formatRupiah(summary.totalKeuntungan) }}</span>
-
-          <span class="sd-summary-card__sub">profit penjualan</span>
-        </div>
-      </mat-card-content>
-    </mat-card>
+  <!-- ═══ FILTER -->
+  <div class="sd-filter-card">
+    <p class="sd-filter-label">
+      <mat-icon>calendar_month</mat-icon>
+      Pilih Tanggal
+    </p>
+    <form [formGroup]="filterForm">
+      <mat-form-field appearance="outline" class="sd-range-picker">
+        <mat-date-range-input [rangePicker]="picker">
+          <input
+            matStartDate
+            formControlName="startDate"
+            placeholder="Tanggal Awal"
+            (keydown)="isTyping = true"
+            (keyup.enter)="onManualEnter()"
+          />
+          <input
+            matEndDate
+            formControlName="endDate"
+            placeholder="Tanggal Akhir"
+            (keydown)="isTyping = true"
+            (keyup.enter)="onManualEnter()"
+          />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </form>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════ TABLE -->
-  <mat-card class="sd-table-card" appearance="outlined">
-    <mat-card-header class="sd-table-card__header">
+  <!-- ═══ SUMMARY -->
+  <div class="sd-summary-grid">
+    <div class="sd-summary-card">
+      <div class="sd-summary-card__icon blue">
+        <mat-icon>receipt_long</mat-icon>
+      </div>
+      <div class="sd-summary-card__info">
+        <span class="sd-summary-card__label">Total Transaksi</span>
+        <span class="sd-summary-card__value">{{ summary.totalTransaksi | number }}</span>
+        <span class="sd-summary-card__sub">transaksi tercatat</span>
+      </div>
+    </div>
+
+    <div class="sd-summary-card">
+      <div class="sd-summary-card__icon green">
+        <mat-icon>payments</mat-icon>
+      </div>
+      <div class="sd-summary-card__info">
+        <span class="sd-summary-card__label">Total Penjualan</span>
+        <span class="sd-summary-card__value value-sm">{{ formatRupiah(summary.totalPenjualan) }}</span>
+        <span class="sd-summary-card__sub">pendapatan periode ini</span>
+      </div>
+    </div>
+
+    <div class="sd-summary-card">
+      <div class="sd-summary-card__icon purple">
+        <mat-icon>inventory_2</mat-icon>
+      </div>
+      <div class="sd-summary-card__info">
+        <span class="sd-summary-card__label">Produk Terjual</span>
+        <span class="sd-summary-card__value">{{ summary.produkTerjual | number }}</span>
+        <span class="sd-summary-card__sub">unit terjual</span>
+      </div>
+    </div>
+
+    <div class="sd-summary-card">
+      <div class="sd-summary-card__icon amber">
+        <mat-icon>trending_up</mat-icon>
+      </div>
+      <div class="sd-summary-card__info">
+        <span class="sd-summary-card__label">Total Keuntungan</span>
+        <span class="sd-summary-card__value value-sm">{{ formatRupiah(summary.totalKeuntungan) }}</span>
+        <span class="sd-summary-card__sub">profit penjualan</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TABLE CARD -->
+  <div class="sd-table-card">
+    <div class="sd-table-card__header">
       <div class="sd-table-card__title">
         <mat-icon>table_chart</mat-icon>
         Detail Transaksi
       </div>
-
       <span class="sd-table-card__badge">{{ filteredTransactions.length }} data</span>
-    </mat-card-header>
+    </div>
 
-    <mat-card-content class="sd-table-card__content">
-      <!-- EMPTY STATE -->
-      <div class="sd-empty" *ngIf="filteredTransactions.length === 0">
-        <mat-icon>inventory_2</mat-icon>
-
-        <p>Tidak ada transaksi dalam periode ini</p>
+    <!-- EMPTY STATE -->
+    <div class="sd-empty" *ngIf="filteredTransactions.length === 0">
+      <div class="sd-empty__icon">
+        <mat-icon>inbox</mat-icon>
       </div>
+      <p class="sd-empty__title">Tidak ada transaksi</p>
+      <p class="sd-empty__sub">Coba ubah rentang tanggal yang dipilih</p>
+    </div>
 
-      <!-- TABLE -->
-      <div class="sd-table-wrap" *ngIf="filteredTransactions.length > 0">
-        <table mat-table [dataSource]="filteredTransactions" class="sd-table">
-          <!-- NO -->
-          <ng-container matColumnDef="no">
-            <th mat-header-cell *matHeaderCellDef class="col-no">No</th>
+    <!-- TABLE -->
+    <div class="sd-table-wrap" *ngIf="filteredTransactions.length > 0">
+      <table mat-table [dataSource]="filteredTransactions" class="sd-table">
+        <ng-container matColumnDef="no">
+          <th mat-header-cell *matHeaderCellDef class="col-no">No</th>
+          <td mat-cell *matCellDef="let row" class="col-no cell-muted">{{ getRowIndex(row) }}</td>
+        </ng-container>
 
-            <td mat-cell *matCellDef="let row" class="col-no cell-muted">{{ getRowIndex(row) }}</td>
-          </ng-container>
+        <!-- TANGGAL -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Tanggal</th>
 
-          <!-- TANGGAL -->
-          <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef>Tanggal</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="date-cell">
+              <span class="date-main">{{ row.date.split('-').reverse().join('-') }}</span>
 
-            <td mat-cell *matCellDef="let row">{{ row.date.split('-').reverse().join('-') }}</td>
-          </ng-container>
+              <span class="date-time">{{ row.time || '-' }}</span>
+            </div>
+          </td>
+        </ng-container>
 
-          <!-- INVOICE -->
-          <ng-container matColumnDef="invoice">
-            <th mat-header-cell *matHeaderCellDef>Invoice</th>
+        <!-- INVOICE -->
+        <ng-container matColumnDef="invoice">
+          <th mat-header-cell *matHeaderCellDef>Invoice</th>
 
-            <td mat-cell *matCellDef="let row" class="cell-invoice">{{ row.id_invoice }}</td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge-invoice">INV-{{ row.id_invoice }}</span>
+          </td>
+        </ng-container>
 
-          <!-- PROJECT -->
-          <ng-container matColumnDef="project">
-            <th mat-header-cell *matHeaderCellDef>Nama Project</th>
+        <ng-container matColumnDef="project">
+          <th mat-header-cell *matHeaderCellDef>Nama Proyek</th>
 
-            <td mat-cell *matCellDef="let row" class="cell-name">{{ row.nama_project }}</td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row" class="cell-name">{{ row.nama_project }}</td>
+        </ng-container>
 
-          <!-- TOTAL BARANG -->
-          <ng-container matColumnDef="totalItems">
-            <th mat-header-cell *matHeaderCellDef class="col-center">Total Barang</th>
+        <ng-container matColumnDef="totalItems">
+          <th mat-header-cell *matHeaderCellDef class="col-center">Total Barang</th>
 
-            <td mat-cell *matCellDef="let row" class="col-center">{{ row.total_items }} pcs</td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row" class="col-center">{{ row.total_items }} pcs</td>
+        </ng-container>
 
-          <!-- TOTAL HARGA -->
-          <ng-container matColumnDef="totalPrice">
-            <th mat-header-cell *matHeaderCellDef>Total Harga</th>
+        <ng-container matColumnDef="totalPrice">
+          <th mat-header-cell *matHeaderCellDef>Total Harga</th>
 
-            <td mat-cell *matCellDef="let row" class="cell-price">{{ formatRupiah(row.total_price) }}</td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row" class="cell-price">{{ formatRupiah(row.total_price) }}</td>
+        </ng-container>
 
-          <!-- PROFIT -->
-          <ng-container matColumnDef="profit">
-            <th mat-header-cell *matHeaderCellDef>Keuntungan</th>
+        <ng-container matColumnDef="profit">
+          <th mat-header-cell *matHeaderCellDef>Keuntungan</th>
 
-            <td mat-cell *matCellDef="let row" class="cell-price">{{ formatRupiah(row.total_profit) }}</td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row" class="cell-profit">{{ formatRupiah(row.total_profit) }}</td>
+        </ng-container>
 
-          <!-- STATUS -->
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef class="col-center">Status</th>
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="col-center">Status</th>
 
-            <td mat-cell *matCellDef="let row" class="col-center">
-              <span
-                class="status-badge"
-                [ngClass]="{
-                  'status-success': row.status_pembayaran?.toLowerCase() === 'lunas',
-                  'status-warning': row.status_pembayaran?.toLowerCase() === 'pending'
-                }"
-              >
-                {{ row.status_pembayaran }}
-              </span>
-            </td>
-          </ng-container>
+          <td mat-cell *matCellDef="let row" class="col-center">
+            <span class="status-badge status-lunas">{{ row.status_pembayaran | titlecase }}</span>
+          </td>
+        </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
 
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-      </div>
-    </mat-card-content>
-  </mat-card>
+    <div class="sd-table-card__footer" *ngIf="filteredTransactions.length > 0">Menampilkan {{ filteredTransactions.length }} transaksi</div>
+  </div>
 </section>

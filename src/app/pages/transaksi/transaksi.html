@@ -1,186 +1,517 @@
-<div class="d-flex align-items-center justify-content-between mb-4">
-  <h4 class="mb-0">Data Transaksi</h4>
-</div>
-
-<!-- ================= BARANG MASUK ================= -->
-<div class="card tbl-card mb-4">
-  <div class="card-header d-flex align-items-center justify-content-between mb-3">
-    <h5 class="mb-0">Barang Masuk</h5>
-    <button type="button" class="btn btn-sm btn-primary" (click)="openAddMasuk()">
-      <i class="bi bi-plus-lg me-1"></i>
-      Tambah Stock Barang
-    </button>
-  </div>
-
-  <div class="table-responsive">
-    <table class="table table-hover mb-0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Barang</th>
-          <th>Jumlah</th>
-          <th>Harga Beli</th>
-          <th>Tanggal</th>
-          <th class="text-center">Action</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        @for (m of barangMasuk; track m.id_brg_masuk) {
-        <tr>
-          <td>{{ m.id_brg_masuk }}</td>
-          <td>{{ getNamaBarang(m.id_barang) }}</td>
-          <td>{{ m.jumlah }}</td>
-          <td>{{ m.harga_beli | number }}</td>
-          <td>{{ m.datetime | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td class="text-center">
-            <button class="btn btn-sm btn-outline-danger" (click)="onDeleteMasuk(m)">
-              <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ================= BARANG KELUAR ================= -->
-<div class="card tbl-card mb-4">
-  <div class="card-header">
-    <h5 class="mb-0">Barang Keluar</h5>
-  </div>
-
-  <div class="table-responsive">
-    <table class="table table-hover mb-0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Barang</th>
-          <th>Invoice</th>
-          <th>Jumlah</th>
-          <th>Harga Jual</th>
-          <th>Tanggal</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        @for (k of barangKeluar; track k.id_brg_keluar) {
-        <tr>
-          <td>{{ k.id_brg_keluar }}</td>
-          <td>{{ getNamaBarang(k.id_barang) }}</td>
-          <td>{{ k.id_invoice }}</td>
-          <td>{{ k.jumlah }}</td>
-          <td>{{ k.harga_jual | number }}</td>
-          <td>{{ k.datetime | date:'dd/MM/yyyy HH:mm' }}</td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ================= RETUR ================= -->
-<div class="card tbl-card">
-  <div class="card-header">
-    <h5 class="mb-0">Data Retur</h5>
-  </div>
-
-  <div class="table-responsive">
-    <table class="table table-hover mb-0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Barang</th>
-          <th>Invoice</th>
-          <th>Jumlah</th>
-          <th>Harga Jual</th>
-          <th>Kondisi</th>
-          <th>Tanggal</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        @for (r of retur; track r.id_retur) {
-        <tr>
-          <td>{{ r.id_retur }}</td>
-          <td>{{ getNamaBarang(r.id_barang) }}</td>
-          <td>{{ r.id_invoice }}</td>
-          <td>{{ r.jumlah }}</td>
-          <td>{{ r.harga_jual | number }}</td>
-          <td>{{ r.kondisi }}</td>
-          <td>{{ r.datetime | date:'dd/MM/yyyy HH:mm' }}</td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- MODAL TAMBAH BARANG MASUK -->
-<div class="modal-backdrop-custom" *ngIf="showAddMasukModal" (click)="closeAddMasuk()"></div>
-
-<div class="modal-custom" *ngIf="showAddMasukModal">
-  <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h5>Tambah Barang Masuk</h5>
-
-      <button class="btn-close" (click)="closeAddMasuk()"></button>
-    </div>
-
-    <div class="modal-body">
-      <div class="mb-2">
-        <label>Barang</label>
-
-        <select class="form-control" [(ngModel)]="addMasukForm.id_barang">
-          <option [ngValue]="null">Pilih Barang</option>
-
-          <option *ngFor="let b of barangList" [ngValue]="b.id_barang">{{ b.nama_barang }} ({{ b.satuan }})</option>
-        </select>
+<div class="page-wrapper">
+  <div class="top-filter-bar">
+    <div class="bar-left">
+      <div class="stat-pill" [class.active]="selectedView === 'masuk'" (click)="selectedView = 'masuk'">
+        <span class="pill-dot dot-masuk"></span>
+        <span>Masuk</span>
+        <span class="pill-count">{{ barangMasuk.length }}</span>
       </div>
 
-      <div class="mb-2">
-        <label>Jumlah</label>
+      <div class="pill-divider"></div>
 
-        <input type="number" class="form-control" [(ngModel)]="addMasukForm.jumlah" />
+      <div class="stat-pill" [class.active]="selectedView === 'keluar'" (click)="selectedView = 'keluar'">
+        <span class="pill-dot dot-keluar"></span>
+        <span>Keluar</span>
+        <span class="pill-count">{{ barangKeluar.length }}</span>
       </div>
 
-      <div class="mb-2">
-        <label>Harga Beli</label>
+      <div class="pill-divider"></div>
 
-        <input type="number" class="form-control" [(ngModel)]="addMasukForm.harga_beli" />
+      <div class="stat-pill" [class.active]="selectedView === 'retur'" (click)="selectedView = 'retur'">
+        <span class="pill-dot dot-retur"></span>
+        <span>Retur</span>
+        <span class="pill-count">{{ retur.length }}</span>
       </div>
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeAddMasuk()">Batal</button>
-
-      <button class="btn btn-primary" (click)="submitAddMasuk()">Simpan</button>
+    <div class="bar-right">
+      <select class="filter-select" [(ngModel)]="selectedView">
+        <option value="all">Semua</option>
+        <option value="masuk">Barang Masuk</option>
+        <option value="keluar">Barang Keluar</option>
+        <option value="retur">Barang Retur</option>
+      </select>
     </div>
   </div>
-</div>
+  <div class="tbl-card" *ngIf="isView('masuk')">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="title-icon">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
 
-<!-- MODAL DELETE -->
-<div class="modal-backdrop-custom" *ngIf="showDeleteMasukModal"></div>
+        <div>
+          <h3 class="mb-0">Barang Masuk</h3>
+          <p class="subtitle">Data penambahan stok barang</p>
+        </div>
+      </div>
 
-<div class="modal-custom" *ngIf="showDeleteMasukModal">
-  <div class="modal-card">
-    <div class="modal-header">
-      <h5>Konfirmasi Hapus</h5>
-
-      <button class="btn-close" (click)="closeDeleteMasuk()"></button>
+      <button mat-raised-button class="btn-add" (click)="openAddMasuk()">
+        <mat-icon>add</mat-icon>
+        <span>Tambah Stok Barang</span>
+      </button>
     </div>
 
-    <div class="modal-body">
-      Yakin hapus data
-      <b>{{ deleteMasukTarget?.id_brg_masuk }}</b>
-      ?
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-stats">
+        <div class="stat-chip">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ filteredBarangMasuk.length }}</span>
+          <span class="stat-label">transaksi</span>
+        </div>
+
+        <div class="stat-divider"></div>
+
+        <div class="stat-chip">
+          <span class="stat-label">Halaman</span>
+          <span class="stat-value">{{ pageIndexMasuk + 1 }}</span>
+          <span class="stat-label">dari {{ totalPagesMasuk }}</span>
+        </div>
+      </div>
+
+      <div class="search-box" [class.focused]="searchMasukFocused">
+        <mat-icon class="search-icon">search</mat-icon>
+
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchMasukKeyword"
+          placeholder="Cari nama barang masuk..."
+          (keyup.enter)="searchBarangMasuk()"
+          (focus)="searchMasukFocused = true"
+          (blur)="searchMasukFocused = false"
+        />
+
+        <button *ngIf="searchMasukKeyword" type="button" class="btn-clear" (click)="clearSearchMasuk()">
+          <mat-icon>close</mat-icon>
+        </button>
+
+        <button type="button" class="btn-search" (click)="searchBarangMasuk()">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-light" (click)="closeDeleteMasuk()">Batal</button>
+    <!-- TABLE -->
+    <div class="table-responsive">
+      <div class="table-wrapper">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th>Nama Barang</th>
+              <th class="col-num">Jumlah</th>
+              <th class="col-num">Harga Beli</th>
+              <th>Tanggal</th>
+              <th class="col-action">Aksi</th>
+            </tr>
+          </thead>
 
-      <button class="btn btn-danger" (click)="confirmDeleteMasuk()">Hapus</button>
+          <tbody>
+            @for (m of paginatedBarangMasuk; track m.id_brg_masuk; let i = $index) {
+
+            <tr class="table-row">
+              <td class="col-no text-muted-sm">{{ (pageIndexMasuk * pageSizeMasuk) + i + 1 }}</td>
+
+              <td>
+                <div class="barang-name">{{ m.nama_barang }}</div>
+              </td>
+
+              <td class="col-num">
+                <span class="qty-value">{{ m.jumlah | number }}</span>
+              </td>
+
+              <td class="col-num">
+                <span class="price-value">{{ m.harga_beli ? 'Rp ' + m.harga_beli.toLocaleString('id-ID') : '—' }}</span>
+              </td>
+
+              <td class="date-cell">
+                <span class="date-main">{{ m.datetime | date:'dd MMM yyyy':'':'id' }}</span>
+
+                <span class="date-time">{{ m.datetime | date:'HH:mm':'':'id' }}</span>
+              </td>
+
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDeleteMasuk(m)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EMPTY -->
+    <div *ngIf="!isLoading && filteredBarangMasuk.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>search_off</mat-icon>
+      </div>
+
+      <p class="empty-title">Data barang masuk tidak ditemukan</p>
+
+      <p class="empty-sub">Coba gunakan kata kunci berbeda</p>
+
+      <button class="btn-reset-search" (click)="clearSearchMasuk()">Reset Pencarian</button>
+    </div>
+
+    <!-- PAGINATOR -->
+    <div class="paginator-wrapper">
+      <mat-paginator
+        [length]="filteredBarangMasuk.length"
+        [pageSize]="pageSizeMasuk"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        [pageIndex]="pageIndexMasuk"
+        (page)="onPageMasukChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- BARANG KELUAR -->
+  <!-- ===================================================== -->
+
+  <div class="tbl-card" *ngIf="isView('keluar')">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="title-icon keluar-icon">
+          <mat-icon>outbox</mat-icon>
+        </div>
+
+        <div>
+          <h3 class="mb-0">Barang Keluar</h3>
+          <p class="subtitle">Data pengeluaran barang berdasarkan invoice</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-stats">
+        <div class="stat-chip">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ filteredBarangKeluar.length }}</span>
+          <span class="stat-label">transaksi</span>
+        </div>
+
+        <div class="stat-divider"></div>
+
+        <div class="stat-chip">
+          <span class="stat-label">Halaman</span>
+          <span class="stat-value">{{ pageIndexKeluar + 1 }}</span>
+          <span class="stat-label">dari {{ totalPagesKeluar }}</span>
+        </div>
+      </div>
+
+      <div class="search-box" [class.focused]="searchKeluarFocused">
+        <mat-icon class="search-icon">search</mat-icon>
+
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchKeluarKeyword"
+          placeholder="Cari nama barang keluar..."
+          (keyup.enter)="searchBarangKeluar()"
+          (focus)="searchKeluarFocused = true"
+          (blur)="searchKeluarFocused = false"
+        />
+
+        <button *ngIf="searchKeluarKeyword" type="button" class="btn-clear" (click)="clearSearchKeluar()">
+          <mat-icon>close</mat-icon>
+        </button>
+
+        <button type="button" class="btn-search" (click)="searchBarangKeluar()">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+      <div class="table-wrapper">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th>Nama Barang</th>
+              <th>Invoice</th>
+              <th class="col-num">Jumlah</th>
+              <th class="col-num">Harga Jual</th>
+              <th>Tanggal</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (k of paginatedBarangKeluar; track k.id_brg_keluar; let i = $index) {
+
+            <tr class="table-row">
+              <td class="col-no text-muted-sm">{{ (pageIndexKeluar * pageSizeKeluar) + i + 1 }}</td>
+
+              <td>
+                <div class="barang-name">{{ k.nama_barang }}</div>
+              </td>
+
+              <td>
+                <span class="badge-kode">INV-{{ k.id_invoice }}</span>
+              </td>
+
+              <td class="col-num">
+                <span class="qty-value">{{ k.jumlah | number }}</span>
+              </td>
+
+              <td class="col-num">
+                <span class="price-value">{{ k.harga_jual ? 'Rp ' + k.harga_jual.toLocaleString('id-ID') : '—' }}</span>
+              </td>
+
+              <td class="date-cell">
+                <span class="date-main">{{ k.datetime | date:'dd MMM yyyy':'':'id' }}</span>
+
+                <span class="date-time">{{ k.datetime | date:'HH:mm':'':'id' }}</span>
+              </td>
+            </tr>
+
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EMPTY -->
+    <div *ngIf="!isLoading && filteredBarangKeluar.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>search_off</mat-icon>
+      </div>
+
+      <p class="empty-title">Data barang keluar tidak ditemukan</p>
+
+      <p class="empty-sub">Coba gunakan kata kunci berbeda</p>
+
+      <button class="btn-reset-search" (click)="clearSearchKeluar()">Reset Pencarian</button>
+    </div>
+
+    <!-- PAGINATOR -->
+    <div class="paginator-wrapper">
+      <mat-paginator
+        [length]="filteredBarangKeluar.length"
+        [pageSize]="pageSizeKeluar"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        [pageIndex]="pageIndexKeluar"
+        (page)="onPageKeluarChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- RETUR -->
+  <!-- ===================================================== -->
+
+  <div class="tbl-card" *ngIf="isView('retur')">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="title-icon retur-icon">
+          <mat-icon>assignment_return</mat-icon>
+        </div>
+
+        <div>
+          <h3 class="mb-0">Barang Retur</h3>
+          <p class="subtitle">Data pengembalian barang dari pelanggan</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-stats">
+        <div class="stat-chip">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ filteredRetur.length }}</span>
+          <span class="stat-label">retur</span>
+        </div>
+
+        <div class="stat-divider"></div>
+
+        <div class="stat-chip">
+          <span class="stat-label">Halaman</span>
+          <span class="stat-value">{{ pageIndexRetur + 1 }}</span>
+          <span class="stat-label">dari {{ totalPagesRetur }}</span>
+        </div>
+      </div>
+
+      <div class="search-box" [class.focused]="searchReturFocused">
+        <mat-icon class="search-icon">search</mat-icon>
+
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchReturKeyword"
+          placeholder="Cari nama barang retur..."
+          (keyup.enter)="searchRetur()"
+          (focus)="searchReturFocused = true"
+          (blur)="searchReturFocused = false"
+        />
+
+        <button *ngIf="searchReturKeyword" type="button" class="btn-clear" (click)="clearSearchRetur()">
+          <mat-icon>close</mat-icon>
+        </button>
+
+        <button type="button" class="btn-search" (click)="searchRetur()">
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-responsive">
+      <div class="table-wrapper">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th>Nama Barang</th>
+              <th>Invoice</th>
+              <th class="col-num">Jumlah</th>
+              <th class="col-num">Harga Jual</th>
+              <th>Kondisi</th>
+              <th>Tanggal</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (r of paginatedRetur; track r.id_retur; let i = $index) {
+
+            <tr class="table-row">
+              <td class="col-no text-muted-sm">{{ (pageIndexRetur * pageSizeRetur) + i + 1 }}</td>
+
+              <td>
+                <div class="barang-name">{{ r.nama_barang }}</div>
+              </td>
+
+              <td>
+                <span class="badge-kode">INV-{{ r.id_invoice }}</span>
+              </td>
+
+              <td class="col-num">
+                <span class="qty-value">{{ r.jumlah | number }}</span>
+              </td>
+
+              <td class="col-num">
+                <span class="price-value">{{ r.harga_jual ? 'Rp ' + r.harga_jual.toLocaleString('id-ID') : '—' }}</span>
+              </td>
+
+              <td>
+                <span class="badge-satuan">{{ r.kondisi }}</span>
+              </td>
+
+              <td class="date-cell">
+                <span class="date-main">{{ r.datetime | date:'dd MMM yyyy':'':'id' }}</span>
+
+                <span class="date-time">{{ r.datetime | date:'HH:mm':'':'id' }}</span>
+              </td>
+            </tr>
+
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EMPTY -->
+    <div *ngIf="!isLoading && filteredRetur.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>search_off</mat-icon>
+      </div>
+
+      <p class="empty-title">Data retur tidak ditemukan</p>
+
+      <p class="empty-sub">Coba gunakan kata kunci berbeda</p>
+
+      <button class="btn-reset-search" (click)="clearSearchRetur()">Reset Pencarian</button>
+    </div>
+
+    <!-- PAGINATOR -->
+    <div class="paginator-wrapper">
+      <mat-paginator
+        [length]="filteredRetur.length"
+        [pageSize]="pageSizeRetur"
+        [pageSizeOptions]="[5, 10, 20, 50]"
+        [pageIndex]="pageIndexRetur"
+        (page)="onPageReturChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- MODAL ADD -->
+  <!-- ===================================================== -->
+
+  <div class="modal-backdrop-custom" *ngIf="showAddMasukModal" (click)="closeAddMasuk()"></div>
+
+  <div class="modal-custom" *ngIf="showAddMasukModal">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon add-icon">
+            <mat-icon>add_box</mat-icon>
+          </div>
+
+          <h5>Tambah Barang Masuk</h5>
+        </div>
+
+        <button type="button" class="btn-close-modal" (click)="closeAddMasuk()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Barang</label>
+
+          <ng-select [(ngModel)]="addMasukForm.id_barang" placeholder="Pilih barang" [searchable]="true" [clearable]="true">
+            @for (b of barangList; track b.id_barang) {
+            <ng-option [value]="b.id_barang">{{ b.nama_barang }} ({{ b.satuan }})</ng-option>
+            }
+          </ng-select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Jumlah</label>
+
+          <input type="number" class="form-control" [(ngModel)]="addMasukForm.jumlah" placeholder="Masukkan jumlah barang" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Harga Beli</label>
+
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">Rp</span>
+
+            <input
+              type="text"
+              class="form-control has-prefix"
+              [(ngModel)]="hargaBeliDisplay"
+              (input)="onHargaBeliInput()"
+              placeholder="0"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" (click)="closeAddMasuk()">Batal</button>
+
+        <button type="button" class="btn-modal-save" (click)="submitAddMasuk()">
+          <mat-icon>save</mat-icon>
+          <span>Simpan</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

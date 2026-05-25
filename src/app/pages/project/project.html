@@ -1,158 +1,269 @@
-<div class="pb-4">
-  <div class="card tbl-card mb-4">
-    <div class="d-flex align-items-center justify-content-between p-3">
-      <h3 class="mb-0">Data Proyek</h3>
-      <button mat-raised-button style="background-color: #2563eb" aria-label="Tambah" (click)="openAdd()">
-        <mat-icon class="text-white">add</mat-icon>
-        <span style="padding-left: 5px; font-size: 14px; color: white">Tambah Proyek</span>
+<div class="page-wrapper">
+  <!-- ───────────────── CARD ───────────────── -->
+  <div class="tbl-card">
+    <!-- HEADER -->
+    <div class="card-header">
+      <div class="card-title">
+        <div class="title-icon">
+          <mat-icon>folder_open</mat-icon>
+        </div>
+
+        <div>
+          <h3 class="mb-0">Data Proyek</h3>
+          <p class="subtitle">Kelola data proyek dan koordinator</p>
+        </div>
+      </div>
+
+      <button class="btn-add" mat-raised-button (click)="openAdd()">
+        <mat-icon>add</mat-icon>
+        <span>Tambah Proyek</span>
       </button>
     </div>
 
-    <div class="d-flex justify-content-end p-3">
-      <div class="search-box">
-        <input type="text" class="search-input" [(ngModel)]="searchKeyword" placeholder="Cari proyek..." (keyup.enter)="searchData()" />
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-stats">
+        <div class="stat-chip">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ filteredProject.length }}</span>
+          <span class="stat-label">proyek</span>
+        </div>
+
+        <div class="stat-divider"></div>
+
+        <div class="stat-chip">
+          <span class="stat-label">Halaman</span>
+          <span class="stat-value">{{ pageIndex + 1 }}</span>
+          <span class="stat-label">dari {{ totalPages }}</span>
+        </div>
+      </div>
+
+      <div class="search-box" [class.focused]="searchFocused">
+        <mat-icon class="search-icon">search</mat-icon>
+
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchKeyword"
+          placeholder="Cari proyek..."
+          (keyup.enter)="searchData()"
+          (focus)="searchFocused = true"
+          (blur)="searchFocused = false"
+        />
+
         <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()">
-          <i class="bi bi-x-lg"></i>
+          <mat-icon>close</mat-icon>
         </button>
+
         <button type="button" class="btn-search" (click)="searchData()">
-          <i class="bi bi-search"></i>
+          <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
     </div>
 
+    <!-- TABLE -->
     <div class="table-responsive">
       <div class="table-wrapper">
-        <table class="table table-hover mb-0">
+        <table class="table mb-0">
           <thead>
             <tr>
-              <th>No</th>
+              <th class="col-no">No</th>
               <th>Nama Proyek</th>
               <th>Alamat</th>
-              <th>Penanggung Jawab 1</th>
-              <th>Penanggung Jawab 2</th>
-              <th>Action</th>
+              <th>Koordinator 1</th>
+              <th>Koordinator 2</th>
+              <th class="col-action">Aksi</th>
             </tr>
           </thead>
 
           <tbody>
             @for (p of paginatedProject; track p.id_project; let i = $index) {
-            <tr>
-              <td>{{ (pageIndex * pageSize) + i + 1 }}</td>
-              <td>{{ p.nama_project || '-' }}</td>
-              <td>{{ p.alamat || '-' }}</td>
-              <td>{{ p.user_1_nama || '-' }}</td>
-              <td>{{ p.user_2_nama || '-' }}</td>
+
+            <tr class="table-row">
+              <td class="col-no text-muted-sm">{{ (pageIndex * pageSize) + i + 1 }}</td>
+
+              <td class="nama-barang">{{ p.nama_project || '-' }}</td>
+
               <td>
-                <button type="button" class="btn btn-sm btn-outline-primary me-2" title="Edit" (click)="onEdit(p)">
-                  <i class="bi bi-pencil-square"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" (click)="onDelete(p)">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <span class="alamat-text">{{ p.alamat || '-' }}</span>
+              </td>
+
+              <td>
+                <span class="badge-user">{{ p.user_1_nama || '-' }}</span>
+              </td>
+
+              <td>
+                <span class="badge-user">{{ p.user_2_nama || '-' }}</span>
+              </td>
+
+              <td>
+                <div class="action-btns">
+                  <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(p)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(p)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
               </td>
             </tr>
+
             }
           </tbody>
         </table>
       </div>
     </div>
 
-    <div *ngIf="!isLoading && filteredProject.length === 0" class="empty-search text-center">
-      <i class="bi bi-search"></i>
-      <div class="mt-2 fw-semibold">Tidak ada proyek ditemukan</div>
-      <small class="text-muted">Coba gunakan kata kunci lain</small>
+    <!-- EMPTY -->
+    <div *ngIf="!isLoading && filteredProject.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>search_off</mat-icon>
+      </div>
+
+      <p class="empty-title">Proyek tidak ditemukan</p>
+
+      <p class="empty-sub">Coba gunakan kata kunci yang berbeda</p>
+
+      <button class="btn-reset-search" (click)="clearSearch()">Reset Pencarian</button>
     </div>
 
-    <mat-paginator
-      [length]="filteredProject.length"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[5, 10, 20, 50]"
-      [pageIndex]="pageIndex"
-      (page)="onPageChange($event)"
-      showFirstLastButtons
-    ></mat-paginator>
+    <!-- PAGINATOR -->
+    <div class="paginator-wrapper">
+      <mat-paginator
+        [length]="filteredProject.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5,10,20,50]"
+        [pageIndex]="pageIndex"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+    </div>
   </div>
 
-  <div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAdd()"></div>
+  <!-- ───────────────── BACKDROP ───────────────── -->
+  <div class="modal-backdrop-custom" *ngIf="showAddModal || showEditModal" (click)="showAddModal ? closeAdd() : closeEdit()"></div>
 
+  <!-- ───────────────── MODAL ADD ───────────────── -->
   <div class="modal-custom" *ngIf="showAddModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h5 class="mb-0">Tambah Proyek</h5>
-        <button type="button" class="btn-close" (click)="closeAdd()"></button>
+        <div class="modal-title-wrap">
+          <div class="modal-icon add-icon">
+            <mat-icon>add_box</mat-icon>
+          </div>
+
+          <h5>Tambah Proyek</h5>
+        </div>
+
+        <button type="button" class="btn-close-modal" (click)="closeAdd()">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
+
       <div class="modal-body">
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Nama Proyek</label>
-          <input class="form-control" [(ngModel)]="addForm.nama_project" placeholder="Masukkan Nama Proyek" />
+
+          <input class="form-control" [(ngModel)]="addForm.nama_project" placeholder="Masukkan nama proyek" />
         </div>
-        <div class="mb-2">
+
+        <div class="form-group">
           <label class="form-label">Alamat</label>
-          <input class="form-control" [(ngModel)]="addForm.alamat" placeholder="Masukkan Alamat Proyek" />
+
+          <input class="form-control" [(ngModel)]="addForm.alamat" placeholder="Masukkan alamat proyek" />
         </div>
-        <div class="mb-2">
-          <label class="form-label">Penanggung Jawab 1</label>
-          <ng-select [(ngModel)]="addForm.id_user1" placeholder="Pilih Penanggung Jawab 1" [searchable]="true" [clearable]="true">
+
+        <div class="form-group">
+          <label class="form-label">Koordinator 1</label>
+
+          <ng-select [(ngModel)]="addForm.id_user1" placeholder="Pilih Koordinator 1" [searchable]="true" [clearable]="true">
             @for (u of getAddUser1(); track u.id_user) {
             <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
             }
           </ng-select>
         </div>
 
-        <div class="mb-2">
-          <label class="form-label">Penanggung Jawab 2</label>
-          <ng-select [(ngModel)]="addForm.id_user2" placeholder="Pilih Penanggung Jawab 2" [searchable]="true" [clearable]="true">
+        <div class="form-group">
+          <label class="form-label">Koordinator 2</label>
+
+          <ng-select [(ngModel)]="addForm.id_user2" placeholder="Pilih Koordinator 2" [searchable]="true" [clearable]="true">
             @for (u of getAddUser2(); track u.id_user) {
             <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
             }
           </ng-select>
         </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-light" (click)="closeAdd()">Batal</button>
-        <button type="button" class="btn btn-primary" (click)="submitAdd()">Simpan</button>
+        <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
+
+        <button type="button" class="btn-modal-save" (click)="submitAdd()">
+          <mat-icon>save</mat-icon>
+          Simpan Proyek
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
-
+  <!-- ───────────────── MODAL EDIT ───────────────── -->
   <div class="modal-custom" *ngIf="showEditModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h5 class="mb-0">Edit Proyek</h5>
-        <button type="button" class="btn-close" (click)="closeEdit()"></button>
+        <div class="modal-title-wrap">
+          <div class="modal-icon edit-icon">
+            <mat-icon>edit_note</mat-icon>
+          </div>
+
+          <h5>Edit Proyek</h5>
+        </div>
+
+        <button type="button" class="btn-close-modal" (click)="closeEdit()">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
+
       <div class="modal-body">
-        <div class="mb-2">
+        <div class="form-group">
           <label class="form-label">Nama Proyek</label>
-          <input class="form-control" [(ngModel)]="editForm.nama_project" placeholder="Masukkan Nama Proyek" />
+
+          <input class="form-control" [(ngModel)]="editForm.nama_project" placeholder="Masukkan nama proyek" />
         </div>
-        <div class="mb-2">
+
+        <div class="form-group">
           <label class="form-label">Alamat</label>
-          <input class="form-control" [(ngModel)]="editForm.alamat" placeholder="Masukkan Alamat Proyek" />
+
+          <input class="form-control" [(ngModel)]="editForm.alamat" placeholder="Masukkan alamat proyek" />
         </div>
-        <div class="mb-2">
-          <label class="form-label">Penanggung Jawab 1</label>
-          <ng-select [(ngModel)]="editForm.id_user1" placeholder="Pilih Penanggung Jawab 1" [searchable]="true" [clearable]="true">
+
+        <div class="form-group">
+          <label class="form-label">Koordinator 1</label>
+
+          <ng-select [(ngModel)]="editForm.id_user1" placeholder="Pilih Koordinator 1" [searchable]="true" [clearable]="true">
             @for (u of getEditUser1(); track u.id_user) {
             <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
             }
           </ng-select>
         </div>
 
-        <div class="mb-2">
-          <label class="form-label">Penanggung Jawab 2</label>
-          <ng-select [(ngModel)]="editForm.id_user2" placeholder="Pilih Penanggung Jawab 2" [searchable]="true" [clearable]="true">
+        <div class="form-group">
+          <label class="form-label">Koordinator 2</label>
+
+          <ng-select [(ngModel)]="editForm.id_user2" placeholder="Pilih Koordinator 2" [searchable]="true" [clearable]="true">
             @for (u of getEditUser2(); track u.id_user) {
             <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
             }
           </ng-select>
         </div>
       </div>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-light" (click)="closeEdit()">Batal</button>
-        <button type="button" class="btn btn-primary" (click)="submitEdit()">Simpan</button>
+        <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
+
+        <button type="button" class="btn-modal-save" (click)="submitEdit()">
+          <mat-icon>save</mat-icon>
+          Simpan Perubahan
+        </button>
       </div>
     </div>
   </div>
