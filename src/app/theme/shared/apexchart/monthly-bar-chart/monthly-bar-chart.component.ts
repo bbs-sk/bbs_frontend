@@ -32,57 +32,64 @@ export class MonthlyBarChartComponent implements OnInit {
 
         this.chartOptions = {
           chart: {
-            height: 450,
+            height: 420,
             type: 'area',
-            toolbar: {
-              show: false
+            toolbar: { show: false },
+            fontFamily: 'inherit',
+            sparkline: { enabled: false }
+          },
+          series: [{ name: 'Total Penjualan', data: totals }],
+          colors: ['#185FA5'],
+          fill: {
+            type: 'gradient',
+            gradient: {
+              shadeIntensity: 1,
+              opacityFrom: 0.35,
+              opacityTo: 0.02,
+              stops: [0, 90, 100]
             }
           },
-
-          series: [
-            {
-              name: 'Total Penjualan',
-              data: totals
-            }
-          ],
-
-          colors: ['#1677ff'],
-
-          dataLabels: {
-            enabled: false
-          },
-
+          dataLabels: { enabled: false },
           stroke: {
             curve: 'smooth',
-            width: 3
+            width: 2.5
           },
-
           xaxis: {
             categories: categories,
-            axisBorder: {
-              show: true,
-              color: '#f0f0f0'
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: {
+              style: {
+                fontSize: '12px',
+                colors: '#888'
+              }
             }
           },
-
           yaxis: {
             labels: {
-              formatter: function (value) {
-                return 'Rp ' + value.toLocaleString('id-ID');
-              }
+              style: { fontSize: '11px', colors: ['#aaa'] },
+              formatter: (value: number) => 'Rp ' + Intl.NumberFormat('id-ID', { notation: 'compact' }).format(value)
             }
           },
-
           tooltip: {
+            theme: 'light',
             y: {
-              formatter: function (value) {
-                return 'Rp ' + value.toLocaleString('id-ID');
-              }
+              formatter: (value: number) => 'Rp ' + value.toLocaleString('id-ID')
             }
           },
-
           grid: {
-            borderColor: '#f5f5f5'
+            borderColor: 'rgba(0,0,0,0.05)',
+            strokeDashArray: 4,
+            xaxis: { lines: { show: false } },
+            yaxis: { lines: { show: true } },
+            padding: { left: 10, right: 10, bottom: 0 }
+          },
+          markers: {
+            size: 4,
+            colors: ['#fff'],
+            strokeColors: '#185FA5',
+            strokeWidth: 2,
+            hover: { size: 6 }
           }
         };
 

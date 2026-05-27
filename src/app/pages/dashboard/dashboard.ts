@@ -8,14 +8,14 @@ import tableData from 'src/fake-data/default-data.json';
 import { MonthlyBarChartComponent } from 'src/app/theme/shared/apexchart/monthly-bar-chart/monthly-bar-chart.component';
 
 // icons
-import { IconService, IconDirective } from '@ant-design/icons-angular';
+import { IconService } from '@ant-design/icons-angular';
 import { FallOutline, ArrowDownOutline, ArrowUpOutline, CloseOutline, RiseOutline, SettingOutline } from '@ant-design/icons-angular/icons';
-import { CardComponent } from 'src/app/theme/shared/components/card/card.component';
 import { ApiService } from 'src/app/shared/services/api.service';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, CardComponent, IconDirective, MonthlyBarChartComponent],
+  imports: [CommonModule, MatIconModule, MonthlyBarChartComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -105,8 +105,17 @@ export class Dashboard {
   loadInvoice() {
     this.api.getInvoiceRecent().subscribe({
       next: (res: any) => {
+        console.log('RAW RESPONSE:', res);
+
         this.invoice = Array.isArray(res) ? res : (res?.val ?? []);
+
+        console.log('INVOICE:', this.invoice);
+
+        this.invoice.forEach((item, index) => {
+          console.log(`ORDER ${index + 1} STATUS:`, item.status);
+        });
       },
+
       error: (err) => console.log(err)
     });
   }
@@ -146,22 +155,6 @@ export class Dashboard {
     }
   }
 
-  getActivityIcon(activity: string): string {
-    switch (activity) {
-      case 'Barang Masuk':
-        return 'arrow-down';
-
-      case 'Barang Keluar':
-        return 'arrow-up';
-
-      case 'Retur':
-        return 'close';
-
-      default:
-        return 'infocircle';
-    }
-  }
-
   getActivityAmount(activity: string): string {
     switch (activity) {
       case 'Barang Masuk':
@@ -176,5 +169,61 @@ export class Dashboard {
       default:
         return '';
     }
+  }
+
+  getCardColor(index: number): string {
+    return ['blue', 'teal', 'coral', 'amber'][index] ?? 'blue';
+  }
+
+  getCardIcon(index: number): string {
+    return ['inventory_2', 'south', 'north', 'pending_actions'][index] ?? 'dashboard';
+  }
+
+  getActivityIcon(activity: string): string {
+    switch (activity) {
+      case 'Barang Masuk':
+        return 'south';
+      case 'Barang Keluar':
+        return 'north';
+      case 'Retur':
+        return 'refresh';
+      default:
+        return 'info';
+    }
+  }
+
+  getActivityClass(activity: string): string {
+    switch (activity) {
+      case 'Barang Masuk':
+        return 'masuk';
+      case 'Barang Keluar':
+        return 'keluar';
+      case 'Retur':
+        return 'retur';
+      default:
+        return 'default';
+    }
+  }
+
+  formatRupiah(value: any): string {
+    if (value === null || value === undefined || value === '') {
+      return '—';
+    }
+
+    return 'Rp ' + Number(value).toLocaleString('id-ID');
+  }
+
+  getStatusClass(status: string): string {
+    const s = status?.toLowerCase()?.trim();
+    const map: Record<string, string> = {
+      menunggu: 'warning',
+      pending: 'warning',
+      disetujui: 'info',
+      dikirim: 'success',
+      delivery: 'success',
+      selesai: 'success',
+      ditolak: 'danger'
+    };
+    return map[s] ?? 'default';
   }
 }

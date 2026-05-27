@@ -1,54 +1,60 @@
-<div class="row">
-  @for (analytic of AnalyticEcommerce; track analytic) {
-  <div class="col-md-6 col-xl-3">
-    <app-card [showHeader]="false" blockClass="dashboard-card">
-      <h6 class="mb-2 f-w-400 text-muted">{{ analytic.title }}</h6>
-      <h4 class="mb-3">{{ analytic.amount }}</h4>
-      <p class="mb-0 text-muted text-sm">
-        <span class="{{ analytic.color }}">{{ analytic.detail }}</span>
-      </p>
-    </app-card>
+<div class="row g-4">
+  <!-- ── STAT CARDS ── -->
+  @for (analytic of AnalyticEcommerce; track analytic; let i = $index) {
+  <div class="col-6 col-xl-3">
+    <div class="stat-card stat-card--{{ getCardColor(i) }}">
+      <div class="stat-icon">
+        <mat-icon>{{ getCardIcon(i) }}</mat-icon>
+      </div>
+      <p class="stat-label">{{ analytic.title }}</p>
+      <h3 class="stat-value">{{ analytic.amount }}</h3>
+      <p class="stat-detail">{{ analytic.detail }}</p>
+    </div>
   </div>
   }
 
-  <div class="col-md-12 col-xl-8">
-    <app-monthly-bar-chart />
+  <!-- ── CHART + TABLE ── -->
+  <div class="col-12 col-xl-8">
+    <div class="section-card mb-4">
+      <div class="section-header">
+        <span class="section-title">Tren Penjualan</span>
+        <span class="section-meta">5 bulan terakhir</span>
+      </div>
+      <div class="section-body">
+        <app-monthly-bar-chart />
+      </div>
+    </div>
 
-    <h5 class="mb-3">Recent Orders</h5>
-    <div class="card tbl-card">
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-title">Pesanan Terbaru</span>
+        <span class="section-meta">{{ invoice.length }} pesanan</span>
+      </div>
       <div class="table-responsive">
-        <table class="table table-hover mb-0">
+        <table class="dash-table">
           <thead>
             <tr>
-              <th>NO.</th>
-              <th>User</th>
+              <th>No.</th>
               <th>Proyek</th>
+              <th>Pemesan</th>
               <th>Status</th>
-              <th class="text-end">TOTAL</th>
+              <th class="text-end">Total</th>
             </tr>
           </thead>
           <tbody>
             @for (order of invoice; track order) {
-
             <tr>
-              <td>
-                <a href="javascript:" class="text-muted">{{ $index + 1 }}</a>
-              </td>
-
+              <td class="no-cell">{{ $index + 1 }}</td>
+              <td>{{ order.nama_project }}</td>
               <td>{{ order.name }}</td>
-
               <td>
-                <span class="d-block">{{ order.nama_project }}</span>
+                <span class="status-badge status-badge--{{ getStatusClass(order.status) }}">
+                  <span class="badge-dot"></span>
+                  {{ order.status }}
+                </span>
               </td>
-
-              <td>
-                <i class="badge-circle {{ getStatusColor(order.status) }} f-10 m-r-5"></i>
-                {{ order.status }}
-              </td>
-
-              <td class="text-end">Rp {{ order.total_harga | number }}</td>
+              <td class="text-end fw-500">{{ formatRupiah(order.total_harga) }}</td>
             </tr>
-
             }
           </tbody>
         </table>
@@ -56,51 +62,32 @@
     </div>
   </div>
 
-  <div class="col-md-12 col-xl-4">
-    <h5 class="mb-3">Activity History</h5>
-    <div class="card">
-      <div class="list-group list-group-flush">
+  <!-- ── ACTIVITY ── -->
+  <div class="col-12 col-xl-4">
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-title">Riwayat Aktivitas</span>
+        <span class="section-meta">Terbaru</span>
+      </div>
+      <div class="activity-list">
         @for (history of activity; track history) {
-        <a href="javascript:" class="list-group-item list-group-item-action px-3">
-          <div class="d-flex">
-            <div class="flex-shrink-0">
-              <div class="avatar avatar-s rounded-circle {{ getActivityBackground(history.aktivitas) }}">
-                <i class="f-16" antIcon type="{{getActivityIcon(history.aktivitas)}}" theme="outline"></i>
-              </div>
-            </div>
-            <div class="flex-grow-1 ms-3">
-              <h6 class="mb-1">{{ history.nama_barang }}</h6>
-              <p class="mb-0 text-muted">{{ history.datetime | date:'dd/MM/yyyy HH:mm' }}</p>
-            </div>
-            <div class="flex-shrink-0 text-end">
-              <h6 class="mb-1">{{ getActivityAmount(history.aktivitas) }} Rp.{{ history.harga }}</h6>
-              <p class="mb-0 text-muted">{{ history.jumlah }} {{ history.satuan }}</p>
-            </div>
+        <a href="javascript:" class="activity-item">
+          <div class="act-icon act-icon--{{ getActivityClass(history.aktivitas) }}">
+            <mat-icon>{{ getActivityIcon(history.aktivitas) }}</mat-icon>
+          </div>
+          <div class="act-body">
+            <p class="act-name">{{ history.nama_barang }}</p>
+            <p class="act-time">{{ history.datetime | date:'dd/MM/yyyy HH:mm' }} · {{ history.aktivitas }}</p>
+          </div>
+          <div class="act-amount">
+            <p class="act-price act-price--{{ getActivityClass(history.aktivitas) }}">
+              {{ getActivityAmount(history.aktivitas) }} {{ formatRupiah(history.harga) }}
+            </p>
+            <p class="act-qty">{{ history.jumlah }} {{ history.satuan }}</p>
           </div>
         </a>
         }
       </div>
     </div>
-    <!-- <div class="card">
-      <div class="card-body">
-        <div class="row justify-content-between">
-          <div class="col-auto">
-            <h5>Help & Support Chat</h5>
-            <p class="mb-3">Typical replay within 5 min</p>
-          </div>
-          <div class="col-auto">
-            <div class="user-group mb-3">
-              <img src="assets/images/user/avatar-1.jpg" alt="image" />
-              <img src="assets/images/user/avatar-2.jpg" alt="image" />
-              <img src="assets/images/user/avatar-3.jpg" alt="image" />
-            </div>
-          </div>
-        </div>
-        <div class="d-grid">
-          <div class="btn btn-primary">Need Help?</div>
-        </div>
-      </div>
-    </div> -->
   </div>
-  <!-- [ sample-page ] end -->
 </div>
