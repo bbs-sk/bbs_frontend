@@ -14,6 +14,7 @@ import { ApiService } from 'src/app/shared/services/api.service';
 export class Login {
   username: string = '';
   password: string = '';
+  showPassword = false;
 
   constructor(
     private api: ApiService,

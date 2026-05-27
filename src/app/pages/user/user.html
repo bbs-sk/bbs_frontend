@@ -71,7 +71,7 @@
               <th>Nama Pengguna</th>
               <th>Role</th>
               <th>Username</th>
-              <th>Password</th>
+              <!-- <th>Password</th> -->
               <th class="col-action">Aksi</th>
             </tr>
           </thead>
@@ -94,15 +94,15 @@
                 <span class="username-text">{{ u.username || '-' }}</span>
               </td>
 
-              <td>
+              <!-- <td>
                 <span class="password-text">{{ u.password || '-' }}</span>
-              </td>
+              </td> -->
 
               <td class="col-action">
                 <div class="action-btns">
-                  <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(u)">
+                  <!-- <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(u)">
                     <mat-icon>edit</mat-icon>
-                  </button>
+                  </button> -->
 
                   <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(u)">
                     <mat-icon>delete_outline</mat-icon>
@@ -215,11 +215,10 @@
   <!-- MODAL EDIT -->
   <!-- ============================= -->
 
-  <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
+  <!-- <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div> -->
 
-  <div class="modal-custom" *ngIf="showEditModal">
+  <!-- <div class="modal-custom" *ngIf="showEditModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
-      <!-- HEADER -->
       <div class="modal-header">
         <div class="modal-title-wrap">
           <div class="modal-icon edit-icon">
@@ -234,7 +233,6 @@
         </button>
       </div>
 
-      <!-- BODY -->
       <div class="modal-body">
         <div class="form-group">
           <label class="form-label">Nama Pengguna</label>
@@ -267,7 +265,6 @@
         </div>
       </div>
 
-      <!-- FOOTER -->
       <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
 
@@ -277,5 +274,5 @@
         </button>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>

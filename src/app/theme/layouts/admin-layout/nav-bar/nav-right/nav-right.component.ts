@@ -123,6 +123,22 @@ export class NavRightComponent {
     }
   ];
 
+  getUserAvatar(): string {
+    switch (this.userRole.toLowerCase()) {
+      case 'admin kantor':
+        return 'assets/images/user/admin.png';
+
+      case 'lapangan':
+        return 'assets/images/user/engineer.png';
+
+      case 'gudang':
+        return 'assets/images/user/worker.png';
+
+      default:
+        return 'assets/images/user/admin.png';
+    }
+  }
+
   logout() {
     localStorage.removeItem('token');
 

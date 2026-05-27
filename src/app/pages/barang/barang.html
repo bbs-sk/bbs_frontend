@@ -12,7 +12,7 @@
           <p class="subtitle">Kelola inventaris barang</p>
         </div>
       </div>
-      <button class="btn-add" mat-raised-button (click)="openAdd()">
+      <button *ngIf="isRole" class="btn-add" mat-raised-button (click)="openAdd()">
         <mat-icon>add</mat-icon>
         <span>Tambah Barang</span>
       </button>
@@ -66,9 +66,9 @@
               <th>Satuan</th>
               <th class="col-num">Jumlah</th>
               <th class="col-num">Harga Jual</th>
-              <th class="col-num">HPP</th>
+              <th class="col-num" *ngIf="isRole">HPP</th>
               <th>Tanggal</th>
-              <th class="col-action">Aksi</th>
+              <th class="col-action" *ngIf="isRole">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -88,14 +88,14 @@
               <td class="col-num">
                 <span class="price-value">{{ b.harga_jual ? 'Rp ' + b.harga_jual.toLocaleString('id-ID') : '—' }}</span>
               </td>
-              <td class="col-num">
+              <td class="col-num" *ngIf="isRole">
                 <span class="hpp-value">{{ b.hpp ? ('Rp ' + (b.hpp | number:'1.0-0':'id')) : '—' }}</span>
               </td>
               <td class="date-cell">
                 <span class="date-main">{{ b.datetime | date:'dd MMM yyyy':'':'id' }}</span>
                 <span class="date-time">{{ b.datetime | date:'HH:mm':'':'id' }}</span>
               </td>
-              <td>
+              <td *ngIf="isRole">
                 <div class="action-btns">
                   <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(b)" aria-label="Edit barang">
                     <mat-icon>edit</mat-icon>

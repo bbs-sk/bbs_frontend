@@ -24,6 +24,9 @@ export class Barang {
     private cdr: ChangeDetectorRef
   ) {}
 
+  userLogin: any = null;
+  isRole = false;
+
   barang: any[] = [];
   filteredBarang: any[] = [];
   paginatedBarang: any[] = [];
@@ -60,6 +63,8 @@ export class Barang {
   }
 
   ngOnInit(): void {
+    this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
+    this.isRole = this.userLogin?.role !== 'Lapangan';
     this.loadBarang();
   }
 

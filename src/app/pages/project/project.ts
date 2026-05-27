@@ -21,6 +21,9 @@ export class Project {
     private cdr: ChangeDetectorRef
   ) {}
 
+  userLogin: any = null;
+  isRole = false;
+
   project: any[] = [];
   filteredProject: any[] = [];
   paginatedProject: any[] = [];
@@ -56,6 +59,10 @@ export class Project {
   }
 
   ngOnInit(): void {
+    this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
+
+    this.isRole = this.userLogin?.role === 'Admin Kantor';
+
     this.loadProject();
     this.loadUserLapangan();
   }
@@ -86,6 +93,10 @@ export class Project {
     this.api.getProject().subscribe({
       next: (res: any) => {
         this.project = Array.isArray(res) ? res : (res?.val ?? []);
+
+        if (!this.isRole) {
+          this.project = this.project.filter((p: any) => p.id_user1 === this.userLogin.id_user || p.id_user2 === this.userLogin.id_user);
+        }
 
         this.filteredProject = [...this.project];
 

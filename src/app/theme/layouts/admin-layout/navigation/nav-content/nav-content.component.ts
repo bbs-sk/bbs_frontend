@@ -2,7 +2,7 @@
 import { Component, OnInit, inject, output } from '@angular/core';
 import { CommonModule, Location, LocationStrategy } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
+import { Input } from '@angular/core';
 // project import
 import { NavigationItem, NavigationItems } from '../navigation';
 import { environment } from 'src/environments/environment';
@@ -41,6 +41,8 @@ export class NavContentComponent implements OnInit {
   private location = inject(Location);
   private locationStrategy = inject(LocationStrategy);
   private iconService = inject(IconService);
+
+  @Input() navItems: any[] = [];
 
   // public props
   NavCollapsedMob = output();

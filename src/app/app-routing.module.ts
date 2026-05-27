@@ -2,8 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminLayout } from './theme/layouts/admin-layout/admin-layout.component';
 import { GuestLayoutComponent } from './theme/layouts/guest-layout/guest-layout.component';
-import { authGuard } from '../app/shared/services/auth.guard';
-import { redirectGuard } from '../app/shared/services/redirect.guard';
+import { authGuard } from './shared/guard/auth.guard';
+import { redirectGuard } from './shared/guard/redirect.guard';
+import { roleGuard } from './shared/guard/role.guard';
 
 const routes: Routes = [
   {
@@ -23,17 +24,17 @@ const routes: Routes = [
       },
       {
         path: 'dashboard',
-        canActivate: [authGuard],
+        canActivate: [authGuard, roleGuard(['Admin Kantor'])],
         loadComponent: () => import('./pages/dashboard/dashboard').then((c) => c.Dashboard)
       },
       {
         path: 'user',
-        canActivate: [authGuard],
+        canActivate: [authGuard, roleGuard(['Admin Kantor'])],
         loadComponent: () => import('./pages/user/user').then((c) => c.User)
       },
       {
         path: 'project',
-        canActivate: [authGuard],
+        canActivate: [authGuard, roleGuard(['Admin Kantor', 'Lapangan'])],
         loadComponent: () => import('./pages/project/project').then((c) => c.Project)
       },
       {
@@ -47,18 +48,13 @@ const routes: Routes = [
         loadComponent: () => import('./pages/invoice/invoice').then((c) => c.Invoice)
       },
       {
-        path: 'stock',
-        canActivate: [authGuard],
-        loadComponent: () => import('./pages/stock/stock').then((c) => c.Stock)
-      },
-      {
         path: 'transaksi',
-        canActivate: [authGuard],
+        canActivate: [authGuard, roleGuard(['Admin Kantor', 'Gudang'])],
         loadComponent: () => import('./pages/transaksi/transaksi').then((c) => c.Transaksi)
       },
       {
         path: 'laporan',
-        canActivate: [authGuard],
+        canActivate: [authGuard, roleGuard(['Admin Kantor'])],
         loadComponent: () => import('./pages/laporan/laporan').then((c) => c.Laporan)
       },
       {

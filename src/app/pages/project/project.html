@@ -14,7 +14,7 @@
         </div>
       </div>
 
-      <button class="btn-add" mat-raised-button (click)="openAdd()">
+      <button *ngIf="isRole" class="btn-add" mat-raised-button (click)="openAdd()">
         <mat-icon>add</mat-icon>
         <span>Tambah Proyek</span>
       </button>
@@ -72,7 +72,7 @@
               <th>Alamat</th>
               <th>Koordinator 1</th>
               <th>Koordinator 2</th>
-              <th class="col-action">Aksi</th>
+              <th *ngIf="isRole" class="col-action">Aksi</th>
             </tr>
           </thead>
 
@@ -96,7 +96,7 @@
                 <span class="badge-user">{{ p.user_2_nama || '-' }}</span>
               </td>
 
-              <td>
+              <td *ngIf="isRole">
                 <div class="action-btns">
                   <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(p)">
                     <mat-icon>edit</mat-icon>

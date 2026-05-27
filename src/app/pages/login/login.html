@@ -17,7 +17,18 @@
     <div class="form-group mb-4">
       <label class="mb-2">Password</label>
 
-      <input type="password" class="form-control" [(ngModel)]="password" placeholder="Masukkan password" />
+      <div class="password-wrapper">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          class="form-control pe-5"
+          [(ngModel)]="password"
+          placeholder="Masukkan password"
+        />
+
+        <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+          <i class="fa" [ngClass]="showPassword ? 'fa-eye' : 'fa-eye-slash'"></i>
+        </button>
+      </div>
     </div>
 
     <div class="d-grid">
