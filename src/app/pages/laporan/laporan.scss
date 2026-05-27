@@ -449,23 +449,22 @@ $radius-xl: 16px;
 }
 
 // ─────────────────────────────────────────────
-// Status badge
+// Payment indicator
 // ─────────────────────────────────────────────
-.status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11.5px;
-  font-weight: 600;
+.pay-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 
-  &.status-lunas {
-    background: $green-light;
-    color: $green;
-  }
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #166534;
 
-  &.status-pending {
-    background: $amber-light;
-    color: $amber;
+  mat-icon {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    color: #16a34a;
   }
 }
 

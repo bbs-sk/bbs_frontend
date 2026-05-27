@@ -116,6 +116,10 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/invoice/delete`, { id_invoice });
   }
 
+  searchPemesanan(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/invoice/search`, payload);
+  }
+
   getStock() {
     return this.http.post<any>(`${environment.apiUrl}/stock`, {});
   }

@@ -179,7 +179,10 @@
           <th mat-header-cell *matHeaderCellDef class="col-center">Status</th>
 
           <td mat-cell *matCellDef="let row" class="col-center">
-            <span class="status-badge status-lunas">{{ row.status_pembayaran | titlecase }}</span>
+            <div class="pay-indicator">
+              <mat-icon>check_circle</mat-icon>
+              <span>Lunas</span>
+            </div>
           </td>
         </ng-container>
 
