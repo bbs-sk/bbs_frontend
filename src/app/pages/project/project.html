@@ -161,48 +161,82 @@
         </button>
       </div>
 
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Nama Proyek</label>
+      <form [formGroup]="addProjectForm" (ngSubmit)="submitAdd()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">
+              Nama Proyek
+              <span class="text-danger">*</span>
+            </label>
 
-          <input class="form-control" [(ngModel)]="addForm.nama_project" placeholder="Masukkan nama proyek" />
+            <input class="form-control" formControlName="nama_project" placeholder="Masukkan nama proyek" />
+
+            <div
+              *ngIf="
+          addProjectForm.get('nama_project')?.invalid &&
+          (
+            addProjectForm.get('nama_project')?.dirty ||
+            addProjectForm.get('nama_project')?.touched
+          )
+        "
+              class="text-danger mt-1"
+            >
+              Nama proyek harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Alamat
+              <span class="text-danger">*</span>
+            </label>
+
+            <input class="form-control" formControlName="alamat" placeholder="Masukkan alamat proyek" />
+
+            <div
+              *ngIf="
+          addProjectForm.get('alamat')?.invalid &&
+          (
+            addProjectForm.get('alamat')?.dirty ||
+            addProjectForm.get('alamat')?.touched
+          )
+        "
+              class="text-danger mt-1"
+            >
+              Alamat proyek harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Koordinator 1</label>
+
+            <ng-select formControlName="id_user1" placeholder="Pilih Koordinator 1" [searchable]="true" [clearable]="true">
+              @for (u of getAddUser1(); track u.id_user) {
+              <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
+              }
+            </ng-select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Koordinator 2</label>
+
+            <ng-select formControlName="id_user2" placeholder="Pilih Koordinator 2" [searchable]="true" [clearable]="true">
+              @for (u of getAddUser2(); track u.id_user) {
+              <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
+              }
+            </ng-select>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Alamat</label>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
 
-          <input class="form-control" [(ngModel)]="addForm.alamat" placeholder="Masukkan alamat proyek" />
+          <button type="submit" class="btn-modal-save">
+            <mat-icon>save</mat-icon>
+            Simpan Proyek
+          </button>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Koordinator 1</label>
-
-          <ng-select [(ngModel)]="addForm.id_user1" placeholder="Pilih Koordinator 1" [searchable]="true" [clearable]="true">
-            @for (u of getAddUser1(); track u.id_user) {
-            <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
-            }
-          </ng-select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Koordinator 2</label>
-
-          <ng-select [(ngModel)]="addForm.id_user2" placeholder="Pilih Koordinator 2" [searchable]="true" [clearable]="true">
-            @for (u of getAddUser2(); track u.id_user) {
-            <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
-            }
-          </ng-select>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
-
-        <button type="button" class="btn-modal-save" (click)="submitAdd()">
-          <mat-icon>save</mat-icon>
-          Simpan Proyek
-        </button>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -223,48 +257,82 @@
         </button>
       </div>
 
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Nama Proyek</label>
+      <form [formGroup]="editProjectForm" (ngSubmit)="submitEdit()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">
+              Nama Proyek
+              <span class="text-danger">*</span>
+            </label>
 
-          <input class="form-control" [(ngModel)]="editForm.nama_project" placeholder="Masukkan nama proyek" />
+            <input class="form-control" formControlName="nama_project" placeholder="Masukkan nama proyek" />
+
+            <div
+              *ngIf="
+          editProjectForm.get('nama_project')?.invalid &&
+          (
+            editProjectForm.get('nama_project')?.dirty ||
+            editProjectForm.get('nama_project')?.touched
+          )
+        "
+              class="text-danger mt-1"
+            >
+              Nama proyek harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Alamat
+              <span class="text-danger">*</span>
+            </label>
+
+            <input class="form-control" formControlName="alamat" placeholder="Masukkan alamat proyek" />
+
+            <div
+              *ngIf="
+          editProjectForm.get('alamat')?.invalid &&
+          (
+            editProjectForm.get('alamat')?.dirty ||
+            editProjectForm.get('alamat')?.touched
+          )
+        "
+              class="text-danger mt-1"
+            >
+              Alamat proyek harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Koordinator 1</label>
+
+            <ng-select formControlName="id_user1" placeholder="Pilih Koordinator 1" [searchable]="true" [clearable]="true">
+              @for (u of getEditUser1(); track u.id_user) {
+              <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
+              }
+            </ng-select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Koordinator 2</label>
+
+            <ng-select formControlName="id_user2" placeholder="Pilih Koordinator 2" [searchable]="true" [clearable]="true">
+              @for (u of getEditUser2(); track u.id_user) {
+              <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
+              }
+            </ng-select>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Alamat</label>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
 
-          <input class="form-control" [(ngModel)]="editForm.alamat" placeholder="Masukkan alamat proyek" />
+          <button type="submit" class="btn-modal-save">
+            <mat-icon>save</mat-icon>
+            Simpan Perubahan
+          </button>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Koordinator 1</label>
-
-          <ng-select [(ngModel)]="editForm.id_user1" placeholder="Pilih Koordinator 1" [searchable]="true" [clearable]="true">
-            @for (u of getEditUser1(); track u.id_user) {
-            <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
-            }
-          </ng-select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Koordinator 2</label>
-
-          <ng-select [(ngModel)]="editForm.id_user2" placeholder="Pilih Koordinator 2" [searchable]="true" [clearable]="true">
-            @for (u of getEditUser2(); track u.id_user) {
-            <ng-option [value]="u.id_user">{{ u.name }}</ng-option>
-            }
-          </ng-select>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
-
-        <button type="button" class="btn-modal-save" (click)="submitEdit()">
-          <mat-icon>save</mat-icon>
-          Simpan Perubahan
-        </button>
-      </div>
+      </form>
     </div>
   </div>
 </div>

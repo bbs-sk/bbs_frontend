@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import localeId from '@angular/common/locales/id';
 
@@ -20,14 +20,15 @@ registerLocaleData(localeId);
 @Component({
   selector: 'app-transaksi',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule, NgSelectModule, MatPaginatorModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatButtonModule, MatIconModule, NgSelectModule, MatPaginatorModule],
   templateUrl: './transaksi.html',
   styleUrl: './transaksi.scss'
 })
 export class Transaksi implements OnInit {
   constructor(
     private api: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
   ) {}
 
   // =====================================================
@@ -98,11 +99,7 @@ export class Transaksi implements OnInit {
 
   hargaBeliDisplay = '';
 
-  addMasukForm: any = {
-    id_barang: null,
-    jumlah: null,
-    harga_beli: null
-  };
+  addMasukForm!: FormGroup;
 
   // =====================================================
   // GETTER
@@ -125,6 +122,11 @@ export class Transaksi implements OnInit {
   // =====================================================
 
   ngOnInit(): void {
+    this.addMasukForm = this.fb.group({
+      id_barang: [null, Validators.required],
+      jumlah: [null, [Validators.required, Validators.min(1)]],
+      harga_beli: [null, [Validators.required, Validators.min(1)]]
+    });
     this.loadData();
   }
 
@@ -455,12 +457,26 @@ export class Transaksi implements OnInit {
     return barang ? barang.nama_barang : '-';
   }
 
-  onHargaBeliInput(): void {
-    const rawValue = this.hargaBeliDisplay.replace(/\D/g, '');
+  onHargaBeliInput(event: any): void {
+    let value = event.target.value || '';
 
-    this.addMasukForm.harga_beli = rawValue ? Number(rawValue) : null;
+    value = value.replace(/\D/g, '');
 
-    this.hargaBeliDisplay = rawValue ? Number(rawValue).toLocaleString('id-ID') : '';
+    const numericValue = value ? Number(value) : null;
+
+    this.addMasukForm.patchValue({
+      harga_beli: numericValue
+    });
+
+    this.hargaBeliDisplay = numericValue ? numericValue.toLocaleString('id-ID') : '';
+  }
+
+  onlyNumber(event: KeyboardEvent): void {
+    const charCode = event.which ? event.which : event.keyCode;
+
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      event.preventDefault();
+    }
   }
 
   // =====================================================
@@ -468,11 +484,11 @@ export class Transaksi implements OnInit {
   // =====================================================
 
   openAddMasuk(): void {
-    this.addMasukForm = {
+    this.addMasukForm.reset({
       id_barang: null,
       jumlah: null,
       harga_beli: null
-    };
+    });
 
     this.hargaBeliDisplay = '';
 
@@ -488,18 +504,17 @@ export class Transaksi implements OnInit {
   // =====================================================
 
   submitAddMasuk(): void {
-    if (!this.addMasukForm.id_barang || !this.addMasukForm.jumlah || !this.addMasukForm.harga_beli) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Peringatan',
-        text: 'Semua field wajib diisi.'
-      });
-
+    if (this.addMasukForm.invalid) {
+      this.addMasukForm.markAllAsTouched();
       return;
     }
 
-    this.api.addBrgMasuk(this.addMasukForm).subscribe({
+    this.api.addBrgMasuk(this.addMasukForm.value).subscribe({
       next: () => {
+        const barang = this.barangList.find((b: any) => b.id_barang == this.addMasukForm.value.id_barang);
+
+        const namaBarang = barang?.nama_barang || 'Barang';
+
         this.closeAddMasuk();
 
         this.cdr.detectChanges();
@@ -508,17 +523,14 @@ export class Transaksi implements OnInit {
           Swal.fire({
             icon: 'success',
             title: 'Berhasil',
-            text: 'Barang masuk berhasil ditambahkan.',
+            text: `Barang "${namaBarang}" berhasil ditambahkan.`,
             timer: 2500,
             showConfirmButton: false
-          })
-
-            .then(() => {
-              this.loadData(false);
-            });
+          }).then(() => {
+            this.loadData(false);
+          });
         }, 100);
       },
-
       error: (err: any) => {
         const msg = err?.error?.message || err?.message || 'Barang masuk gagal ditambahkan.';
 
@@ -538,44 +550,40 @@ export class Transaksi implements OnInit {
   onDeleteMasuk(data: any): void {
     Swal.fire({
       title: 'Konfirmasi Hapus',
-      text: 'Apakah Anda yakin ingin menghapus transaksi ini?',
+      text: `Apakah Anda yakin ingin menghapus barang "${data.nama_barang}"?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#6c757d',
       confirmButtonText: 'Hapus',
       cancelButtonText: 'Batal'
-    })
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.api.deleteBrgMasuk(data.id_brg_masuk).subscribe({
+          next: () => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil',
+              text: `Barang "${data.nama_barang}" berhasil dihapus.`,
+              timer: 2500,
+              showConfirmButton: false
+            }).then(() => {
+              this.loadData(false);
+            });
+          },
 
-      .then((result) => {
-        if (result.isConfirmed) {
-          this.api.deleteBrgMasuk(data.id_brg_masuk).subscribe({
-            next: () => {
-              Swal.fire({
-                icon: 'success',
-                title: 'Berhasil',
-                text: 'Data transaksi berhasil dihapus.',
-                timer: 2500,
-                showConfirmButton: false
-              })
+          error: (err: any) => {
+            const msg = err?.error?.message || err?.message || 'Data transaksi gagal dihapus.';
 
-                .then(() => {
-                  this.loadData(false);
-                });
-            },
-
-            error: (err: any) => {
-              const msg = err?.error?.message || err?.message || 'Data transaksi gagal dihapus.';
-
-              Swal.fire({
-                icon: 'error',
-                title: 'Gagal',
-                text: msg
-              });
-            }
-          });
-        }
-      });
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal',
+              text: msg
+            });
+          }
+        });
+      }
+    });
   }
 
   // =====================================================

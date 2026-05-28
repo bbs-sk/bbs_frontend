@@ -240,7 +240,7 @@
             <tr>
               <th class="col-no">No</th>
               <th>Nama Barang</th>
-              <th>Invoice</th>
+              <th>Ref</th>
               <th class="col-num">Jumlah</th>
               <th class="col-num">Harga Jual</th>
               <th>Tanggal</th>
@@ -258,7 +258,7 @@
               </td>
 
               <td>
-                <span class="badge-kode">INV-{{ k.id_invoice }}</span>
+                <span class="barang-name">{{k.nama_project}}</span>
               </td>
 
               <td class="col-num">
@@ -375,7 +375,7 @@
             <tr>
               <th class="col-no">No</th>
               <th>Nama Barang</th>
-              <th>Invoice</th>
+              <th>Ref</th>
               <th class="col-num">Jumlah</th>
               <th class="col-num">Harga Jual</th>
               <th>Kondisi</th>
@@ -394,7 +394,7 @@
               </td>
 
               <td>
-                <span class="badge-kode">INV-{{ r.id_invoice }}</span>
+                <span class="barang-name">{{ r.nama_project }}</span>
               </td>
 
               <td class="col-num">
@@ -456,6 +456,7 @@
 
   <div class="modal-custom" *ngIf="showAddMasukModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
+      <!-- HEADER -->
       <div class="modal-header">
         <div class="modal-title-wrap">
           <div class="modal-icon add-icon">
@@ -470,48 +471,113 @@
         </button>
       </div>
 
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Barang</label>
+      <!-- FORM -->
+      <form [formGroup]="addMasukForm" (ngSubmit)="submitAddMasuk()">
+        <div class="modal-body">
+          <!-- BARANG -->
+          <div class="form-group">
+            <label class="form-label">
+              Barang
+              <span class="text-danger">*</span>
+            </label>
 
-          <ng-select [(ngModel)]="addMasukForm.id_barang" placeholder="Pilih barang" [searchable]="true" [clearable]="true">
-            @for (b of barangList; track b.id_barang) {
-            <ng-option [value]="b.id_barang">{{ b.nama_barang }} ({{ b.satuan }})</ng-option>
-            }
-          </ng-select>
-        </div>
+            <ng-select formControlName="id_barang" placeholder="Pilih barang" [searchable]="true" [clearable]="true">
+              @for (b of barangList; track b.id_barang) {
 
-        <div class="form-group">
-          <label class="form-label">Jumlah</label>
+              <ng-option [value]="b.id_barang">{{ b.nama_barang }} ({{ b.satuan }})</ng-option>
 
-          <input type="number" class="form-control" [(ngModel)]="addMasukForm.jumlah" placeholder="Masukkan jumlah barang" />
-        </div>
+              }
+            </ng-select>
 
-        <div class="form-group">
-          <label class="form-label">Harga Beli</label>
+            <div
+              *ngIf="
+              addMasukForm.get('id_barang')?.invalid &&
+              (
+                addMasukForm.get('id_barang')?.dirty ||
+                addMasukForm.get('id_barang')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Barang wajib dipilih.
+            </div>
+          </div>
 
-          <div class="input-prefix-wrap">
-            <span class="input-prefix">Rp</span>
+          <!-- JUMLAH -->
+          <div class="form-group">
+            <label class="form-label">
+              Jumlah
+              <span class="text-danger">*</span>
+            </label>
 
             <input
               type="text"
-              class="form-control has-prefix"
-              [(ngModel)]="hargaBeliDisplay"
-              (input)="onHargaBeliInput()"
-              placeholder="0"
+              class="form-control"
+              formControlName="jumlah"
+              placeholder="Masukkan jumlah barang"
+              (keypress)="onlyNumber($event)"
             />
+
+            <div
+              *ngIf="
+              addMasukForm.get('jumlah')?.invalid &&
+              (
+                addMasukForm.get('jumlah')?.dirty ||
+                addMasukForm.get('jumlah')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Jumlah wajib diisi.
+            </div>
+          </div>
+
+          <!-- HARGA BELI -->
+          <div class="form-group">
+            <label class="form-label">
+              Harga Beli
+              <span class="text-danger">*</span>
+            </label>
+
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">Rp</span>
+
+              <input
+                type="text"
+                class="form-control has-prefix"
+                [value]="hargaBeliDisplay"
+                (input)="onHargaBeliInput($event)"
+                (keypress)="onlyNumber($event)"
+                placeholder="0"
+              />
+            </div>
+
+            <div
+              *ngIf="
+              addMasukForm.get('harga_beli')?.invalid &&
+              (
+                addMasukForm.get('harga_beli')?.dirty ||
+                addMasukForm.get('harga_beli')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Harga beli wajib diisi.
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeAddMasuk()">Batal</button>
+        <!-- FOOTER -->
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeAddMasuk()">Batal</button>
 
-        <button type="button" class="btn-modal-save" (click)="submitAddMasuk()">
-          <mat-icon>save</mat-icon>
-          <span>Simpan</span>
-        </button>
-      </div>
+          <button type="submit" class="btn-modal-save">
+            <mat-icon>save</mat-icon>
+
+            <span>Simpan</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

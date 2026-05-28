@@ -1,6 +1,5 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { ApiService } from 'src/app/shared/services/api.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -8,20 +7,22 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import localeId from '@angular/common/locales/id';
 import { registerLocaleData } from '@angular/common';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 registerLocaleData(localeId);
 
 @Component({
   selector: 'app-barang',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatPaginatorModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatPaginatorModule, MatIconModule, MatButtonModule],
   templateUrl: './barang.html',
   styleUrl: './barang.scss'
 })
 export class Barang {
   constructor(
     private api: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
   ) {}
 
   userLogin: any = null;
@@ -41,21 +42,8 @@ export class Barang {
   hargaJualDisplayAdd = '';
   hargaJualDisplayEdit = '';
 
-  addForm: any = {
-    kode_barang: '',
-    nama_barang: '',
-    satuan: '',
-    harga_jual: null
-  };
-
-  editForm: any = {
-    id_barang: null,
-    kode_barang: '',
-    nama_barang: '',
-    satuan: '',
-    harga_jual: null,
-    hpp: null
-  };
+  addBarangForm!: FormGroup;
+  editBarangForm!: FormGroup;
 
   // ← baru: getter untuk total halaman di toolbar
   get totalPages(): number {
@@ -66,6 +54,21 @@ export class Barang {
     this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
     this.isRole = this.userLogin?.role !== 'Lapangan';
     this.loadBarang();
+    this.addBarangForm = this.fb.group({
+      kode_barang: ['', Validators.required],
+      nama_barang: ['', Validators.required],
+      satuan: ['', Validators.required],
+      harga_jual: [null, Validators.required]
+    });
+
+    this.editBarangForm = this.fb.group({
+      id_barang: [null],
+      kode_barang: ['', Validators.required],
+      nama_barang: ['', Validators.required],
+      satuan: ['', Validators.required],
+      harga_jual: [null, Validators.required],
+      hpp: [null]
+    });
   }
 
   loadBarang(showLoading: boolean = true): void {
@@ -163,13 +166,15 @@ export class Barang {
   }
 
   openAdd(): void {
-    this.addForm = {
+    this.addBarangForm.reset({
       kode_barang: '',
       nama_barang: '',
       satuan: '',
-      harga_jual: 0
-    };
+      harga_jual: null
+    });
+
     this.hargaJualDisplayAdd = '';
+
     this.showAddModal = true;
   }
 
@@ -178,15 +183,17 @@ export class Barang {
   }
 
   onEdit(b: any): void {
-    this.editForm = {
+    this.editBarangForm.patchValue({
       id_barang: b.id_barang,
       kode_barang: b.kode_barang ?? '',
       nama_barang: b.nama_barang ?? '',
       satuan: b.satuan ?? '',
       harga_jual: b.harga_jual ?? null,
       hpp: b.hpp ?? null
-    };
-    this.hargaJualDisplayEdit = this.editForm.harga_jual ? Number(this.editForm.harga_jual).toLocaleString('id-ID') : '';
+    });
+
+    this.hargaJualDisplayEdit = b.harga_jual ? Number(b.harga_jual).toLocaleString('id-ID') : '';
+
     this.showEditModal = true;
   }
 
@@ -195,17 +202,19 @@ export class Barang {
   }
 
   submitAdd(): void {
-    this.api.addBarang(this.addForm).subscribe({
-      next: () => {
-        const nama = this.addForm.nama_barang;
+    if (this.addBarangForm.invalid) {
+      this.addBarangForm.markAllAsTouched();
+      return;
+    }
 
-        // tutup modal
+    this.api.addBarang(this.addBarangForm.value).subscribe({
+      next: () => {
+        const nama = this.addBarangForm.value.nama_barang;
+
         this.closeAdd();
 
-        // paksa render angular
         this.cdr.detectChanges();
 
-        // tampilkan alert sukses
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -214,7 +223,6 @@ export class Barang {
             timer: 2500,
             showConfirmButton: false
           }).then(() => {
-            // reload data TANPA loading animation
             this.loadBarang(false);
           });
         }, 100);
@@ -233,17 +241,19 @@ export class Barang {
   }
 
   submitEdit(): void {
-    this.api.updateBarang(this.editForm).subscribe({
-      next: () => {
-        const nama = this.editForm.nama_barang;
+    if (this.editBarangForm.invalid) {
+      this.editBarangForm.markAllAsTouched();
+      return;
+    }
 
-        // tutup modal
+    this.api.updateBarang(this.editBarangForm.value).subscribe({
+      next: () => {
+        const nama = this.editBarangForm.value.nama_barang;
+
         this.closeEdit();
 
-        // paksa angular render perubahan
         this.cdr.detectChanges();
 
-        // delay kecil agar modal benar-benar hilang
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -252,7 +262,6 @@ export class Barang {
             timer: 3000,
             showConfirmButton: false
           }).then(() => {
-            // reload data TANPA loading animation
             this.loadBarang(false);
           });
         }, 100);
@@ -310,16 +319,25 @@ export class Barang {
     });
   }
 
-  onHargaJualInput(type: 'add' | 'edit'): void {
-    let rawValue = '';
+  onHargaJualInput(event: any, type: 'add' | 'edit'): void {
+    const input = event.target.value;
+
+    const numericValue = input.replace(/\D/g, '');
+
+    const formattedValue = numericValue ? Number(numericValue).toLocaleString('id-ID') : '';
+
     if (type === 'add') {
-      rawValue = this.hargaJualDisplayAdd.replace(/\D/g, '');
-      this.addForm.harga_jual = rawValue ? Number(rawValue) : null;
-      this.hargaJualDisplayAdd = rawValue ? Number(rawValue).toLocaleString('id-ID') : '';
+      this.hargaJualDisplayAdd = formattedValue;
+
+      this.addBarangForm.patchValue({
+        harga_jual: numericValue ? Number(numericValue) : null
+      });
     } else {
-      rawValue = this.hargaJualDisplayEdit.replace(/\D/g, '');
-      this.editForm.harga_jual = rawValue ? Number(rawValue) : null;
-      this.hargaJualDisplayEdit = rawValue ? Number(rawValue).toLocaleString('id-ID') : '';
+      this.hargaJualDisplayEdit = formattedValue;
+
+      this.editBarangForm.patchValue({
+        harga_jual: numericValue ? Number(numericValue) : null
+      });
     }
   }
 
@@ -349,5 +367,17 @@ export class Barang {
       return '';
     }
     return Number(value).toLocaleString('id-ID');
+  }
+
+  numberOnly(event: KeyboardEvent): void {
+    const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
+
+    if (allowedKeys.includes(event.key)) {
+      return;
+    }
+
+    if (!/^[0-9]$/.test(event.key)) {
+      event.preventDefault();
+    }
   }
 }
