@@ -8,6 +8,8 @@ import Swal from 'sweetalert2';
 import { ApiService } from 'src/app/shared/services/api.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import localeId from '@angular/common/locales/id';
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, TextRun, AlignmentType, BorderStyle } from 'docx';
+import { saveAs } from 'file-saver';
 
 registerLocaleData(localeId);
 
@@ -55,6 +57,14 @@ export class Invoice {
   showEditModal = false;
   showDetailModal = false;
   showStatusModal = false;
+  showSuratJalanModal = false;
+
+  suratJalanData: any = null;
+  suratJalanForm: any = {
+    id_invoice: null,
+    no_surat_jalan: '',
+    plat_kendaraan: ''
+  };
 
   // ─── Form state ─────────────────────────────
   addForm: any = {
@@ -147,12 +157,20 @@ export class Invoice {
   getProject(): void {
     this.api.getProject().subscribe({
       next: (res: any) => {
-        this.project = Array.isArray(res) ? res : (res?.val ?? []);
+        let data = Array.isArray(res) ? res : (res?.val ?? []);
+
+        if (this.userLogin?.role === 'Gudang') {
+          data = data.filter((p: any) => p.id_project == 0);
+        } else {
+          data = data.filter((p: any) => p.id_project != 0);
+        }
+
+        this.project = data;
       },
+
       error: (err) => console.log(err)
     });
   }
-
   getBarang(): void {
     this.api.getBarang().subscribe({
       next: (res: any) => {
@@ -246,11 +264,17 @@ export class Invoice {
   openAdd(): void {
     this.addForm = {
       id_user: this.idUser,
-      id_project: null,
+      id_project: this.userLogin?.role === 'Gudang' ? 0 : null,
       total_harga: 0,
       pembayaran: null,
       detail: ''
     };
+
+    // status otomatis selesai untuk gudang
+    if (this.userLogin?.role === 'Gudang') {
+      this.status = 'selesai';
+    }
+
     this.jumlahJenisBarang = null;
     this.selectedBarang = [];
     this.showAddModal = true;
@@ -303,14 +327,25 @@ export class Invoice {
   // Modal Edit
   // ─────────────────────────────────────────────
   canEdit(invoice: any): boolean {
+    const role = this.userLogin?.role;
+    if (role === 'Admin Kantor') {
+      return true;
+    }
     const isOwner = invoice.id_user === this.userLogin?.id_user;
     const allowedStatus = invoice.status === 'menunggu' || invoice.status === 'dipesan';
     return isOwner && allowedStatus;
   }
 
+  isAdminEditOtherUser(): boolean {
+    const isAdmin = this.userLogin?.role === 'Admin Kantor';
+    const isOtherUser = this.editForm?.id_user !== this.userLogin?.id_user;
+    const lockedStatus = this.editForm?.status !== 'menunggu' && this.editForm?.status !== 'dipesan';
+    return isAdmin && (isOtherUser || lockedStatus);
+  }
   onEdit(i: any): void {
     this.editForm = {
       id_invoice: i.id_invoice,
+      id_user: i.id_user,
       id_project: i.id_project,
       pembayaran: i.pembayaran,
       detail: i.detail,
@@ -353,6 +388,54 @@ export class Invoice {
   }
 
   submitEdit(): void {
+    // =========================
+    // ADMIN EDIT USER LAIN
+    // =========================
+    if (this.isAdminEditOtherUser()) {
+      const payload = {
+        id_invoice: this.editForm.id_invoice,
+        pembayaran: this.editForm.pembayaran,
+        detail: this.editForm.detail
+      };
+
+      this.api.updatePembayaranInvoice(payload).subscribe({
+        next: () => {
+          const proyek = this.project.find((p: any) => p.id_project == this.editForm.id_project)?.nama_project || 'Proyek';
+
+          this.closeEdit();
+
+          this.cdr.detectChanges();
+
+          setTimeout(() => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil',
+              text: `Pembayaran proyek "${proyek}" berhasil diperbarui.`,
+              timer: 3000,
+              showConfirmButton: false
+            }).then(() => {
+              this.loadInvoice(false);
+            });
+          }, 100);
+        },
+
+        error: (err: any) => {
+          const msg = err?.error?.message || err?.message || 'Pembaruan pembayaran gagal.';
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: msg
+          });
+        }
+      });
+
+      return;
+    }
+
+    // =========================
+    // EDIT NORMAL
+    // =========================
     const payload = {
       ...this.editForm,
       barang: this.editBarang
@@ -362,13 +445,10 @@ export class Invoice {
       next: () => {
         const proyek = this.project.find((p: any) => p.id_project == this.editForm.id_project)?.nama_project || 'Proyek';
 
-        // tutup modal
         this.closeEdit();
 
-        // paksa angular render perubahan
         this.cdr.detectChanges();
 
-        // delay kecil agar modal benar-benar hilang
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -377,7 +457,6 @@ export class Invoice {
             timer: 3000,
             showConfirmButton: false
           }).then(() => {
-            // reload data TANPA loading animation
             this.loadInvoice(false);
           });
         }, 100);
@@ -399,9 +478,12 @@ export class Invoice {
   // Modal Hapus
   // ─────────────────────────────────────────────
   canDelete(invoice: any): boolean {
+    const role = this.userLogin?.role;
     const isOwner = invoice.id_user === this.userLogin?.id_user;
+    if (role === 'Gudang') {
+      return isOwner;
+    }
     const allowedStatus = invoice.status === 'menunggu' || invoice.status === 'dipesan';
-
     return isOwner && allowedStatus;
   }
 
@@ -451,19 +533,44 @@ export class Invoice {
   openDetail(i: any): void {
     this.detailInvoice = i;
     this.detailBarang = [];
+    this.suratJalanData = null;
 
     this.loadingAnimation();
 
     this.api.getBrgKeluarId(i.id_invoice).subscribe({
       next: (res: any) => {
         this.detailBarang = Array.isArray(res) ? res : (res?.val ?? []);
-        Swal.close();
-        this.showDetailModal = true;
-        this.cdr.detectChanges();
+
+        // CEK SURAT JALAN
+        this.api.getSuratJalan(i.id_invoice).subscribe({
+          next: (sj: any) => {
+            this.suratJalanData = sj;
+
+            Swal.close();
+
+            this.showDetailModal = true;
+
+            this.cdr.detectChanges();
+          },
+
+          error: () => {
+            Swal.close();
+
+            this.showDetailModal = true;
+
+            this.cdr.detectChanges();
+          }
+        });
       },
+
       error: () => {
         Swal.close();
-        Swal.fire({ icon: 'error', title: 'Gagal', text: 'Detail pemesanan gagal dimuat.' });
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: 'Detail pemesanan gagal dimuat.'
+        });
       }
     });
   }
@@ -480,15 +587,29 @@ export class Invoice {
   canUpdateStatus(invoice: any): boolean {
     const role = this.userLogin?.role;
     const status = invoice.status;
+    const isOwner = invoice.id_user === this.userLogin?.id_user;
 
+    // ADMIN KANTOR
     if (role === 'Admin Kantor') {
-      return status === 'menunggu' || status === 'disetujui' || status === 'ditolak';
+      // boleh untuk semua invoice
+      if (status === 'menunggu' || status === 'disetujui' || status === 'ditolak') {
+        return true;
+      }
+
+      // hanya pemilik invoice
+      if (isOwner && (status === 'dikirim' || status === 'selesai')) {
+        return true;
+      }
+
+      return false;
     }
 
+    // GUDANG
     if (role === 'Gudang') {
       return status === 'disetujui' || status === 'dikirim';
     }
 
+    // LAPANGAN
     if (role === 'Lapangan') {
       return status === 'dikirim' || status === 'selesai';
     }
@@ -496,11 +617,18 @@ export class Invoice {
     return false;
   }
 
-  getAvailableStatus(): string[] {
+  getAvailableStatus(invoice: any): string[] {
     const role = this.userLogin?.role;
+    const isOwner = invoice.id_user === this.userLogin?.id_user;
 
     if (role === 'Admin Kantor') {
-      return ['menunggu', 'disetujui', 'ditolak'];
+      if (invoice.status === 'menunggu' || invoice.status === 'disetujui' || invoice.status === 'ditolak') {
+        return ['menunggu', 'disetujui', 'ditolak'];
+      }
+
+      if (isOwner && (invoice.status === 'dikirim' || invoice.status === 'selesai')) {
+        return ['dikirim', 'selesai'];
+      }
     }
 
     if (role === 'Gudang') {
@@ -651,6 +779,503 @@ export class Invoice {
           text: msg
         });
       }
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // Modal Surat Jalan
+  // ─────────────────────────────────────────────
+
+  openSuratJalan(): void {
+    // JIKA SUDAH ADA SURAT JALAN
+    if (this.suratJalanData) {
+      this.suratJalanForm = {
+        id_invoice: this.detailInvoice?.id_invoice,
+        no_surat_jalan: this.suratJalanData.no_surat_jalan,
+        plat_kendaraan: this.suratJalanData.plat_kendaraan
+      };
+    }
+
+    // JIKA BELUM ADA
+    else {
+      this.suratJalanForm = {
+        id_invoice: this.detailInvoice?.id_invoice,
+        no_surat_jalan: '',
+        plat_kendaraan: ''
+      };
+    }
+
+    this.showSuratJalanModal = true;
+  }
+
+  closeSuratJalan(): void {
+    this.showSuratJalanModal = false;
+  }
+
+  submitSuratJalan(): void {
+    if (!this.suratJalanForm.no_surat_jalan?.trim()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validasi',
+        text: 'No surat jalan wajib diisi.'
+      });
+      return;
+    }
+
+    if (!this.suratJalanForm.plat_kendaraan?.trim()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validasi',
+        text: 'Plat kendaraan wajib diisi.'
+      });
+      return;
+    }
+
+    // =========================
+    // MODE UPDATE
+    // =========================
+    if (this.suratJalanData) {
+      this.api.updateSuratJalan(this.suratJalanForm).subscribe({
+        next: () => {
+          this.suratJalanData = {
+            ...this.suratJalanForm
+          };
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Surat jalan berhasil diperbarui.',
+            timer: 2500,
+            showConfirmButton: false
+          });
+
+          this.closeSuratJalan();
+        },
+
+        error: (err: any) => {
+          const msg = err?.error?.message || err?.message || 'Surat jalan gagal diperbarui.';
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: msg
+          });
+        }
+      });
+
+      return;
+    }
+
+    // =========================
+    // MODE TAMBAH
+    // =========================
+    this.api.addSuratJalan(this.suratJalanForm).subscribe({
+      next: () => {
+        this.suratJalanData = {
+          ...this.suratJalanForm
+        };
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: 'Surat jalan berhasil dibuat.',
+          timer: 2500,
+          showConfirmButton: false
+        });
+
+        this.closeSuratJalan();
+      },
+
+      error: (err: any) => {
+        const msg = err?.error?.message || err?.message || 'Surat jalan gagal dibuat.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
+        });
+      }
+    });
+  }
+
+  downloadSuratJalan(): void {
+    if (!this.suratJalanData) return;
+
+    const tanggal = new Date().toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    const rows = this.detailBarang.map((item: any, index: number) => {
+      return new TableRow({
+        children: [
+          new TableCell({
+            children: [new Paragraph(String(index + 1))]
+          }),
+
+          new TableCell({
+            children: [new Paragraph(item.nama_barang)]
+          }),
+
+          new TableCell({
+            children: [new Paragraph(`${item.jumlah} ${item.satuan}`)]
+          })
+        ]
+      });
+    });
+
+    const doc = new Document({
+      sections: [
+        {
+          properties: {},
+
+          children: [
+            // =========================
+            // HEADER
+            // =========================
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: 'PANGLONG BBS',
+                  bold: true,
+                  size: 34
+                })
+              ],
+              spacing: {
+                after: 80
+              }
+            }),
+
+            new Paragraph({
+              text: 'Jl Gatot Subroto',
+              spacing: {
+                after: 40
+              }
+            }),
+
+            new Paragraph({
+              text: 'Medan',
+              spacing: {
+                after: 400
+              }
+            }),
+
+            // =========================
+            // TANGGAL
+            // =========================
+            new Paragraph({
+              alignment: AlignmentType.RIGHT,
+
+              children: [
+                new TextRun({
+                  text: `Medan, ${tanggal}`,
+                  bold: true
+                })
+              ],
+
+              spacing: {
+                after: 300
+              }
+            }),
+
+            // =========================
+            // PENERIMA
+            // =========================
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Kepada Yth : ${this.detailInvoice?.name}`,
+                  bold: true
+                })
+              ]
+            }),
+
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${this.detailInvoice?.nama_project}`,
+                  bold: true
+                })
+              ],
+
+              spacing: {
+                after: 300
+              }
+            }),
+
+            // =========================
+            // INFORMASI SURAT
+            // =========================
+            new Paragraph({
+              text: `Surat Jalan : ${this.suratJalanData.no_surat_jalan}`
+            }),
+
+            new Paragraph({
+              text: `No Plat Kendaraan : ${this.suratJalanData.plat_kendaraan}`,
+
+              spacing: {
+                after: 300
+              }
+            }),
+
+            // =========================
+            // TABEL
+            // =========================
+            new Table({
+              width: {
+                size: 100,
+                type: WidthType.PERCENTAGE
+              },
+
+              borders: {
+                top: {
+                  style: BorderStyle.SINGLE,
+                  size: 1,
+                  color: '000000'
+                },
+                bottom: {
+                  style: BorderStyle.SINGLE,
+                  size: 1,
+                  color: '000000'
+                },
+                left: {
+                  style: BorderStyle.SINGLE,
+                  size: 1,
+                  color: '000000'
+                },
+                right: {
+                  style: BorderStyle.SINGLE,
+                  size: 1,
+                  color: '000000'
+                },
+                insideHorizontal: {
+                  style: BorderStyle.SINGLE,
+                  size: 1,
+                  color: '000000'
+                },
+                insideVertical: {
+                  style: BorderStyle.SINGLE,
+                  size: 1,
+                  color: '000000'
+                }
+              },
+
+              rows: [
+                // HEADER TABLE
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      width: {
+                        size: 10,
+                        type: WidthType.PERCENTAGE
+                      },
+
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: 'No',
+                              bold: true
+                            })
+                          ]
+                        })
+                      ]
+                    }),
+
+                    new TableCell({
+                      width: {
+                        size: 60,
+                        type: WidthType.PERCENTAGE
+                      },
+
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: 'Nama Barang',
+                              bold: true
+                            })
+                          ]
+                        })
+                      ]
+                    }),
+
+                    new TableCell({
+                      width: {
+                        size: 30,
+                        type: WidthType.PERCENTAGE
+                      },
+
+                      children: [
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: 'Quantity',
+                              bold: true
+                            })
+                          ]
+                        })
+                      ]
+                    })
+                  ]
+                }),
+
+                ...rows
+              ]
+            }),
+
+            // =========================
+            // CATATAN
+            // =========================
+            new Paragraph({
+              spacing: {
+                before: 250
+              },
+
+              children: [
+                new TextRun({
+                  text: 'Catatan : ',
+                  bold: true,
+                  italics: true
+                }),
+
+                new TextRun({
+                  text: 'Mohon di cek kembali bahan-bahan yang diantar',
+                  italics: true
+                })
+              ]
+            }),
+
+            // =========================
+            // SPASI TTD
+            // =========================
+            new Paragraph({
+              text: '',
+              spacing: {
+                after: 700
+              }
+            }),
+
+            // =========================
+            // TTD SEJAJAR
+            // =========================
+            new Table({
+              width: {
+                size: 100,
+                type: WidthType.PERCENTAGE
+              },
+
+              borders: {
+                top: {
+                  style: BorderStyle.NONE,
+                  size: 0,
+                  color: 'FFFFFF'
+                },
+                bottom: {
+                  style: BorderStyle.NONE,
+                  size: 0,
+                  color: 'FFFFFF'
+                },
+                left: {
+                  style: BorderStyle.NONE,
+                  size: 0,
+                  color: 'FFFFFF'
+                },
+                right: {
+                  style: BorderStyle.NONE,
+                  size: 0,
+                  color: 'FFFFFF'
+                },
+                insideHorizontal: {
+                  style: BorderStyle.NONE,
+                  size: 0,
+                  color: 'FFFFFF'
+                },
+                insideVertical: {
+                  style: BorderStyle.NONE,
+                  size: 0,
+                  color: 'FFFFFF'
+                }
+              },
+
+              rows: [
+                new TableRow({
+                  children: [
+                    // HORMAT KAMI
+                    new TableCell({
+                      width: {
+                        size: 50,
+                        type: WidthType.PERCENTAGE
+                      },
+
+                      children: [
+                        new Paragraph({
+                          text: 'Hormat Kami,',
+                          alignment: AlignmentType.LEFT
+                        }),
+
+                        new Paragraph({
+                          text: '',
+                          spacing: {
+                            after: 900
+                          }
+                        }),
+
+                        new Paragraph({
+                          text: '................................',
+                          alignment: AlignmentType.LEFT
+                        }),
+
+                        new Paragraph({
+                          text: '(                           )',
+                          alignment: AlignmentType.LEFT
+                        })
+                      ]
+                    }),
+
+                    // DITERIMA OLEH
+                    new TableCell({
+                      width: {
+                        size: 50,
+                        type: WidthType.PERCENTAGE
+                      },
+
+                      children: [
+                        new Paragraph({
+                          text: 'Diterima Oleh :',
+                          alignment: AlignmentType.CENTER
+                        }),
+
+                        new Paragraph({
+                          text: '',
+                          spacing: {
+                            after: 900
+                          }
+                        }),
+
+                        new Paragraph({
+                          text: '................................',
+                          alignment: AlignmentType.CENTER
+                        }),
+
+                        new Paragraph({
+                          text: '(                           )',
+                          alignment: AlignmentType.CENTER
+                        })
+                      ]
+                    })
+                  ]
+                })
+              ]
+            })
+          ]
+        }
+      ]
+    });
+
+    Packer.toBlob(doc).then((blob) => {
+      saveAs(blob, `Surat-Jalan-${this.suratJalanData.no_surat_jalan}.docx`);
     });
   }
 

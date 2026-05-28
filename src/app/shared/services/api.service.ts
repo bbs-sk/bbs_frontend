@@ -37,7 +37,7 @@ export class ApiService {
   }
 
   getBarang() {
-    return this.http.post<any>(`${environment.apiUrl}/barang`, {});
+    return this.http.post<any>(`${environment.apiUrl}/barang/`, {});
   }
 
   getTotalBarang() {
@@ -106,6 +106,10 @@ export class ApiService {
 
   updateInvoice(payload: any) {
     return this.http.post<any>(`${environment.apiUrl}/invoice/update`, payload);
+  }
+
+  updatePembayaranInvoice(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/invoice/pay`, payload);
   }
 
   updateStatusInvoice(payload: any) {
@@ -214,5 +218,17 @@ export class ApiService {
 
   getActivity() {
     return this.http.get<any>(`${environment.apiUrl}/mix/activity`);
+  }
+
+  getSuratJalan(id_invoice: number) {
+    return this.http.get<any>(`${environment.apiUrl}/suratJalan/invoice/${id_invoice}`);
+  }
+
+  addSuratJalan(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/suratJalan/add`, payload);
+  }
+
+  updateSuratJalan(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/suratJalan/update`, payload);
   }
 }

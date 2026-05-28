@@ -182,7 +182,13 @@
         <!-- PROYEK -->
         <div class="form-group">
           <label class="form-label">Proyek</label>
-          <ng-select [(ngModel)]="addForm.id_project" placeholder="Pilih proyek" [searchable]="true" [clearable]="true">
+          <ng-select
+            [(ngModel)]="addForm.id_project"
+            [disabled]="userLogin?.role === 'Gudang'"
+            placeholder="Pilih proyek"
+            [searchable]="true"
+            [clearable]="true"
+          >
             @for (p of project; track p.id_project) {
             <ng-option [value]="p.id_project">{{ p.nama_project }}</ng-option>
             }
@@ -333,7 +339,13 @@
         <!-- PROYEK -->
         <div class="form-group">
           <label class="form-label">Proyek</label>
-          <ng-select [(ngModel)]="editForm.id_project" placeholder="Pilih proyek" [searchable]="true" [clearable]="true">
+          <ng-select
+            [(ngModel)]="editForm.id_project"
+            placeholder="Pilih proyek"
+            [searchable]="true"
+            [clearable]="true"
+            [disabled]="isAdminEditOtherUser()"
+          >
             @for (p of project; track p.id_project) {
             <ng-option [value]="p.id_project">{{ p.nama_project }}</ng-option>
             }
@@ -356,6 +368,7 @@
                   <label class="form-label">Barang</label>
                   <ng-select
                     [(ngModel)]="item.id_barang"
+                    [disabled]="isAdminEditOtherUser()"
                     [name]="'edit_barang_' + $index"
                     (change)="onBarangChange(item)"
                     placeholder="Pilih Barang"
@@ -375,6 +388,7 @@
                     <span class="input-prefix">Rp</span>
                     <input
                       type="text"
+                      [disabled]="isAdminEditOtherUser()"
                       class="form-control has-prefix"
                       placeholder="Masukkan harga jual"
                       [value]="formatNumber(item.harga_jual)"
@@ -388,6 +402,7 @@
                   <label class="form-label">Jumlah</label>
                   <input
                     type="number"
+                    [disabled]="isAdminEditOtherUser()"
                     class="form-control"
                     placeholder="Qty"
                     [(ngModel)]="item.jumlah"
@@ -546,7 +561,12 @@
         </div>
       </div>
 
-      <div class="modal-footer">
+      <div class="modal-footer footer-between">
+        <button *ngIf="userLogin?.role === 'Gudang'" type="button" class="btn-surat-jalan" (click)="openSuratJalan()">
+          <mat-icon>local_shipping</mat-icon>
+          Surat Jalan
+        </button>
+
         <button type="button" class="btn-modal-cancel" (click)="closeDetail()">Tutup</button>
       </div>
     </div>
@@ -595,7 +615,7 @@
         <div class="status-select-wrap">
           <label class="form-label">Status Pemesanan</label>
           <ng-select [(ngModel)]="statusForm.status" [searchable]="false" [clearable]="false" placeholder="Pilih status pembayaran">
-            @for (s of getAvailableStatus(); track s) {
+            @for (s of getAvailableStatus(statusInvoice); track s) {
             <ng-option [value]="s">{{ s }}</ng-option>
             }
           </ng-select>
@@ -669,6 +689,64 @@
         <button type="button" class="btn-modal-save" (click)="submitStatus()">
           <mat-icon>task_alt</mat-icon>
           Update Status
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───── MODAL SURAT JALAN ───── -->
+<div class="modal-custom" *ngIf="showSuratJalanModal">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <!-- HEADER -->
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <div class="modal-icon status-icon">
+          <mat-icon>local_shipping</mat-icon>
+        </div>
+
+        <h5>{{ suratJalanData ? 'Update Surat Jalan' : 'Tambah Surat Jalan' }}</h5>
+      </div>
+
+      <button type="button" class="btn-close-modal" (click)="closeSuratJalan()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+      <!-- NO SURAT JALAN -->
+      <div class="form-group">
+        <label class="form-label">No Surat Jalan</label>
+
+        <input type="text" class="form-control" [(ngModel)]="suratJalanForm.no_surat_jalan" placeholder="Contoh: SJ-2026-001" />
+      </div>
+
+      <!-- PLAT -->
+      <div class="form-group">
+        <label class="form-label">Plat Kendaraan</label>
+
+        <input type="text" class="form-control" [(ngModel)]="suratJalanForm.plat_kendaraan" placeholder="Contoh: BK 8249 GO" />
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer footer-between">
+      <!-- KIRI -->
+      <div>
+        @if (suratJalanData) {
+        <button type="button" class="btn-surat-jalan" (click)="downloadSuratJalan()">
+          <mat-icon>download</mat-icon>
+          Unduh
+        </button>
+        }
+      </div>
+
+      <!-- KANAN -->
+      <div class="d-flex gap-2">
+        <button type="button" class="btn-modal-save" (click)="submitSuratJalan()">
+          <mat-icon>save</mat-icon>
+          {{ suratJalanData ? 'Update' : 'Simpan' }}
         </button>
       </div>
     </div>
