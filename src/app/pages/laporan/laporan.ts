@@ -78,7 +78,7 @@ export interface SummaryData {
   styleUrl: './laporan.scss'
 })
 export class Laporan implements OnInit, OnDestroy {
-  displayedColumns: string[] = ['no', 'date', 'invoice', 'project', 'totalItems', 'totalPrice', 'profit', 'status'];
+  displayedColumns: string[] = ['no', 'date', 'project', 'totalItems', 'totalPrice', 'profit', 'status'];
 
   filterForm!: FormGroup;
 
@@ -308,8 +308,7 @@ export class Laporan implements OnInit, OnDestroy {
     const exportData = this.filteredTransactions.map((item, index) => ({
       No: index + 1,
       Tanggal: item.date,
-      Invoice: item.id_invoice,
-      Proyek: item.nama_project,
+      Ref: item.nama_project,
       'Total Barang': item.total_items,
       'Total Harga': item.total_price,
       Keuntungan: item.total_profit,

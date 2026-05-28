@@ -715,3 +715,53 @@ table.table {
     min-width: 980px;
   }
 }
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &.aktif {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+
+    &::before {
+      background: #16a34a;
+      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+    }
+  }
+
+  &.nonaktif {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+
+    &::before {
+      background: #dc2626;
+    }
+  }
+}
+
+.btn-restore {
+  background: #dcfce7;
+  color: #15803d;
+
+  &:hover {
+    background: #bbf7d0;
+  }
+}

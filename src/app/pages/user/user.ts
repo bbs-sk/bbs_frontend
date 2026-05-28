@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { ApiService } from 'src/app/shared/services/api.service';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -11,44 +11,47 @@ import { NgSelectModule } from '@ng-select/ng-select';
 @Component({
   selector: 'app-user',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatPaginatorModule, MatButtonModule, MatIconModule, NgSelectModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatPaginatorModule, MatButtonModule, MatIconModule, NgSelectModule],
   templateUrl: './user.html',
   styleUrl: './user.scss'
 })
 export class User implements OnInit {
   constructor(
     private api: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
   ) {}
 
   users: any[] = [];
   filteredUsers: any[] = [];
   paginatedUsers: any[] = [];
   isLoading = false;
-  pageSize = 10;
+  pageSize = 20;
   pageIndex = 0;
   searchKeyword = '';
   showAddModal = false;
   showEditModal = false;
   searchFocused = false;
 
-  addForm: any = {
-    name: '',
-    role: 'Admin Kantor',
-    username: '',
-    password: ''
-  };
-
-  editForm: any = {
-    id_user: null,
-    name: '',
-    role: 'Admin Kantor',
-    username: '',
-    password: ''
-  };
+  addUserForm!: FormGroup;
+  editUserForm!: FormGroup;
 
   ngOnInit(): void {
     this.loadUsers();
+    this.addUserForm = this.fb.group({
+      name: ['', Validators.required],
+      role: [null, Validators.required],
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+
+    this.editUserForm = this.fb.group({
+      id_user: [null],
+      name: ['', Validators.required],
+      role: [null, Validators.required],
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
   }
 
   loadUsers(showLoading: boolean = true): void {
@@ -161,12 +164,13 @@ export class User implements OnInit {
   }
 
   openAdd(): void {
-    this.addForm = {
+    this.addUserForm.reset({
       name: '',
-      role: 'Admin Kantor',
+      role: null,
       username: '',
       password: ''
-    };
+    });
+
     this.showAddModal = true;
   }
 
@@ -175,35 +179,35 @@ export class User implements OnInit {
   }
 
   submitAdd(): void {
-    if (!this.addForm.name || !this.addForm.role || !this.addForm.username || !this.addForm.password) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Peringatan',
-        text: 'Semua field wajib diisi.'
-      });
+    if (this.addUserForm.invalid) {
+      this.addUserForm.markAllAsTouched();
       return;
     }
-    const payload = {
-      name: this.addForm.name,
-      role: this.addForm.role,
-      username: this.addForm.username,
-      password: this.addForm.password
-    };
-    this.api.addUser(payload).subscribe({
+
+    this.api.addUser(this.addUserForm.value).subscribe({
       next: () => {
-        const nama = this.addForm.name;
+        const nama = this.addUserForm.value.name;
+
         this.closeAdd();
-        this.loadUsers(false);
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: `Pengguna "${nama}" berhasil ditambahkan.`,
-          timer: 2500,
-          showConfirmButton: false
-        });
+
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: `Pengguna "${nama}" berhasil ditambahkan.`,
+            timer: 2500,
+            showConfirmButton: false
+          }).then(() => {
+            this.loadUsers(false);
+          });
+        }, 100);
       },
+
       error: (err) => {
         const msg = err?.error?.message || err?.message || 'Pengguna gagal ditambahkan.';
+
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
@@ -214,13 +218,14 @@ export class User implements OnInit {
   }
 
   onEdit(u: any): void {
-    this.editForm = {
+    this.editUserForm.patchValue({
       id_user: u.id_user,
       name: u.name ?? '',
-      role: u.role ?? 'Admin Kantor',
+      role: u.role ?? null,
       username: u.username ?? '',
       password: u.password ?? ''
-    };
+    });
+
     this.showEditModal = true;
   }
 
@@ -229,39 +234,35 @@ export class User implements OnInit {
   }
 
   submitEdit(): void {
-    if (!this.editForm.name || !this.editForm.role || !this.editForm.username || !this.editForm.password) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Peringatan',
-        text: 'Semua field wajib diisi.'
-      });
+    if (this.editUserForm.invalid) {
+      this.editUserForm.markAllAsTouched();
       return;
     }
 
-    const payload = {
-      id_user: this.editForm.id_user,
-      name: this.editForm.name,
-      role: this.editForm.role,
-      username: this.editForm.username,
-      password: this.editForm.password
-    };
-
-    this.api.updateUser(payload).subscribe({
+    this.api.updateUser(this.editUserForm.value).subscribe({
       next: () => {
-        const nama = this.editForm.name;
+        const nama = this.editUserForm.value.name;
+
         this.closeEdit();
-        this.loadUsers(false);
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil',
-          text: `Pengguna "${nama}" berhasil diperbarui.`,
-          timer: 2500,
-          showConfirmButton: false
-        });
+
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: `Pengguna "${nama}" berhasil diperbarui.`,
+            timer: 2500,
+            showConfirmButton: false
+          }).then(() => {
+            this.loadUsers(false);
+          });
+        }, 100);
       },
 
       error: (err) => {
         const msg = err?.error?.message || err?.message || 'Pengguna gagal diperbarui.';
+
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
@@ -296,6 +297,45 @@ export class User implements OnInit {
           },
           error: (err) => {
             const msg = err?.error?.message || err?.message || 'Pengguna gagal dihapus.';
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal',
+              text: msg
+            });
+          }
+        });
+      }
+    });
+  }
+
+  onRestore(u: any): void {
+    Swal.fire({
+      title: 'Aktifkan Pengguna',
+      text: `Aktifkan kembali pengguna "${u.name}"?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#16a34a',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Aktifkan',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.api.restoreUser(u.id_user).subscribe({
+          next: () => {
+            this.loadUsers(false);
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil',
+              text: `Pengguna "${u.name}" berhasil diaktifkan kembali.`,
+              timer: 2500,
+              showConfirmButton: false
+            });
+          },
+
+          error: (err) => {
+            const msg = err?.error?.message || err?.message || 'Pengguna gagal diaktifkan.';
+
             Swal.fire({
               icon: 'error',
               title: 'Gagal',

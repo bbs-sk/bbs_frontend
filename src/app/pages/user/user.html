@@ -72,6 +72,7 @@
               <th>Role</th>
               <th>Username</th>
               <!-- <th>Password</th> -->
+              <th>Status</th>
               <th class="col-action">Aksi</th>
             </tr>
           </thead>
@@ -97,15 +98,21 @@
               <!-- <td>
                 <span class="password-text">{{ u.password || '-' }}</span>
               </td> -->
-
+              <td>
+                <span class="status-badge" [ngClass]="u.status == 1 ? 'aktif' : 'nonaktif'">
+                  {{ u.status == 1 ? 'Aktif' : 'Nonaktif' }}
+                </span>
+              </td>
               <td class="col-action">
                 <div class="action-btns">
-                  <!-- <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(u)">
-                    <mat-icon>edit</mat-icon>
-                  </button> -->
-
-                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(u)">
+                  <!-- USER AKTIF -->
+                  <button *ngIf="u.status == 1" type="button" class="btn-action btn-del" title="Nonaktifkan" (click)="onDelete(u)">
                     <mat-icon>delete_outline</mat-icon>
+                  </button>
+
+                  <!-- USER NONAKTIF -->
+                  <button *ngIf="u.status == 0" type="button" class="btn-action btn-restore" title="Aktifkan" (click)="onRestore(u)">
+                    <mat-icon>restore</mat-icon>
                   </button>
                 </div>
               </td>
@@ -166,48 +173,110 @@
         </button>
       </div>
 
-      <!-- BODY -->
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Nama Pengguna</label>
+      <form [formGroup]="addUserForm" (ngSubmit)="submitAdd()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">
+              Nama Pengguna
+              <span class="text-danger">*</span>
+            </label>
 
-          <input type="text" class="form-control" [(ngModel)]="addForm.name" placeholder="Masukkan nama pengguna" />
+            <input type="text" class="form-control" formControlName="name" placeholder="Masukkan nama pengguna" />
+
+            <div
+              *ngIf="
+              addUserForm.get('name')?.invalid &&
+              (
+                addUserForm.get('name')?.dirty ||
+                addUserForm.get('name')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Nama pengguna harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Role Pengguna
+              <span class="text-danger">*</span>
+            </label>
+
+            <ng-select formControlName="role" placeholder="Pilih role" [searchable]="true" [clearable]="true">
+              <ng-option value="Admin Kantor">Admin Kantor</ng-option>
+              <ng-option value="Gudang">Gudang</ng-option>
+              <ng-option value="Lapangan">Lapangan</ng-option>
+            </ng-select>
+
+            <div
+              *ngIf="
+              addUserForm.get('role')?.invalid &&
+              (
+                addUserForm.get('role')?.dirty ||
+                addUserForm.get('role')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Role pengguna harus dipilih.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Username
+              <span class="text-danger">*</span>
+            </label>
+
+            <input type="text" class="form-control" formControlName="username" placeholder="Masukkan username" />
+
+            <div
+              *ngIf="
+              addUserForm.get('username')?.invalid &&
+              (
+                addUserForm.get('username')?.dirty ||
+                addUserForm.get('username')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Username harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Password
+              <span class="text-danger">*</span>
+            </label>
+
+            <input type="password" class="form-control" formControlName="password" placeholder="Masukkan password" />
+
+            <div
+              *ngIf="
+              addUserForm.get('password')?.invalid &&
+              (
+                addUserForm.get('password')?.dirty ||
+                addUserForm.get('password')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Password harus diisi.
+            </div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Role Pengguna</label>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
 
-          <ng-select [(ngModel)]="addForm.role" placeholder="Pilih role pengguna" [searchable]="true" [clearable]="true">
-            <ng-option value="Admin Kantor">Admin Kantor</ng-option>
-
-            <ng-option value="Gudang">Gudang</ng-option>
-
-            <ng-option value="Lapangan">Lapangan</ng-option>
-          </ng-select>
+          <button type="submit" class="btn-modal-save">
+            <mat-icon>save</mat-icon>
+            <span>Simpan</span>
+          </button>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Username</label>
-
-          <input type="text" class="form-control" [(ngModel)]="addForm.username" placeholder="Masukkan username" />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Password</label>
-
-          <input type="text" class="form-control" [(ngModel)]="addForm.password" placeholder="Masukkan password" />
-        </div>
-      </div>
-
-      <!-- FOOTER -->
-      <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
-
-        <button type="button" class="btn-modal-save" (click)="submitAdd()">
-          <mat-icon>save</mat-icon>
-          <span>Simpan</span>
-        </button>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -233,46 +302,98 @@
         </button>
       </div>
 
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">Nama Pengguna</label>
+      <form [formGroup]="editUserForm" (ngSubmit)="submitEdit()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nama Pengguna</label>
 
-          <input type="text" class="form-control" [(ngModel)]="editForm.name" placeholder="Masukkan nama pengguna" />
+            <input type="text" class="form-control" formControlName="name" placeholder="Masukkan nama pengguna" />
+
+            <div
+              *ngIf="
+              editUserForm.get('name')?.invalid &&
+              (
+                editUserForm.get('name')?.dirty ||
+                editUserForm.get('name')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Nama pengguna harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Role Pengguna</label>
+
+            <ng-select formControlName="role" placeholder="Pilih role" [searchable]="true" [clearable]="true">
+              <ng-option value="Admin Kantor">Admin Kantor</ng-option>
+              <ng-option value="Gudang">Gudang</ng-option>
+              <ng-option value="Lapangan">Lapangan</ng-option>
+            </ng-select>
+
+            <div
+              *ngIf="
+              editUserForm.get('role')?.invalid &&
+              (
+                editUserForm.get('role')?.dirty ||
+                editUserForm.get('role')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Role pengguna harus dipilih.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Username</label>
+
+            <input type="text" class="form-control" formControlName="username" placeholder="Masukkan username" />
+
+            <div
+              *ngIf="
+              editUserForm.get('username')?.invalid &&
+              (
+                editUserForm.get('username')?.dirty ||
+                editUserForm.get('username')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Username harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+
+            <input type="password" class="form-control" formControlName="password" placeholder="Masukkan password" />
+
+            <div
+              *ngIf="
+              editUserForm.get('password')?.invalid &&
+              (
+                editUserForm.get('password')?.dirty ||
+                editUserForm.get('password')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Password harus diisi.
+            </div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Role Pengguna</label>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
 
-          <ng-select [(ngModel)]="editForm.role" placeholder="Pilih role pengguna" [searchable]="true" [clearable]="true">
-            <ng-option value="Admin Kantor">Admin Kantor</ng-option>
-
-            <ng-option value="Gudang">Gudang</ng-option>
-
-            <ng-option value="Lapangan">Lapangan</ng-option>
-          </ng-select>
+          <button type="submit" class="btn-modal-save">
+            <mat-icon>save</mat-icon>
+            <span>Simpan Perubahan</span>
+          </button>
         </div>
-
-        <div class="form-group">
-          <label class="form-label">Username</label>
-
-          <input type="text" class="form-control" [(ngModel)]="editForm.username" placeholder="Masukkan username" />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Password</label>
-
-          <input type="text" class="form-control" [(ngModel)]="editForm.password" placeholder="Masukkan password" />
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
-
-        <button type="button" class="btn-modal-save" (click)="submitEdit()">
-          <mat-icon>save</mat-icon>
-          <span>Simpan Perubahan</span>
-        </button>
-      </div>
+      </form>
     </div>
   </div> -->
 </div>

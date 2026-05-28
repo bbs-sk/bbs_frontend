@@ -146,50 +146,129 @@
           <div class="modal-icon add-icon">
             <mat-icon>add_box</mat-icon>
           </div>
+
           <h5>Tambah Barang</h5>
         </div>
-        <button type="button" class="btn-close-modal" (click)="closeAdd()" aria-label="Tutup">
+
+        <button type="button" class="btn-close-modal" (click)="closeAdd()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      <div class="modal-body">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Kode Barang</label>
-            <input class="form-control" [(ngModel)]="addForm.kode_barang" placeholder="Masukkan kode barang" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Satuan</label>
-            <input class="form-control" [(ngModel)]="addForm.satuan" placeholder="Masukkan satuan barang" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Nama Barang</label>
-          <input class="form-control" [(ngModel)]="addForm.nama_barang" placeholder="Masukkan nama barang" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Harga Jual</label>
-          <div class="input-prefix-wrap">
-            <span class="input-prefix">Rp</span>
-            <input
-              type="text"
-              class="form-control has-prefix"
-              [(ngModel)]="hargaJualDisplayAdd"
-              (input)="onHargaJualInput('add')"
-              placeholder="0"
-            />
-          </div>
-        </div>
-      </div>
+      <form [formGroup]="addBarangForm" (ngSubmit)="submitAdd()">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">
+                Kode Barang
+                <span class="text-danger">*</span>
+              </label>
 
-      <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
-        <button type="button" class="btn-modal-save" (click)="submitAdd()">
-          <mat-icon>save</mat-icon>
-          Simpan Barang
-        </button>
-      </div>
+              <input class="form-control" formControlName="kode_barang" placeholder="Masukkan kode barang" />
+
+              <div
+                *ngIf="
+                addBarangForm.get('kode_barang')?.invalid &&
+                (
+                  addBarangForm.get('kode_barang')?.dirty ||
+                  addBarangForm.get('kode_barang')?.touched
+                )
+              "
+                class="text-danger mt-1"
+              >
+                Kode barang harus diisi.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Satuan
+                <span class="text-danger">*</span>
+              </label>
+
+              <input class="form-control" formControlName="satuan" placeholder="Masukkan satuan barang" />
+
+              <div
+                *ngIf="
+                addBarangForm.get('satuan')?.invalid &&
+                (
+                  addBarangForm.get('satuan')?.dirty ||
+                  addBarangForm.get('satuan')?.touched
+                )
+              "
+                class="text-danger mt-1"
+              >
+                Satuan harus diisi.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Nama Barang
+              <span class="text-danger">*</span>
+            </label>
+
+            <input class="form-control" formControlName="nama_barang" placeholder="Masukkan nama barang" />
+
+            <div
+              *ngIf="
+              addBarangForm.get('nama_barang')?.invalid &&
+              (
+                addBarangForm.get('nama_barang')?.dirty ||
+                addBarangForm.get('nama_barang')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Nama barang harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Harga Jual
+              <span class="text-danger">*</span>
+            </label>
+
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">Rp</span>
+
+              <input
+                type="text"
+                class="form-control has-prefix"
+                [value]="hargaJualDisplayAdd"
+                (input)="onHargaJualInput($event, 'add')"
+                (keypress)="numberOnly($event)"
+                inputmode="numeric"
+                placeholder="0"
+              />
+            </div>
+
+            <div
+              *ngIf="
+      addBarangForm.get('harga_jual')?.invalid &&
+      (
+        addBarangForm.get('harga_jual')?.dirty ||
+        addBarangForm.get('harga_jual')?.touched
+      )
+    "
+              class="text-danger mt-1"
+            >
+              Harga jual harus diisi.
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
+
+          <button type="submit" class="btn-modal-save">
+            <mat-icon>save</mat-icon>
+            Simpan Barang
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -201,59 +280,146 @@
           <div class="modal-icon edit-icon">
             <mat-icon>edit_note</mat-icon>
           </div>
+
           <h5>Edit Barang</h5>
         </div>
-        <button type="button" class="btn-close-modal" (click)="closeEdit()" aria-label="Tutup">
+
+        <button type="button" class="btn-close-modal" (click)="closeEdit()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      <div class="modal-body">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Kode Barang</label>
-            <input class="form-control" [(ngModel)]="editForm.kode_barang" placeholder="Kode Barang" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Satuan</label>
-            <input class="form-control" [(ngModel)]="editForm.satuan" placeholder="Satuan" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Nama Barang</label>
-          <input class="form-control" [(ngModel)]="editForm.nama_barang" placeholder="Nama Barang" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Harga Jual</label>
-          <div class="input-prefix-wrap">
-            <span class="input-prefix">Rp</span>
-            <input
-              type="text"
-              class="form-control has-prefix"
-              [(ngModel)]="hargaJualDisplayEdit"
-              (input)="onHargaJualInput('edit')"
-              placeholder="0"
-            />
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">HPP</label>
-          <div class="input-prefix-wrap">
-            <span class="input-prefix">Rp</span>
+      <form [formGroup]="editBarangForm" (ngSubmit)="submitEdit()">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">
+                Kode Barang
+                <span class="text-danger">*</span>
+              </label>
 
-            <input type="text" class="form-control has-prefix" [value]="editForm.hpp ? formatNumber(editForm.hpp) : '—'" disabled />
-          </div>
-          <p class="form-hint">HPP dihitung otomatis dari transaksi masuk</p>
-        </div>
-      </div>
+              <input class="form-control" formControlName="kode_barang" placeholder="Masukkan kode barang" />
 
-      <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
-        <button type="button" class="btn-modal-save" (click)="submitEdit()">
-          <mat-icon>save</mat-icon>
-          Simpan Perubahan
-        </button>
-      </div>
+              <div
+                *ngIf="
+                editBarangForm.get('kode_barang')?.invalid &&
+                (
+                  editBarangForm.get('kode_barang')?.dirty ||
+                  editBarangForm.get('kode_barang')?.touched
+                )
+              "
+                class="text-danger mt-1"
+              >
+                Kode barang harus diisi.
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Satuan
+                <span class="text-danger">*</span>
+              </label>
+
+              <input class="form-control" formControlName="satuan" placeholder="Masukkan satuan barang" />
+
+              <div
+                *ngIf="
+                editBarangForm.get('satuan')?.invalid &&
+                (
+                  editBarangForm.get('satuan')?.dirty ||
+                  editBarangForm.get('satuan')?.touched
+                )
+              "
+                class="text-danger mt-1"
+              >
+                Satuan harus diisi.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Nama Barang
+              <span class="text-danger">*</span>
+            </label>
+
+            <input class="form-control" formControlName="nama_barang" placeholder="Masukkan nama barang" />
+
+            <div
+              *ngIf="
+              editBarangForm.get('nama_barang')?.invalid &&
+              (
+                editBarangForm.get('nama_barang')?.dirty ||
+                editBarangForm.get('nama_barang')?.touched
+              )
+            "
+              class="text-danger mt-1"
+            >
+              Nama barang harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Harga Jual
+              <span class="text-danger">*</span>
+            </label>
+
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">Rp</span>
+
+              <input
+                type="text"
+                class="form-control has-prefix"
+                [value]="hargaJualDisplayEdit"
+                (input)="onHargaJualInput($event, 'edit')"
+                (keypress)="numberOnly($event)"
+                inputmode="numeric"
+                placeholder="0"
+              />
+            </div>
+
+            <div
+              *ngIf="
+      editBarangForm.get('harga_jual')?.invalid &&
+      (
+        editBarangForm.get('harga_jual')?.dirty ||
+        editBarangForm.get('harga_jual')?.touched
+      )
+    "
+              class="text-danger mt-1"
+            >
+              Harga jual harus diisi.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">HPP</label>
+
+            <div class="input-prefix-wrap">
+              <span class="input-prefix">Rp</span>
+
+              <input
+                type="text"
+                class="form-control has-prefix"
+                [value]="editBarangForm.get('hpp')?.value ? formatNumber(editBarangForm.get('hpp')?.value) : '—'"
+                disabled
+              />
+            </div>
+
+            <p class="form-hint">HPP dihitung otomatis dari transaksi masuk</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
+
+          <button type="submit" class="btn-modal-save">
+            <mat-icon>save</mat-icon>
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

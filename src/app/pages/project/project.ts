@@ -7,18 +7,20 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-project',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatPaginatorModule, MatButtonModule, MatIconModule, NgSelectModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatPaginatorModule, MatButtonModule, MatIconModule, NgSelectModule],
   templateUrl: './project.html',
   styleUrl: './project.scss'
 })
 export class Project {
   constructor(
     private api: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private fb: FormBuilder
   ) {}
 
   userLogin: any = null;
@@ -39,20 +41,8 @@ export class Project {
   showAddModal = false;
   showEditModal = false;
 
-  addForm: any = {
-    nama_project: '',
-    alamat: '',
-    id_user1: null,
-    id_user2: null
-  };
-
-  editForm: any = {
-    id_project: null,
-    nama_project: '',
-    alamat: '',
-    id_user1: null,
-    id_user2: null
-  };
+  addProjectForm!: FormGroup;
+  editProjectForm!: FormGroup;
 
   get totalPages(): number {
     return Math.ceil(this.filteredProject.length / this.pageSize) || 1;
@@ -65,22 +55,37 @@ export class Project {
 
     this.loadProject();
     this.loadUserLapangan();
+
+    this.addProjectForm = this.fb.group({
+      nama_project: ['', Validators.required],
+      alamat: ['', Validators.required],
+      id_user1: [null],
+      id_user2: [null]
+    });
+
+    this.editProjectForm = this.fb.group({
+      id_project: [null],
+      nama_project: ['', Validators.required],
+      alamat: ['', Validators.required],
+      id_user1: [null],
+      id_user2: [null]
+    });
   }
 
   getAddUser1() {
-    return this.userLapangan.filter((u) => u.id_user !== this.addForm.id_user2);
+    return this.userLapangan.filter((u) => u.id_user !== this.addProjectForm.get('id_user2')?.value);
   }
 
   getAddUser2() {
-    return this.userLapangan.filter((u) => u.id_user !== this.addForm.id_user1);
+    return this.userLapangan.filter((u) => u.id_user !== this.addProjectForm.get('id_user1')?.value);
   }
 
   getEditUser1() {
-    return this.userLapangan.filter((u) => u.id_user !== this.editForm.id_user2);
+    return this.userLapangan.filter((u) => u.id_user !== this.editProjectForm.get('id_user2')?.value);
   }
 
   getEditUser2() {
-    return this.userLapangan.filter((u) => u.id_user !== this.editForm.id_user1);
+    return this.userLapangan.filter((u) => u.id_user !== this.editProjectForm.get('id_user1')?.value);
   }
 
   loadProject(showLoading: boolean = true): void {
@@ -222,12 +227,12 @@ export class Project {
   }
 
   openAdd(): void {
-    this.addForm = {
+    this.addProjectForm.reset({
       nama_project: '',
       alamat: '',
       id_user1: null,
       id_user2: null
-    };
+    });
 
     this.showAddModal = true;
   }
@@ -237,9 +242,13 @@ export class Project {
   }
 
   submitAdd(): void {
-    this.api.addProject(this.addForm).subscribe({
+    if (this.addProjectForm.invalid) {
+      this.addProjectForm.markAllAsTouched();
+      return;
+    }
+    this.api.addProject(this.addProjectForm.value).subscribe({
       next: () => {
-        const nama = this.addForm.nama_project;
+        const nama = this.addProjectForm.value.nama_project;
 
         this.closeAdd();
 
@@ -275,14 +284,13 @@ export class Project {
 
     const user2Exist = this.userLapangan.some((u) => u.id_user === p.id_user2);
 
-    this.editForm = {
+    this.editProjectForm.patchValue({
       id_project: p.id_project,
       nama_project: p.nama_project ?? '',
       alamat: p.alamat ?? '',
-
       id_user1: user1Exist ? p.id_user1 : null,
       id_user2: user2Exist ? p.id_user2 : null
-    };
+    });
 
     this.showEditModal = true;
   }
@@ -292,9 +300,14 @@ export class Project {
   }
 
   submitEdit(): void {
-    this.api.updateProject(this.editForm).subscribe({
+    if (this.editProjectForm.invalid) {
+      this.editProjectForm.markAllAsTouched();
+      return;
+    }
+
+    this.api.updateProject(this.editProjectForm.value).subscribe({
       next: () => {
-        const nama = this.editForm.nama_project;
+        const nama = this.editProjectForm.value.nama_project;
 
         this.closeEdit();
 
