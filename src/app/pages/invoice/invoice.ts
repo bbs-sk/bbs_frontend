@@ -36,7 +36,7 @@ export class Invoice {
   filterStatus = '';
 
   // ─── Pagination ─────────────────────────────
-  pageSize = 20;
+  pageSize = 10;
   pageIndex = 0;
 
   get totalPages(): number {
@@ -284,6 +284,32 @@ export class Invoice {
     this.showAddModal = false;
   }
 
+  getStock(id_barang: any): number {
+    const barang = this.barang.find((b: any) => b.id_barang == id_barang);
+
+    return barang ? Number(barang.jumlah) : 0;
+  }
+
+  onJumlahChange(item: any): void {
+    const stock = this.getStock(item.id_barang);
+
+    if (Number(item.jumlah) > stock) {
+      item.jumlah = stock;
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Stok Tidak Mencukupi',
+        text: `Jumlah barang melebihi stok tersedia (${stock}).`
+      });
+    }
+
+    if (Number(item.jumlah) < 1 || !item.jumlah) {
+      item.jumlah = 1;
+    }
+
+    this.calculateTotal();
+  }
+
   submitAdd(): void {
     const payload = {
       ...this.addForm,
@@ -327,17 +353,20 @@ export class Invoice {
   // Modal Edit
   // ─────────────────────────────────────────────
   canEdit(invoice: any): boolean {
+    const isOwner = invoice.id_user === this.userLogin?.id_user;
     const role = this.userLogin?.role;
     if (role === 'Admin Kantor') {
       return true;
     }
-    const isOwner = invoice.id_user === this.userLogin?.id_user;
+    if (role === 'Gudang') {
+      return isOwner;
+    }
     const allowedStatus = invoice.status === 'menunggu' || invoice.status === 'dipesan';
     return isOwner && allowedStatus;
   }
 
   isAdminEditOtherUser(): boolean {
-    const isAdmin = this.userLogin?.role === 'Admin Kantor';
+    const isAdmin = this.userLogin?.role === 'Admin Kantor' || 'Gudang';
     const isOtherUser = this.editForm?.id_user !== this.userLogin?.id_user;
     const lockedStatus = this.editForm?.status !== 'menunggu' && this.editForm?.status !== 'dipesan';
     return isAdmin && (isOtherUser || lockedStatus);
@@ -482,6 +511,9 @@ export class Invoice {
     const isOwner = invoice.id_user === this.userLogin?.id_user;
     if (role === 'Gudang') {
       return isOwner;
+    }
+    if (role === 'Admin Kantor') {
+      return isOwner && invoice.status === 'disetujui';
     }
     const allowedStatus = invoice.status === 'menunggu' || invoice.status === 'dipesan';
     return isOwner && allowedStatus;
