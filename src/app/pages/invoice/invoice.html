@@ -1,12 +1,9 @@
 <div class="page-wrapper">
-  <!-- ───── CARD UTAMA ───── -->
   <div class="tbl-card">
-    <!-- Header -->
+    <!-- ─── Header ─── -->
     <div class="card-header">
       <div class="card-title">
-        <div class="title-icon">
-          <mat-icon>receipt_long</mat-icon>
-        </div>
+        <div class="title-icon"><mat-icon>receipt_long</mat-icon></div>
         <div>
           <h3 class="mb-0">Pemesanan Barang</h3>
           <p class="subtitle">Kelola data pemesanan barang</p>
@@ -18,7 +15,7 @@
       </button>
     </div>
 
-    <!-- Toolbar: statistik + search -->
+    <!-- ─── Toolbar ─── -->
     <div class="toolbar">
       <div class="search-box" [class.focused]="searchFocused">
         <mat-icon class="search-icon">search</mat-icon>
@@ -28,17 +25,12 @@
           [(ngModel)]="searchKeyword"
           placeholder="Cari nama proyek..."
           (keyup.enter)="searchData()"
-          (focus)="searchFocused = true"
-          (blur)="searchFocused = false"
+          (focus)="searchFocused=true"
+          (blur)="searchFocused=false"
         />
-        <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()" aria-label="Hapus pencarian">
-          <mat-icon>close</mat-icon>
-        </button>
-        <button type="button" class="btn-search" (click)="searchData()" aria-label="Cari">
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
+        <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()"><mat-icon>close</mat-icon></button>
+        <button type="button" class="btn-search" (click)="searchData()"><mat-icon>arrow_forward</mat-icon></button>
       </div>
-
       <select class="filter-status" [(ngModel)]="filterStatus" (change)="applyStatusFilter()">
         <option value="">Semua Status</option>
         <option value="menunggu">Menunggu</option>
@@ -50,19 +42,19 @@
       </select>
     </div>
 
-    <!-- Tabel -->
+    <!-- ─── Tabel ─── -->
     <div class="table-responsive">
       <div class="table-wrapper">
         <table class="table mb-0">
           <thead>
             <tr>
               <th class="col-no">No</th>
+              <th class="col-date">Tanggal</th>
               <th>Proyek</th>
               <th>Pemesan</th>
               <th class="col-num">Total Harga</th>
               <th>Status</th>
               <th>Pembayaran</th>
-              <!-- <th>Detail</th> -->
               <th class="col-action">Aksi</th>
             </tr>
           </thead>
@@ -70,19 +62,24 @@
             @for (i of paginatedInvoice; track i.id_invoice; let idx = $index) {
             <tr class="table-row">
               <td class="col-no text-muted-sm">{{ (pageIndex * pageSize) + idx + 1 }}</td>
+
+              <td class="col-date">
+                <div class="date-wrap">
+                  <span class="date-main">{{ i.created_at | date:'dd MMM yyyy':'':'id' }}</span>
+                </div>
+              </td>
               <td>
                 <div class="badge-proyek">{{ i.nama_project }}</div>
               </td>
-              <td>
-                <div class="user-name">{{ i.name }}</div>
-              </td>
+              <td><div class="user-name">{{ i.name }}</div></td>
               <td class="col-num">
                 <span class="price-value">{{ i.total_harga ? 'Rp ' + i.total_harga.toLocaleString('id-ID') : '—' }}</span>
               </td>
               <td>
+                <!-- FIX: status ditampilkan dengan titlecase pipe agar konsisten dengan filter dropdown -->
                 <span class="badge-status badge-{{ i.status }}">
                   <span class="status-dot"></span>
-                  {{ i.status }}
+                  {{ i.status | titlecase }}
                 </span>
               </td>
               <td>
@@ -91,39 +88,51 @@
                   <span>{{ i.pembayaran === 'lunas' ? 'Lunas' : 'Belum Lunas' }}</span>
                 </div>
               </td>
-              <!-- <td class="detail-cell">
-                <span class="detail-text" [title]="i.detail">{{ i.detail || '—' }}</span>
-              </td> -->
-              <td>
+
+              <!-- ─── Kolom Aksi: Detail + ⋮ menu ─── -->
+              <!-- FIX: col-action selalu menampilkan placeholder agar lebar kolom konsisten -->
+              <td class="col-action-cell">
                 <div class="action-btns">
-                  <!-- Detail -->
-                  <button type="button" class="btn-action btn-detail" title="Detail" (click)="openDetail(i)" aria-label="Lihat detail">
+                  <!-- Tombol Detail (selalu ada) -->
+                  <button type="button" class="btn-action btn-detail" title="Lihat detail" (click)="openDetail(i)">
                     <mat-icon>visibility</mat-icon>
                   </button>
-                  <!-- Edit -->
-                  @if (canEdit(i)) {
-                  <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(i)" aria-label="Edit pemesanan">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  }
-                  <!-- Hapus -->
-                  @if (canDelete(i)) {
-                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(i)" aria-label="Hapus pemesanan">
-                    <mat-icon>delete_outline</mat-icon>
-                  </button>
-                  }
-                  <!-- Update Status -->
-                  @if (canUpdateStatus(i)) {
-                  <button
-                    type="button"
-                    class="btn-action btn-status"
-                    title="Update Status"
-                    (click)="openStatus(i)"
-                    aria-label="Update status"
-                  >
-                    <mat-icon>task_alt</mat-icon>
-                  </button>
-                  }
+
+                  <!-- ⋮ Dropdown menu — placeholder transparan jika tidak ada aksi agar kolom tetap lebar sama -->
+                  <div class="action-menu-wrap" *ngIf="hasAnyAction(i); else actionPlaceholder" (click)="$event.stopPropagation()">
+                    <button type="button" class="btn-action btn-menu" title="Aksi lain" (click)="toggleMenu($event, i.id_invoice)">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+
+                    <div class="action-dropdown" *ngIf="activeMenuId === i.id_invoice">
+                      <button *ngIf="canEdit(i)" type="button" class="action-dropdown-item" (click)="onEdit(i)">
+                        <mat-icon>edit</mat-icon>
+                        Edit
+                      </button>
+                      <button
+                        *ngIf="canUpdateStatus(i)"
+                        type="button"
+                        class="action-dropdown-item"
+                        (click)="openStatus(i); activeMenuId=null"
+                      >
+                        <mat-icon>task_alt</mat-icon>
+                        Ubah Status
+                      </button>
+                      <button *ngIf="canRetur(i)" type="button" class="action-dropdown-item action-dropdown-retur" (click)="openRetur(i)">
+                        <mat-icon>assignment_return</mat-icon>
+                        Retur
+                      </button>
+                      <button *ngIf="canDelete(i)" type="button" class="action-dropdown-item action-dropdown-danger" (click)="onDelete(i)">
+                        <mat-icon>delete_outline</mat-icon>
+                        Hapus
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- FIX: placeholder agar lebar kolom tidak berubah-ubah antar baris -->
+                  <ng-template #actionPlaceholder>
+                    <div class="action-placeholder"></div>
+                  </ng-template>
                 </div>
               </td>
             </tr>
@@ -135,9 +144,7 @@
 
     <!-- Empty state -->
     <div *ngIf="!isLoading && filteredInvoice.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <mat-icon>search_off</mat-icon>
-      </div>
+      <div class="empty-icon"><mat-icon>search_off</mat-icon></div>
       <p class="empty-title">Pemesanan tidak ditemukan</p>
       <p class="empty-sub">Coba gunakan kata kunci yang berbeda</p>
       <button class="btn-reset-search" (click)="clearSearch()">Reset Pencarian</button>
@@ -148,7 +155,7 @@
       <mat-paginator
         [length]="filteredInvoice.length"
         [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 20, 50]"
+        [pageSizeOptions]="[5,10,20,50]"
         [pageIndex]="pageIndex"
         (page)="onPageChange($event)"
         showFirstLastButtons
@@ -156,35 +163,32 @@
     </div>
   </div>
 
-  <!-- ───── BACKDROP ───── -->
+  <!-- ─── Backdrop ─── -->
   <div
     class="modal-backdrop-custom"
-    *ngIf="showAddModal || showEditModal || showDetailModal || showStatusModal"
-    (click)="showAddModal ? closeAdd() : showEditModal ? closeEdit() : showDetailModal ? closeDetail() : closeStatus()"
+    *ngIf="showAddModal || showEditModal || showDetailModal || showReturModal || showStatusModal || showSuratJalanModal"
+    (click)="showAddModal?closeAdd():showEditModal?closeEdit():showDetailModal?closeDetail():showReturModal?closeRetur():showStatusModal?closeStatus():closeSuratJalan()"
   ></div>
 
-  <!-- ───── MODAL TAMBAH ───── -->
+  <!-- ═══════════ MODAL TAMBAH ═══════════ -->
   <div class="modal-custom" *ngIf="showAddModal">
     <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <div class="modal-icon add-icon">
-            <mat-icon>add_shopping_cart</mat-icon>
-          </div>
+          <div class="modal-icon add-icon"><mat-icon>add_shopping_cart</mat-icon></div>
           <h5>Pesan Barang</h5>
         </div>
-        <button type="button" class="btn-close-modal" (click)="closeAdd()" aria-label="Tutup">
-          <mat-icon>close</mat-icon>
-        </button>
+        <button type="button" class="btn-close-modal" (click)="closeAdd()"><mat-icon>close</mat-icon></button>
       </div>
-
-      <div class="modal-body">
-        <!-- PROYEK -->
+      <div class="modal-body modal-body-scroll">
         <div class="form-group">
-          <label class="form-label">Proyek</label>
+          <label class="form-label">
+            Proyek
+            <span class="text-danger">*</span>
+          </label>
           <ng-select
             [(ngModel)]="addForm.id_project"
-            [disabled]="userLogin?.role === 'Gudang'"
+            [disabled]="userLogin?.role==='Gudang'"
             placeholder="Pilih proyek"
             [searchable]="true"
             [clearable]="true"
@@ -193,56 +197,47 @@
             <ng-option [value]="p.id_project">{{ p.nama_project }}</ng-option>
             }
           </ng-select>
+          <div *ngIf="addErrors['id_project']" class="text-danger mt-1">{{ addErrors['id_project'] }}</div>
         </div>
 
-        <!-- JUMLAH JENIS BARANG -->
-        <div class="form-group">
-          <label class="form-label">Jumlah Jenis Barang</label>
-          <input
-            type="text"
-            class="form-control"
-            [ngModel]="jumlahJenisBarang"
-            (ngModelChange)="onJumlahJenisBarangChange($event)"
-            inputmode="numeric"
-            placeholder="Masukkan jumlah jenis barang (Contoh: 3)"
-          />
+        <!-- FIX: ganti input "Jumlah Jenis Barang" ke tombol "+ Tambah Barang" yang lebih intuitif -->
+        <div class="barang-list-header" style="margin-bottom: 8px">
+          <span class="barang-list-title">
+            Daftar Barang
+            <span class="text-danger">*</span>
+          </span>
+          <span class="barang-list-count" *ngIf="selectedBarang.length > 0">{{ selectedBarang.length }} item</span>
         </div>
 
-        <!-- LIST BARANG -->
         <div class="barang-list" *ngIf="selectedBarang.length > 0">
-          <div class="barang-list-header">
-            <span class="barang-list-title">Daftar Barang</span>
-            <span class="barang-list-count">{{ selectedBarang.length }} item</span>
-          </div>
-
           @for (item of selectedBarang; track $index) {
           <div class="barang-item-card">
             <div class="barang-item-num">{{ $index + 1 }}</div>
             <div class="barang-item-body">
               <div class="barang-item-row">
-                <!-- PILIH BARANG -->
                 <div class="barang-item-field field-barang">
                   <label class="form-label">Barang</label>
                   <ng-select
                     [(ngModel)]="item.id_barang"
-                    [name]="'barang_' + $index"
+                    [name]="'barang_'+$index"
                     (change)="onBarangChange(item)"
                     placeholder="Pilih Barang"
                     [searchable]="true"
                     [clearable]="true"
                   >
                     @for (b of barang; track b.id_barang) {
-                    <ng-option [value]="b.id_barang" [disabled]="isBarangSelected(b.id_barang, item) || b.jumlah <= 0">
-                      <span [style.color]="b.jumlah <= 0 ? '#dc2626' : null">
+                    <ng-option [value]="b.id_barang" [disabled]="isBarangSelected(b.id_barang,item)||b.jumlah<=0">
+                      <span [style.color]="b.jumlah<=0?'#dc2626':null">
                         {{ b.nama_barang }} - Stok: {{ b.jumlah }}
-
-                        <span *ngIf="b.jumlah <= 0">Stok Habis</span>
+                        <span *ngIf="b.jumlah<=0">(Habis)</span>
                       </span>
                     </ng-option>
                     }
                   </ng-select>
+                  <div *ngIf="addBarangErrors[$index]?.['id_barang']" class="text-danger mt-1">
+                    {{ addBarangErrors[$index]['id_barang'] }}
+                  </div>
                 </div>
-                <!-- HARGA JUAL -->
                 <div class="barang-item-field field-harga">
                   <label class="form-label">Harga Jual</label>
                   <div class="input-prefix-wrap">
@@ -250,32 +245,40 @@
                     <input
                       type="text"
                       class="form-control has-prefix"
-                      placeholder="Masukkan harga jual"
                       [value]="formatNumber(item.harga_jual)"
-                      [name]="'harga_' + $index"
+                      [name]="'harga_'+$index"
                       inputmode="numeric"
-                      (input)="onHargaInput($event, item)"
+                      (input)="onHargaInput($event,item)"
+                      placeholder="0"
                     />
                   </div>
+                  <div *ngIf="addBarangErrors[$index]?.['harga_jual']" class="text-danger mt-1">
+                    {{ addBarangErrors[$index]['harga_jual'] }}
+                  </div>
                 </div>
-                <!-- JUMLAH -->
                 <div class="barang-item-field field-jumlah">
                   <label class="form-label">Jumlah</label>
                   <input
                     type="number"
                     class="form-control"
-                    placeholder="Qty"
                     [(ngModel)]="item.jumlah"
-                    [name]="'jumlah_' + $index"
+                    [name]="'jumlah_'+$index"
                     (input)="onJumlahChange(item)"
                     min="1"
                     [max]="getStock(item.id_barang)"
                   />
+                  <div *ngIf="addBarangErrors[$index]?.['jumlah']" class="text-danger mt-1">{{ addBarangErrors[$index]['jumlah'] }}</div>
                 </div>
-                <!-- SATUAN -->
                 <div class="barang-item-field field-satuan">
                   <label class="form-label">Satuan</label>
                   <div class="satuan-display">{{ item.satuan || '—' }}</div>
+                </div>
+                <!-- FIX: tombol hapus per baris agar user bisa menghapus baris yang tidak perlu -->
+                <div class="barang-item-field field-remove">
+                  <label class="form-label">&nbsp;</label>
+                  <button type="button" class="btn-remove-barang" title="Hapus baris" (click)="removeBarangRow($index)">
+                    <mat-icon>close</mat-icon>
+                  </button>
                 </div>
               </div>
             </div>
@@ -283,24 +286,22 @@
           }
         </div>
 
-        <div class="form-divider"></div>
+        <!-- FIX: tombol tambah baris barang -->
+        <button type="button" class="btn-add-barang" (click)="addBarangRow()">
+          <mat-icon>add</mat-icon>
+          Tambah Barang
+        </button>
+        <div *ngIf="addErrors['barang_empty']" class="text-danger mt-1">{{ addErrors['barang_empty'] }}</div>
 
-        <!-- DETAIL -->
+        <div class="form-divider"></div>
         <div class="form-group">
           <label class="form-label">Detail Pemesanan</label>
-          <textarea
-            class="form-control"
-            rows="3"
-            [(ngModel)]="addForm.detail"
-            placeholder="Contoh: Barang dikirim sebelum tanggal 10"
-          ></textarea>
+          <textarea class="form-control" rows="3" [(ngModel)]="addForm.detail" placeholder="Contoh: Dikirim sebelum tanggal 10"></textarea>
         </div>
-
-        <!-- PEMBAYARAN & TOTAL -->
         <div class="form-row-2">
-          <div class="form-group">
+          <div class="form-group" *ngIf="showPembayaranOnAdd()">
             <label class="form-label">Status Pembayaran</label>
-            <ng-select [(ngModel)]="addForm.pembayaran" placeholder="Pilih status pembayaran" [searchable]="false" [clearable]="true">
+            <ng-select [(ngModel)]="addForm.pembayaran" placeholder="Pilih status" [searchable]="false" [clearable]="true">
               <ng-option value="belum">Belum Lunas</ng-option>
               <ng-option value="lunas">Lunas</ng-option>
             </ng-select>
@@ -314,56 +315,53 @@
           </div>
         </div>
       </div>
-
       <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
         <button type="button" class="btn-modal-save" (click)="submitAdd()">
           <mat-icon>save</mat-icon>
-          Simpan Pemesanan
+          Simpan
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ───── MODAL EDIT ───── -->
+  <!-- ═══════════ MODAL EDIT ═══════════ -->
   <div class="modal-custom" *ngIf="showEditModal">
     <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <div class="modal-icon edit-icon">
-            <mat-icon>edit_note</mat-icon>
-          </div>
-          <h5>Edit Pemesanan Barang</h5>
+          <div class="modal-icon edit-icon"><mat-icon>edit_note</mat-icon></div>
+          <h5>Edit Pemesanan</h5>
         </div>
-        <button type="button" class="btn-close-modal" (click)="closeEdit()" aria-label="Tutup">
-          <mat-icon>close</mat-icon>
-        </button>
+        <button type="button" class="btn-close-modal" (click)="closeEdit()"><mat-icon>close</mat-icon></button>
       </div>
-
-      <div class="modal-body">
-        <!-- PROYEK -->
+      <div class="modal-body modal-body-scroll">
         <div class="form-group">
-          <label class="form-label">Proyek</label>
+          <label class="form-label">
+            Proyek
+            <span class="text-danger">*</span>
+          </label>
           <ng-select
             [(ngModel)]="editForm.id_project"
             placeholder="Pilih proyek"
             [searchable]="true"
             [clearable]="true"
-            [disabled]="isAdminEditOtherUser()"
+            [disabled]="isFieldsLockedOnEdit()"
           >
             @for (p of project; track p.id_project) {
             <ng-option [value]="p.id_project">{{ p.nama_project }}</ng-option>
             }
           </ng-select>
+          <div *ngIf="editErrors['id_project']" class="text-danger mt-1">{{ editErrors['id_project'] }}</div>
         </div>
-
-        <!-- LIST BARANG -->
         <div class="barang-list" *ngIf="editBarang.length > 0">
           <div class="barang-list-header">
-            <span class="barang-list-title">Daftar Barang</span>
+            <span class="barang-list-title">
+              Daftar Barang
+              <span class="text-danger">*</span>
+            </span>
             <span class="barang-list-count">{{ editBarang.length }} item</span>
           </div>
-
           @for (item of editBarang; track $index) {
           <div class="barang-item-card">
             <div class="barang-item-num">{{ $index + 1 }}</div>
@@ -373,19 +371,20 @@
                   <label class="form-label">Barang</label>
                   <ng-select
                     [(ngModel)]="item.id_barang"
-                    [disabled]="isAdminEditOtherUser()"
-                    [name]="'edit_barang_' + $index"
+                    [disabled]="isFieldsLockedOnEdit()"
+                    [name]="'edit_barang_'+$index"
                     (change)="onBarangChange(item)"
                     placeholder="Pilih Barang"
                     [searchable]="true"
                     [clearable]="true"
                   >
                     @for (b of barang; track b.id_barang) {
-
-                    <ng-option [value]="b.id_barang" [disabled]="isBarangSelectedEdit(b.id_barang, item)">{{ b.nama_barang }}</ng-option>
-
+                    <ng-option [value]="b.id_barang" [disabled]="isBarangSelectedEdit(b.id_barang,item)">{{ b.nama_barang }}</ng-option>
                     }
                   </ng-select>
+                  <div *ngIf="editBarangErrors[$index]?.['id_barang']" class="text-danger mt-1">
+                    {{ editBarangErrors[$index]['id_barang'] }}
+                  </div>
                 </div>
                 <div class="barang-item-field field-harga">
                   <label class="form-label">Harga Jual</label>
@@ -393,28 +392,30 @@
                     <span class="input-prefix">Rp</span>
                     <input
                       type="text"
-                      [disabled]="isAdminEditOtherUser()"
+                      [disabled]="isFieldsLockedOnEdit()"
                       class="form-control has-prefix"
-                      placeholder="Masukkan harga jual"
                       [value]="formatNumber(item.harga_jual)"
-                      [name]="'edit_harga_' + $index"
+                      [name]="'edit_harga_'+$index"
                       inputmode="numeric"
-                      (input)="onHargaInputEdit($event, item)"
+                      (input)="onHargaInputEdit($event,item)"
                     />
+                  </div>
+                  <div *ngIf="editBarangErrors[$index]?.['harga_jual']" class="text-danger mt-1">
+                    {{ editBarangErrors[$index]['harga_jual'] }}
                   </div>
                 </div>
                 <div class="barang-item-field field-jumlah">
                   <label class="form-label">Jumlah</label>
                   <input
                     type="number"
-                    [disabled]="isAdminEditOtherUser()"
+                    [disabled]="isFieldsLockedOnEdit()"
                     class="form-control"
-                    placeholder="Qty"
                     [(ngModel)]="item.jumlah"
-                    [name]="'edit_jumlah_' + $index"
+                    [name]="'edit_jumlah_'+$index"
                     (input)="calculateEditTotal()"
                     min="1"
                   />
+                  <div *ngIf="editBarangErrors[$index]?.['jumlah']" class="text-danger mt-1">{{ editBarangErrors[$index]['jumlah'] }}</div>
                 </div>
                 <div class="barang-item-field field-satuan">
                   <label class="form-label">Satuan</label>
@@ -425,22 +426,16 @@
           </div>
           }
         </div>
-
         <div class="form-divider"></div>
-
-        <!-- DETAIL -->
         <div class="form-group">
           <label class="form-label">Detail Pemesanan</label>
-          <textarea class="form-control" rows="3" [(ngModel)]="editForm.detail" placeholder="Masukkan detail pemesanan"></textarea>
+          <textarea class="form-control" rows="3" [(ngModel)]="editForm.detail" placeholder="Masukkan detail"></textarea>
         </div>
-
-        <!-- PEMBAYARAN & TOTAL -->
         <div class="form-row-2">
-          <div class="form-group">
+          <div class="form-group" *ngIf="showPembayaranOnEdit()">
             <label class="form-label">Status Pembayaran</label>
-            <ng-select [(ngModel)]="editForm.pembayaran" placeholder="Pilih Pembayaran" [searchable]="false" [clearable]="false">
+            <ng-select [(ngModel)]="editForm.pembayaran" [searchable]="false" [clearable]="false">
               <ng-option value="belum">Belum Lunas</ng-option>
-
               <ng-option value="lunas">Lunas</ng-option>
             </ng-select>
           </div>
@@ -453,44 +448,45 @@
           </div>
         </div>
       </div>
-
       <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
         <button type="button" class="btn-modal-save" (click)="submitEdit()">
           <mat-icon>save</mat-icon>
-          Simpan Perubahan
+          Simpan
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ───── MODAL DETAIL ───── -->
+  <!-- ═══════════ MODAL DETAIL ═══════════ -->
   <div class="modal-custom" *ngIf="showDetailModal">
     <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <div class="modal-icon detail-icon">
-            <mat-icon>receipt</mat-icon>
+          <div class="modal-icon detail-icon"><mat-icon>receipt</mat-icon></div>
+          <div>
+            <h5>Detail Pemesanan</h5>
+            <!-- FIX: tampilkan nama proyek di sub-header agar konteks langsung terlihat -->
+            <p class="modal-subtitle">{{ detailInvoice?.nama_project }}</p>
           </div>
-          <h5>Detail Pemesanan Barang</h5>
         </div>
-        <button type="button" class="btn-close-modal" (click)="closeDetail()" aria-label="Tutup">
-          <mat-icon>close</mat-icon>
-        </button>
+        <button type="button" class="btn-close-modal" (click)="closeDetail()"><mat-icon>close</mat-icon></button>
       </div>
+      <div class="modal-body modal-body-scroll">
+        <!-- FIX: section label eksplisit untuk info order -->
+        <div class="detail-section-title">
+          <mat-icon>info_outline</mat-icon>
+          Informasi Pemesanan
+        </div>
 
-      <div class="modal-body">
-        <!-- INFO GRID -->
         <div class="detail-info-grid">
           <div class="detail-info-item">
-            <span class="detail-info-label">Tanggal Pemesanan</span>
+            <span class="detail-info-label">Tanggal</span>
             <span class="detail-info-value">{{ detailInvoice?.created_at | date:'dd MMMM yyyy, HH:mm':'':'id' }}</span>
           </div>
           <div class="detail-info-item">
             <span class="detail-info-label">Pemesan</span>
-            <div class="user-cell">
-              <div class="detail-info-value">{{ detailInvoice?.name }}</div>
-            </div>
+            <span class="detail-info-value">{{ detailInvoice?.name }}</span>
           </div>
           <div class="detail-info-item">
             <span class="detail-info-label">Proyek</span>
@@ -504,9 +500,10 @@
           </div>
           <div class="detail-info-item">
             <span class="detail-info-label">Status</span>
+            <!-- FIX: titlecase konsisten -->
             <span class="badge-status badge-{{ detailInvoice?.status }}">
               <span class="status-dot"></span>
-              {{ detailInvoice?.status }}
+              {{ detailInvoice?.status | titlecase }}
             </span>
           </div>
           <div class="detail-info-item">
@@ -517,20 +514,19 @@
             </div>
           </div>
           <div class="detail-info-item detail-info-full">
-            <span class="detail-info-label">Detail</span>
-            <span class="detail-info-value">{{ detailInvoice?.detail || '—' }}</span>
+            <span class="detail-info-label">Detail / Catatan</span>
+            <span class="detail-info-value detail-note">{{ detailInvoice?.detail || '—' }}</span>
           </div>
         </div>
 
         <div class="form-divider"></div>
 
-        <!-- TABEL BARANG -->
+        <!-- Tabel Barang -->
         <div class="detail-section-title">
           <mat-icon>inventory_2</mat-icon>
-          Daftar Barang Pesanan
+          Daftar Barang
           <span class="barang-list-count">{{ detailBarang.length }} item</span>
         </div>
-
         <div class="table-responsive">
           <table class="table mb-0">
             <thead>
@@ -549,157 +545,154 @@
                 <td class="nama-barang">{{ b.nama_barang }}</td>
                 <td class="col-num">
                   {{ b.jumlah }}
-                  <span class="text-muted" style="font-size: 11px">{{ b.satuan }}</span>
+                  <span style="font-size: 11px; color: #9ca3af">{{ b.satuan }}</span>
                 </td>
-                <td class="col-num price-value">{{ b.harga_jual ? 'Rp ' + b.harga_jual.toLocaleString('id-ID') : '—' }}</td>
+                <td class="col-num price-value">{{ b.harga_jual ? 'Rp '+b.harga_jual.toLocaleString('id-ID') : '—' }}</td>
                 <td class="col-num price-value">
-                  {{ (b.harga_jual && b.jumlah) ? 'Rp ' + (b.harga_jual * b.jumlah).toLocaleString('id-ID') : '—' }}
+                  {{ (b.harga_jual&&b.jumlah) ? 'Rp '+(b.harga_jual*b.jumlah).toLocaleString('id-ID') : '—' }}
                 </td>
               </tr>
               } @if (detailBarang.length === 0) {
-              <tr>
-                <td colspan="5" class="text-center" style="padding: 24px; color: #9ca3af; font-size: 13px">Tidak ada data barang keluar</td>
-              </tr>
+              <tr><td colspan="5" class="text-center" style="padding: 24px; color: #9ca3af; font-size: 13px">Tidak ada data</td></tr>
               }
             </tbody>
           </table>
         </div>
+
+        <!-- Tabel Retur (jika ada) -->
+        <ng-container *ngIf="detailRetur.length > 0">
+          <div class="form-divider"></div>
+          <div class="detail-section-title detail-section-retur">
+            <mat-icon>assignment_return</mat-icon>
+            Retur Barang
+            <span class="barang-list-count">{{ detailRetur.length }} item</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead>
+                <tr>
+                  <th class="col-no">No</th>
+                  <th>Barang</th>
+                  <th class="col-num">Qty Retur</th>
+                  <th>Kondisi</th>
+                  <!-- <th>Tanggal</th> -->
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of detailRetur; track $index) {
+                <tr class="table-row">
+                  <td class="col-no text-muted-sm">{{ $index + 1 }}</td>
+                  <td class="nama-barang">{{ r.nama_barang }}</td>
+                  <td class="col-num">
+                    {{ r.jumlah }}
+                    <span style="font-size: 11px; color: #9ca3af">{{ r.satuan }}</span>
+                  </td>
+                  <td><span class="badge-status badge-ditolak" style="font-size: 11px">{{ r.kondisi || '—' }}</span></td>
+                  <!-- <td style="font-size: 12px; color: #6b7280">{{ r.created_at | date:'dd MMM yyyy':'':'id' }}</td> -->
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </ng-container>
+
+        <!-- FIX: Surat Jalan dipindah ke dalam body modal (di atas footer) agar tidak terlewat -->
+        <ng-container *ngIf="showSuratJalanBtn()">
+          <div class="form-divider"></div>
+          <div class="detail-section-title detail-section-sj">
+            <mat-icon>local_shipping</mat-icon>
+            Surat Jalan
+          </div>
+          <div class="surat-jalan-inline">
+            <div class="sj-info" *ngIf="suratJalanData; else noSJ">
+              <div class="sj-info-row">
+                <span class="sj-label">No. Surat Jalan</span>
+                <span class="sj-value">{{ suratJalanData.no_surat_jalan }}</span>
+              </div>
+              <div class="sj-info-row">
+                <span class="sj-label">Plat Kendaraan</span>
+                <span class="sj-value">{{ suratJalanData.plat_kendaraan }}</span>
+              </div>
+            </div>
+            <ng-template #noSJ>
+              <p class="sj-empty">Surat jalan belum dibuat untuk pemesanan ini.</p>
+            </ng-template>
+            <button type="button" class="btn-surat-jalan" (click)="openSuratJalan()">
+              <mat-icon>{{ suratJalanData ? 'edit' : 'add' }}</mat-icon>
+              {{ suratJalanData ? 'Edit Surat Jalan' : 'Buat Surat Jalan' }}
+            </button>
+          </div>
+        </ng-container>
       </div>
 
-      <div class="modal-footer footer-between">
-        <button
-          *ngIf="
-            userLogin?.role === 'Gudang' &&
-            (
-              detailInvoice?.status === 'disetujui' ||
-              detailInvoice?.status === 'dikirim' ||
-              detailInvoice?.status === 'selesai'
-            )
-          "
-          type="button"
-          class="btn-surat-jalan"
-          (click)="openSuratJalan()"
-        >
-          <mat-icon>local_shipping</mat-icon>
-          Surat Jalan
-        </button>
-
+      <!-- Footer: hanya tombol tutup -->
+      <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" (click)="closeDetail()">Tutup</button>
       </div>
     </div>
   </div>
 
-  <!-- ───── MODAL UPDATE STATUS ───── -->
-  <div class="modal-custom" *ngIf="showStatusModal">
+  <!-- ═══════════ MODAL RETUR ═══════════ -->
+  <div class="modal-custom" *ngIf="showReturModal">
     <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <div class="modal-icon status-icon">
-            <mat-icon>task_alt</mat-icon>
+          <div class="modal-icon" style="background: #fef3c7"><mat-icon style="color: #92400e">assignment_return</mat-icon></div>
+          <div>
+            <h5>Retur Barang</h5>
+            <p class="modal-subtitle">{{ returInvoice?.nama_project }}</p>
           </div>
-          <h5>Update Status Pemesanan Barang</h5>
         </div>
-        <button type="button" class="btn-close-modal" (click)="closeStatus()" aria-label="Tutup">
-          <mat-icon>close</mat-icon>
-        </button>
+        <button type="button" class="btn-close-modal" (click)="closeRetur()"><mat-icon>close</mat-icon></button>
       </div>
-
-      <div class="modal-body">
-        <!-- INFO INVOICE -->
-        <div class="detail-info-grid">
-          <div class="detail-info-item">
-            <span class="detail-info-label">Tanggal Pemesanan</span>
-            <span class="detail-info-value">{{ statusInvoice?.created_at | date:'dd MMMM yyyy, HH:mm':'':'id' }}</span>
-          </div>
-          <div class="detail-info-item">
-            <span class="detail-info-label">Pemesan</span>
-            <span class="detail-info-value">{{ statusInvoice?.name }}</span>
-          </div>
-          <div class="detail-info-item">
-            <span class="detail-info-label">Proyek</span>
-            <span class="detail-info-value">{{ statusInvoice?.nama_project }}</span>
-          </div>
-          <div class="detail-info-item">
-            <span class="detail-info-label">Pembayaran</span>
-            <div class="pay-indicator pay-{{ statusInvoice?.pembayaran }}">
-              <mat-icon>{{ statusInvoice?.pembayaran === 'lunas' ? 'check_circle' : 'schedule' }}</mat-icon>
-              <span>{{ statusInvoice?.pembayaran === 'lunas' ? 'Lunas' : 'Belum Lunas' }}</span>
-            </div>
-          </div>
+      <div class="modal-body modal-body-scroll">
+        <div class="retur-hint">
+          <mat-icon>info</mat-icon>
+          <span>Centang barang yang ingin diretur, isi jumlah dan kondisi barang.</span>
         </div>
-
-        <!-- STATUS SELECT -->
-        <div class="status-select-wrap">
-          <label class="form-label">Status Pemesanan</label>
-          <ng-select [(ngModel)]="statusForm.status" [searchable]="false" [clearable]="false" placeholder="Pilih status pembayaran">
-            @for (s of getAvailableStatus(statusInvoice); track s) {
-            <ng-option [value]="s">{{ s }}</ng-option>
-            }
-          </ng-select>
-        </div>
-
-        <div class="form-divider"></div>
-
-        <!-- RETUR BARANG -->
-        <div class="detail-section-title">
-          <mat-icon>inventory_2</mat-icon>
-          Detail Barang Pemesanan
-          <span class="barang-list-count">{{ returBarang.length }} item</span>
-        </div>
-
         @for (item of returBarang; track $index) {
-        <div class="barang-item-card retur-card">
+        <div class="barang-item-card retur-card" [class.retur-card-active]="item.checked">
           <div class="barang-item-num">{{ $index + 1 }}</div>
           <div class="barang-item-body">
             <div class="barang-item-row retur-row">
-              <!-- CHECKBOX -->
               <div class="retur-check">
                 <label class="form-label">Retur</label>
-
                 <label class="checkbox-wrap">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="item.checked"
-                    class="checkbox-input"
-                    [disabled]="statusInvoice?.id_user !== userLogin?.id_user"
-                  />
-
+                  <input type="checkbox" [(ngModel)]="item.checked" class="checkbox-input" />
                   <span class="checkbox-custom"></span>
                 </label>
               </div>
-              <!-- NAMA BARANG -->
               <div class="barang-item-field field-barang-retur">
                 <label class="form-label">Barang</label>
                 <div class="form-control form-control-disabled">{{ item.nama_barang }}</div>
               </div>
-              <!-- HARGA -->
               <div class="barang-item-field field-harga-sm">
                 <label class="form-label">Harga</label>
                 <div class="form-control form-control-disabled">
-                  {{ item.harga_jual ? 'Rp ' + item.harga_jual.toLocaleString('id-ID') : '—' }}
+                  {{ item.harga_jual ? 'Rp '+item.harga_jual.toLocaleString('id-ID') : '—' }}
                 </div>
               </div>
-              <!-- QTY -->
               <div class="barang-item-field field-qty">
-                <label class="form-label">Jumlah</label>
+                <label class="form-label">Stok</label>
                 <div class="form-control form-control-disabled text-center">{{ item.jumlah }}</div>
               </div>
-              <!-- QTY RETUR -->
               <div class="barang-item-field field-qty">
                 <label class="form-label">Qty Retur</label>
                 <input
                   type="number"
                   class="form-control"
-                  placeholder="Qty retur"
                   [(ngModel)]="item.jumlah_retur"
                   [disabled]="!item.checked"
                   min="1"
                   [max]="item.jumlah"
+                  placeholder="0"
                 />
               </div>
-              <!-- KONDISI -->
               <div class="barang-item-field field-kondisi">
-                <label class="form-label">Kondisi Barang</label>
+                <label class="form-label">
+                  Kondisi
+                  <span class="text-danger">*</span>
+                </label>
                 <input type="text" class="form-control" [(ngModel)]="item.kondisi" [disabled]="!item.checked" placeholder="Rusak / pecah" />
               </div>
             </div>
@@ -707,81 +700,114 @@
         </div>
         }
       </div>
-
       <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeStatus()">Batal</button>
-        <button type="button" class="btn-modal-save" (click)="submitStatus()">
-          <mat-icon>task_alt</mat-icon>
-          Update Status
+        <button type="button" class="btn-modal-cancel" (click)="closeRetur()">Batal</button>
+        <button type="button" class="btn-modal-save" (click)="submitRetur()">
+          <mat-icon>assignment_return</mat-icon>
+          Simpan Retur
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ───── MODAL SURAT JALAN ───── -->
-  <div class="modal-custom" *ngIf="showSuratJalanModal">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <!-- HEADER -->
+  <!-- ═══════════ MODAL UPDATE STATUS ═══════════ -->
+  <div class="modal-custom" *ngIf="showStatusModal">
+    <div class="modal-card modal-status" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <div class="modal-icon status-icon">
-            <mat-icon>local_shipping</mat-icon>
+          <div class="modal-icon status-icon"><mat-icon>task_alt</mat-icon></div>
+          <div>
+            <h5>Ubah Status</h5>
+            <p class="modal-subtitle">{{ statusInvoice?.nama_project }}</p>
           </div>
-
-          <h5>{{ suratJalanData ? 'Update Surat Jalan' : 'Tambah Surat Jalan' }}</h5>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeStatus()"><mat-icon>close</mat-icon></button>
+      </div>
+      <div class="modal-body">
+        <div class="status-info-row">
+          <div class="status-info-item">
+            <span class="detail-info-label">Pemesan</span>
+            <span class="detail-info-value">{{ statusInvoice?.name }}</span>
+          </div>
+          <div class="status-info-item">
+            <span class="detail-info-label">Status Saat Ini</span>
+            <!-- FIX: titlecase konsisten -->
+            <span class="badge-status badge-{{ statusInvoice?.status }}">
+              <span class="status-dot"></span>
+              {{ statusInvoice?.status | titlecase }}
+            </span>
+          </div>
         </div>
 
-        <button type="button" class="btn-close-modal" (click)="closeSuratJalan()">
-          <mat-icon>close</mat-icon>
+        <div class="form-divider"></div>
+
+        <div class="form-group">
+          <label class="form-label">Ubah Status Menjadi</label>
+          <ng-select [(ngModel)]="statusForm.status" [searchable]="false" [clearable]="false" placeholder="Pilih status baru">
+            @for (s of getAvailableStatus(statusInvoice); track s) {
+            <!-- FIX: titlecase konsisten -->
+            <ng-option [value]="s">{{ s | titlecase }}</ng-option>
+            }
+          </ng-select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" (click)="closeStatus()">Batal</button>
+        <button type="button" class="btn-modal-save" (click)="submitStatus()">
+          <mat-icon>task_alt</mat-icon>
+          Simpan Perubahan
         </button>
       </div>
+    </div>
+  </div>
 
-      <!-- BODY -->
+  <!-- ═══════════ MODAL SURAT JALAN ═══════════ -->
+  <div class="modal-custom" *ngIf="showSuratJalanModal">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon status-icon"><mat-icon>local_shipping</mat-icon></div>
+          <div>
+            <h5>{{ suratJalanData ? 'Edit Surat Jalan' : 'Buat Surat Jalan' }}</h5>
+            <p class="modal-subtitle">{{ detailInvoice?.nama_project }}</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeSuratJalan()"><mat-icon>close</mat-icon></button>
+      </div>
       <div class="modal-body">
-        <!-- NO SURAT JALAN -->
         <div class="form-group">
           <label class="form-label">No Surat Jalan</label>
-
           <input
             type="text"
             class="form-control"
-            [disabled]="detailInvoice?.status === 'selesai'"
+            [disabled]="isSuratJalanReadOnly()"
             [(ngModel)]="suratJalanForm.no_surat_jalan"
             placeholder="Contoh: SJ-2026-001"
           />
         </div>
-
-        <!-- PLAT -->
         <div class="form-group">
           <label class="form-label">Plat Kendaraan</label>
-
           <input
             type="text"
             class="form-control"
-            [disabled]="detailInvoice?.status === 'selesai'"
+            [disabled]="isSuratJalanReadOnly()"
             [(ngModel)]="suratJalanForm.plat_kendaraan"
             placeholder="Contoh: BK 8249 GO"
           />
         </div>
       </div>
-
-      <!-- FOOTER -->
       <div class="modal-footer footer-between">
-        <!-- KIRI -->
         <div>
-          @if (suratJalanData) {
-          <button type="button" class="btn-surat-jalan" (click)="downloadSuratJalan()">
+          <button *ngIf="suratJalanData" type="button" class="btn-surat-jalan" (click)="downloadSuratJalan()">
             <mat-icon>download</mat-icon>
-            Unduh
+            Unduh .docx
           </button>
-          }
         </div>
-
-        <!-- KANAN -->
         <div class="d-flex gap-2">
-          <button type="button" class="btn-modal-save" [disabled]="detailInvoice?.status === 'selesai'" (click)="submitSuratJalan()">
+          <button type="button" class="btn-modal-cancel" (click)="closeSuratJalan()">Batal</button>
+          <button type="button" class="btn-modal-save" [disabled]="isSuratJalanReadOnly()" (click)="submitSuratJalan()">
             <mat-icon>save</mat-icon>
-            {{ suratJalanData ? 'Update' : 'Simpan' }}
+            {{ suratJalanData ? 'Simpan Perubahan' : 'Simpan' }}
           </button>
         </div>
       </div>

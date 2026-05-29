@@ -216,6 +216,10 @@ export class ApiService {
     return this.http.post(`${environment.apiUrl}/retur/add`, data);
   }
 
+  getReturByInvoice(id_invoice: number) {
+    return this.http.get<any>(`${environment.apiUrl}/retur/invoice/${id_invoice}`);
+  }
+
   searchRetur(payload: any) {
     return this.http.post<any>(`${environment.apiUrl}/retur/search`, payload);
   }
