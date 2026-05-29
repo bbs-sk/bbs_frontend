@@ -28,12 +28,12 @@ const routes: Routes = [
         loadComponent: () => import('./pages/dashboard/dashboard').then((c) => c.Dashboard)
       },
       {
-        path: 'user',
+        path: 'daftar-pengguna',
         canActivate: [authGuard, roleGuard(['Admin Kantor'])],
         loadComponent: () => import('./pages/user/user').then((c) => c.User)
       },
       {
-        path: 'project',
+        path: 'proyek',
         canActivate: [authGuard, roleGuard(['Admin Kantor', 'Lapangan'])],
         loadComponent: () => import('./pages/project/project').then((c) => c.Project)
       },
@@ -43,17 +43,17 @@ const routes: Routes = [
         loadComponent: () => import('./pages/barang/barang').then((c) => c.Barang)
       },
       {
-        path: 'invoice',
+        path: 'pemesanan',
         canActivate: [authGuard],
         loadComponent: () => import('./pages/invoice/invoice').then((c) => c.Invoice)
       },
       {
-        path: 'transaksi',
+        path: 'transaksi-barang',
         canActivate: [authGuard, roleGuard(['Admin Kantor', 'Gudang'])],
         loadComponent: () => import('./pages/transaksi/transaksi').then((c) => c.Transaksi)
       },
       {
-        path: 'laporan',
+        path: 'laporan-penjualan',
         canActivate: [authGuard, roleGuard(['Admin Kantor'])],
         loadComponent: () => import('./pages/laporan/laporan').then((c) => c.Laporan)
       },

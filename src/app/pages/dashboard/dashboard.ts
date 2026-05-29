@@ -1,10 +1,9 @@
 // angular import
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // project import
 import tableData from 'src/fake-data/default-data.json';
-
 import { MonthlyBarChartComponent } from 'src/app/theme/shared/apexchart/monthly-bar-chart/monthly-bar-chart.component';
 
 // icons
@@ -21,8 +20,11 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class Dashboard {
   private iconService = inject(IconService);
-  // constructor
-  constructor(private api: ApiService) {
+
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {
     this.iconService.addIcon(...[RiseOutline, FallOutline, SettingOutline, ArrowDownOutline, ArrowUpOutline, CloseOutline]);
   }
 
@@ -63,34 +65,34 @@ export class Dashboard {
   }
 
   loadDashboard() {
-    // TOTAL BARANG
     this.api.getTotalBarang().subscribe({
       next: (res: any) => {
         this.AnalyticEcommerce[0].amount = res.total;
+        this.cdr.detectChanges();
       },
       error: (err) => console.log(err)
     });
 
-    // BARANG MASUK
     this.api.getMonthlyBrgMasuk().subscribe({
       next: (res: any) => {
         this.AnalyticEcommerce[1].amount = res.total;
+        this.cdr.detectChanges();
       },
       error: (err) => console.log(err)
     });
 
-    // BARANG KELUAR
     this.api.getMonthlyBrgKeluar().subscribe({
       next: (res: any) => {
         this.AnalyticEcommerce[2].amount = res.total;
+        this.cdr.detectChanges();
       },
       error: (err) => console.log(err)
     });
 
-    // PESANAN MENUNGGU
     this.api.getWait().subscribe({
       next: (res: any) => {
         this.AnalyticEcommerce[3].amount = res.total;
+        this.cdr.detectChanges();
       },
       error: (err) => console.log(err)
     });
@@ -98,24 +100,18 @@ export class Dashboard {
     this.api.getActivity().subscribe({
       next: (res: any) => {
         this.activity = Array.isArray(res) ? res : (res?.val ?? []);
+        this.cdr.detectChanges();
       },
       error: (err) => console.log(err)
     });
   }
+
   loadInvoice() {
     this.api.getInvoiceRecent().subscribe({
       next: (res: any) => {
-        console.log('RAW RESPONSE:', res);
-
         this.invoice = Array.isArray(res) ? res : (res?.val ?? []);
-
-        console.log('INVOICE:', this.invoice);
-
-        this.invoice.forEach((item, index) => {
-          console.log(`ORDER ${index + 1} STATUS:`, item.status);
-        });
+        this.cdr.detectChanges();
       },
-
       error: (err) => console.log(err)
     });
   }
@@ -124,16 +120,12 @@ export class Dashboard {
     switch (status?.toLowerCase()) {
       case 'menunggu':
         return 'bg-warning';
-
       case 'disetujui':
         return 'bg-primary';
-
       case 'selesai':
         return 'bg-success';
-
       case 'ditolak':
         return 'bg-danger';
-
       default:
         return 'bg-secondary';
     }
@@ -143,13 +135,10 @@ export class Dashboard {
     switch (activity) {
       case 'Barang Masuk':
         return 'text-success bg-light-success';
-
       case 'Barang Keluar':
         return 'text-primary bg-light-primary';
-
       case 'Retur':
         return 'text-danger bg-light-danger';
-
       default:
         return 'text-secondary bg-light-secondary';
     }
@@ -159,13 +148,10 @@ export class Dashboard {
     switch (activity) {
       case 'Barang Masuk':
         return '-';
-
       case 'Barang Keluar':
         return '+';
-
       case 'Retur':
         return '!';
-
       default:
         return '';
     }
@@ -215,6 +201,7 @@ export class Dashboard {
 
   getStatusClass(status: string): string {
     const s = status?.toLowerCase()?.trim();
+
     const map: Record<string, string> = {
       menunggu: 'warning',
       pending: 'warning',
@@ -224,6 +211,7 @@ export class Dashboard {
       selesai: 'success',
       ditolak: 'danger'
     };
+
     return map[s] ?? 'default';
   }
 }
