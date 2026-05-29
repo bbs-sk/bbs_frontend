@@ -1,60 +1,295 @@
 .login-container {
   width: 100%;
   min-height: 100vh;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
-  background-color: #f5f7fb;
-
+  background-color: #eef2f7;
   padding: 20px;
 }
 
 .login-card {
+  display: flex;
   width: 100%;
-  max-width: 420px;
+  max-width: 700px;
+  min-height: 480px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
 
-  background: white;
+// ─── Sisi kiri (panel biru) ───────────────────────────────────────────
 
-  padding: 40px;
+.login-side {
+  width: 240px;
+  flex-shrink: 0;
+  background-color: #0c447c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 28px;
+  text-align: center;
+}
 
+.side-icon {
+  width: 64px;
+  height: 64px;
   border-radius: 16px;
-
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background-color: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
 }
 
-.logo {
-  width: 80px;
-  height: auto;
+.side-content {
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.6;
+  }
 }
 
-.form-control {
-  height: 45px;
+// ─── Sisi kanan (form) ────────────────────────────────────────────────
+
+.login-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 44px 40px;
+  background-color: #fff;
+}
+
+// Heading
+
+h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+// Alert error
+
+.alert-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
   border-radius: 10px;
+  background-color: #fff5f5;
+  border: 1px solid #ffd0d0;
+  color: #c0392b;
+  font-size: 13px;
+  margin-bottom: 16px;
+
+  svg {
+    flex-shrink: 0;
+    stroke: #c0392b;
+  }
 }
 
-.btn {
-  height: 45px;
-  border-radius: 10px;
-  font-weight: 600;
+// Fields
+
+.field {
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
 }
 
-.password-wrapper {
+.input-wrap {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.toggle-password {
+.input-icon {
   position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: #666;
+  left: 12px;
+  pointer-events: none;
+  stroke: #aaa;
 }
 
-.toggle-password:focus {
+.input-wrap input {
+  width: 100%;
+  height: 44px;
+  padding: 0 40px 0 38px;
+  border: 1.5px solid #e8edf3;
+  border-radius: 10px;
+  background-color: #f8fafc;
+  color: #1a1a2e;
+  font-size: 13px;
   outline: none;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s,
+    box-shadow 0.15s;
+  font-family: inherit;
+
+  &::placeholder {
+    color: #bbb;
+  }
+
+  &:hover {
+    border-color: #c8d6e5;
+  }
+
+  &:focus {
+    border-color: #378add;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.12);
+  }
+
+  &.input-error {
+    border-color: #e74c3c;
+    background-color: #fff9f9;
+  }
+}
+
+.eye-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  color: #aaa;
+  transition: color 0.15s;
+
+  &:hover {
+    color: #555;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  svg {
+    stroke: currentColor;
+  }
+}
+
+// Tombol login
+
+.btn-login {
+  width: 100%;
+  height: 44px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #185fa5;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background-color 0.15s,
+    transform 0.1s;
+
+  &:hover:not(:disabled) {
+    background-color: #0c447c;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  svg {
+    stroke: #fff;
+    flex-shrink: 0;
+  }
+}
+
+// Spinner loading
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Footer note
+
+.footer-note {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 12px;
+  color: #bbb;
+}
+
+// ─── Responsive (mobile) ──────────────────────────────────────────────
+
+@media (max-width: 560px) {
+  .login-card {
+    flex-direction: column;
+    max-width: 420px;
+  }
+
+  .login-side {
+    width: 100%;
+    padding: 28px 24px;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 16px;
+    text-align: left;
+
+    .side-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .side-content h2 {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+  }
+
+  .login-form {
+    padding: 32px 24px;
+  }
 }

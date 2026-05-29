@@ -26,7 +26,7 @@ export class User implements OnInit {
   filteredUsers: any[] = [];
   paginatedUsers: any[] = [];
   isLoading = false;
-  pageSize = 20;
+  pageSize = 10;
   pageIndex = 0;
   searchKeyword = '';
   showAddModal = false;

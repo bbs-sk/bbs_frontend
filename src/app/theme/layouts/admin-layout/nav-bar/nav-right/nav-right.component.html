@@ -89,7 +89,7 @@
       </div>
     </div>
   </li> -->
-  <li class="dropdown pc-h-item header-user-profile" ngbDropdown>
+  <!-- <li class="dropdown pc-h-item header-user-profile" ngbDropdown>
     <a href="javascript:" class="pc-head-link dropdown-toggle arrow-none me-0" ngbDropdownToggle>
       <img [src]="getUserAvatar()" alt="user-image" class="user-avatar me-2" />
 
@@ -114,6 +114,48 @@
           </a>
         </div>
       </div>
+    </div>
+  </li> -->
+  <li class="dropdown pc-h-item" ngbDropdown>
+    <a href="javascript:" class="pc-head-link dropdown-toggle arrow-none me-0 p-0" ngbDropdownToggle>
+      <img
+        [src]="getUserAvatar()"
+        alt="user"
+        class="user-avatar"
+        style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover"
+      />
+    </a>
+    <div class="dropdown-menu dropdown-menu-end pc-h-dropdown" ngbDropdownMenu style="min-width: 210px">
+      <p
+        style="
+          font-size: 11px;
+          font-weight: 500;
+          color: #999;
+          padding: 10px 16px 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          margin: 0;
+        "
+      >
+        Settings
+      </p>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 8px 16px">
+        <i antIcon type="user" theme="outline" style="font-size: 16px; color: #888"></i>
+        <span style="font-size: 13px">{{ userName }}</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 6px 16px 10px">
+        <i antIcon type="idcard" theme="outline" style="font-size: 16px; color: #888"></i>
+        <span style="font-size: 12px; color: #999">{{ userRole }}</span>
+      </div>
+      <div style="height: 0.5px; background: #e5e5e5; margin: 4px 0"></div>
+      <a
+        href="javascript:"
+        (click)="logout()"
+        style="display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: #e53935; text-decoration: none"
+      >
+        <i antIcon type="logout" theme="outline" style="font-size: 16px; color: #e53935"></i>
+        Log out
+      </a>
     </div>
   </li>
 </ul>

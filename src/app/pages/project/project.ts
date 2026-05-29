@@ -32,7 +32,7 @@ export class Project {
   userLapangan: any[] = [];
 
   isLoading = false;
-  pageSize = 20;
+  pageSize = 10;
   pageIndex = 0;
 
   searchKeyword = '';

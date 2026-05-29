@@ -40,7 +40,7 @@ export const NavigationItems: NavigationItem[] = [
   },
   {
     id: 'table',
-    title: 'table',
+    title: 'Menu',
     type: 'group',
     icon: 'icon-navigation',
     children: [
@@ -49,7 +49,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Proyek',
         type: 'item',
         classes: 'nav-item',
-        url: '/project',
+        url: '/proyek',
         icon: 'project',
         roles: ['Admin Kantor', 'Lapangan'],
         breadcrumbs: false
@@ -69,7 +69,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Pemesanan',
         type: 'item',
         classes: 'nav-item',
-        url: '/invoice',
+        url: '/pemesanan',
         icon: 'shopping-cart',
         roles: ['Admin Kantor', 'Lapangan', 'Gudang'],
         breadcrumbs: false
@@ -79,7 +79,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Transaksi Barang',
         type: 'item',
         classes: 'nav-item',
-        url: '/transaksi',
+        url: '/transaksi-barang',
         icon: 'interaction',
         roles: ['Admin Kantor', 'Gudang'],
         breadcrumbs: false
@@ -89,7 +89,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Laporan Penjualan',
         type: 'item',
         classes: 'nav-item',
-        url: '/laporan',
+        url: '/laporan-penjualan',
         icon: 'dollar',
         roles: ['Admin Kantor'],
         breadcrumbs: false
@@ -99,7 +99,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Daftar Pengguna',
         type: 'item',
         classes: 'nav-item',
-        url: '/user',
+        url: '/daftar-pengguna',
         icon: 'user',
         roles: ['Admin Kantor'],
         breadcrumbs: false
