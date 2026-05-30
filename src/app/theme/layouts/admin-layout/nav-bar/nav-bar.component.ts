@@ -17,7 +17,7 @@ export class NavBarComponent {
   readonly NavCollapse = output();
   readonly NavCollapsedMob = output<void>();
 
-  navCollapsed;
+  navCollapsed: any;
   windowWidth: number;
   navCollapsedMob;
 
@@ -39,7 +39,7 @@ export class NavBarComponent {
   // eslint-disable-next-line
   onResize(event: any): void {
     this.windowWidth = event.target.innerWidth;
-    this.navCollapseMob();
+    // this.navCollapseMob();
   }
 
   navCollapseMob(): void {
