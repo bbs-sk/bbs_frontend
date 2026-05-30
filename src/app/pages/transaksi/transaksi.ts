@@ -101,6 +101,10 @@ export class Transaksi implements OnInit {
 
   addMasukForm!: FormGroup;
 
+  userLogin: any = null;
+
+  isGudang = false;
+
   // =====================================================
   // GETTER
   // =====================================================
@@ -122,11 +126,16 @@ export class Transaksi implements OnInit {
   // =====================================================
 
   ngOnInit(): void {
+    this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
+
+    this.isGudang = this.userLogin?.role === 'Gudang';
+
     this.addMasukForm = this.fb.group({
       id_barang: [null, Validators.required],
       jumlah: [null, [Validators.required, Validators.min(1)]],
       harga_beli: [null, [Validators.required, Validators.min(1)]]
     });
+
     this.loadData();
   }
 

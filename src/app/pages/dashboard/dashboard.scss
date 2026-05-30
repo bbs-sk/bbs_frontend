@@ -215,7 +215,6 @@
   }
 }
 
-// ── Status Badge ─────────────────────────────────────────
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -231,39 +230,57 @@
     border-radius: 50%;
   }
 
-  &--warning {
+  &--menunggu {
     background: #faeeda;
     color: #854f0b;
+
     .badge-dot {
       background: #ef9f27;
     }
   }
-  &--info {
+
+  &--disetujui {
     background: #e6f1fb;
     color: #185fa5;
+
     .badge-dot {
       background: #378add;
     }
   }
-  &--success {
+
+  &--dipesan {
+    background: #ede9fe;
+    color: #6d28d9;
+
+    .badge-dot {
+      background: #8b5cf6;
+    }
+  }
+
+  &--dikirim {
+    background: #e0f7fa;
+    color: #0e7490;
+
+    .badge-dot {
+      background: #06b6d4;
+    }
+  }
+
+  &--selesai {
     background: #e1f5ee;
     color: #0f6e56;
+
     .badge-dot {
       background: #1d9e75;
     }
   }
-  &--danger {
+
+  &--ditolak {
     background: #fcebeb;
     color: #a32d2d;
+
     .badge-dot {
       background: #e24b4a;
-    }
-  }
-  &--default {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--pc-secondary);
-    .badge-dot {
-      background: #aaa;
     }
   }
 }
