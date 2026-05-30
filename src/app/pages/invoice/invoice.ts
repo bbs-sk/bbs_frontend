@@ -157,7 +157,15 @@ export class Invoice {
     this.api.getProject().subscribe({
       next: (res: any) => {
         let data = Array.isArray(res) ? res : (res?.val ?? []);
-        data = this.role === 'Gudang' ? data.filter((p: any) => p.id_project == 0) : data.filter((p: any) => p.id_project != 0);
+
+        if (this.role === 'Gudang') {
+          data = data.filter((p: any) => p.id_project == 0);
+        } else if (this.role === 'Lapangan') {
+          data = data.filter((p: any) => p.id_user1 == this.userLogin?.id_user || p.id_user2 == this.userLogin?.id_user);
+        } else {
+          data = data.filter((p: any) => p.id_project != 0);
+        }
+
         this.project = data;
       },
       error: (err) => console.log(err)
@@ -293,8 +301,8 @@ export class Invoice {
   }
 
   isFieldsLockedOnEdit(): boolean {
-    if (this.role === 'Admin Kantor') {
-      const lockedStatus = ['dipesan', 'disetujui', 'dikirim', 'selesai', 'ditolak'];
+    if (this.role === 'Admin Kantor' || 'Gudang') {
+      const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'selesai', 'ditolak'];
       return this.editForm?.id_user !== this.userLogin?.id_user || lockedStatus.includes(this.editForm?.status);
     }
     return false;
@@ -530,9 +538,13 @@ export class Invoice {
         this.showEditModal = true;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
         Swal.close();
-        Swal.fire({ icon: 'error', title: 'Gagal', text: 'Data barang gagal dimuat.' });
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: err?.error?.detail || err?.error?.message || 'Gagal update invoice'
+        });
       }
     });
   }
@@ -735,7 +747,7 @@ export class Invoice {
           id_barang: item.id_barang,
           nama_barang: item.nama_barang,
           jumlah: item.jumlah,
-          harga_jual: item.harga_jual,
+          harga_jual: Number(item.harga_jual) - Number(item.profit),
           satuan: item.satuan || '',
           checked: false,
           jumlah_retur: 1,
@@ -807,7 +819,13 @@ export class Invoice {
               );
             }
           },
-          error: (err: any) => Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Retur gagal disimpan.' })
+          error: (err: any) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Retur Gagal',
+              text: err?.error?.message || err?.error?.detail || 'Retur gagal disimpan.'
+            });
+          }
         });
     });
   }

@@ -32,7 +32,7 @@ export class Barang {
   filteredBarang: any[] = [];
   paginatedBarang: any[] = [];
   isLoading = false;
-  pageSize = 20;
+  pageSize = 10;
   pageIndex = 0;
   searchKeyword = '';
   searchFocused = false; // ← baru: untuk styling focus state search box
@@ -52,7 +52,7 @@ export class Barang {
 
   ngOnInit(): void {
     this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
-    this.isRole = this.userLogin?.role !== 'Lapangan';
+    this.isRole = this.userLogin?.role === 'Gudang';
     this.loadBarang();
     this.addBarangForm = this.fb.group({
       kode_barang: ['', Validators.required],

@@ -77,7 +77,7 @@
               </td>
               <td>
                 <!-- FIX: status ditampilkan dengan titlecase pipe agar konsisten dengan filter dropdown -->
-                <span class="badge-status badge-{{ i.status }}">
+                <span class="badge-status badge-{{ i.status }}" [class.badge-retur]="i.has_retur">
                   <span class="status-dot"></span>
                   {{ i.status | titlecase }}
                 </span>
@@ -229,7 +229,7 @@
                     <ng-option [value]="b.id_barang" [disabled]="isBarangSelected(b.id_barang,item)||b.jumlah<=0">
                       <span [style.color]="b.jumlah<=0?'#dc2626':null">
                         {{ b.nama_barang }} - Stok: {{ b.jumlah }}
-                        <span *ngIf="b.jumlah<=0">(Habis)</span>
+                        <span *ngIf="b.jumlah<=0">Habis</span>
                       </span>
                     </ng-option>
                     }
