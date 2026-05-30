@@ -1,0 +1,156 @@
+@use 'variables' as *;
+
+// ─────────────────────────────────────────────
+// Semua form style dibungkus .modal-card
+// agar specificity lebih tinggi dari Bootstrap
+// ─────────────────────────────────────────────
+.modal-card {
+  .form-group {
+    margin-bottom: 14px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: #374151;
+  }
+
+  .form-divider {
+    height: 1px;
+    background: $border;
+    margin: 18px 0;
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 13px;
+    color: #111827;
+    background: #fff;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    outline: none;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $muted-light;
+      font-size: 12.5px;
+    }
+    &:hover {
+      border-color: $border-hover;
+    }
+    &:focus {
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+    &:disabled {
+      background: $surface;
+      color: $muted;
+      cursor: not-allowed;
+    }
+  }
+
+  .form-control-disabled {
+    padding: 9px 12px;
+    font-size: 13px;
+    color: $muted;
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+  }
+
+  // Input dengan prefix Rp
+  .input-prefix-wrap {
+    position: relative;
+
+    .input-prefix {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      font-weight: 600;
+      color: $muted;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .form-control.has-prefix {
+      padding-left: 34px;
+    }
+  }
+
+  // Total harga display
+  .total-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 12px;
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+
+    .total-prefix {
+      font-size: 12px;
+      font-weight: 600;
+      color: $muted;
+    }
+    .total-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: $primary-hover;
+    }
+  }
+
+  // Satuan display
+  .satuan-display {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: $muted;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+// ─────────────────────────────────────────────
+// ng-select — pakai ::ng-deep, tidak perlu parent
+// ─────────────────────────────────────────────
+::ng-deep .ng-select .ng-select-container {
+  min-height: 42px !important;
+  border-radius: 8px !important;
+  border: 1px solid #e5e7eb !important;
+  font-size: 13px !important;
+  box-shadow: none !important;
+}
+
+::ng-deep .ng-select.ng-select-focused .ng-select-container {
+  border-color: $primary !important;
+  box-shadow: 0 0 0 3px rgba($primary, 0.1) !important;
+}

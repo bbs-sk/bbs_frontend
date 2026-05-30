@@ -1,36 +1,40 @@
-@use '../../../scss/variables' as *;
+// ─────────────────────────────────────────────
+// Color palette
+// ─────────────────────────────────────────────
+$primary: #185fa5;
+$primary-hover: #0c447c;
+$primary-light: #ebf2fe;
+$primary-mid: #b5d4f4;
+
+$danger: #a32d2d;
+$danger-light: #fcebeb;
+$danger-mid: #f7c1c1;
+
+$success: #166534;
+$success-light: #dcfce7;
+$success-mid: #86efac;
+
+$warning: #92400e;
+$warning-light: #fef3c7;
+$warning-mid: #fcd34d;
+
+$info: #0e7490;
+$info-light: #cffafe;
+$info-mid: #67e8f9;
 
 // ─────────────────────────────────────────────
-// Table wrapper (min-width khusus halaman proyek)
+// Neutrals
 // ─────────────────────────────────────────────
-.table-wrapper {
-  min-width: 980px;
-}
+$border: #e5e7eb;
+$border-hover: #d1d5db;
+$surface: #f8fafc;
+$muted: #6b7280;
+$muted-light: #9ca3af;
 
 // ─────────────────────────────────────────────
-// Project content
+// Border radius
 // ─────────────────────────────────────────────
-.project-name {
-  font-weight: 500;
-  color: #111827;
-}
-
-.project-address {
-  color: #4b5563;
-  line-height: 1.5;
-}
-
-// ─────────────────────────────────────────────
-// Badge user/owner
-// ─────────────────────────────────────────────
-.badge-user {
-  display: inline-block;
-  padding: 3px 9px;
-  background: $primary-light;
-  color: $primary-hover;
-  border-radius: $radius-sm;
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  font-family: 'Courier New', monospace;
-}
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;

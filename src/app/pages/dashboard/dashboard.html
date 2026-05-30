@@ -51,6 +51,7 @@
                 <span class="status-badge status-badge--{{ getStatusClass(order.status) }}">
                   <span class="badge-dot"></span>
                   {{ order.status }}
+                  <mat-icon class="retur-indicator" *ngIf="order.has_retur" title="Ada retur">assignment_return</mat-icon>
                 </span>
               </td>
               <td class="text-end fw-500">{{ formatRupiah(order.total_harga) }}</td>

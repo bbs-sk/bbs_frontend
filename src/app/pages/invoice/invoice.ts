@@ -62,6 +62,8 @@ export class Invoice {
   showDetailModal = false;
   showReturModal = false;
   showSuratJalanModal = false;
+  // ─── Loading flags ───────────────────────────
+  isSubmitting = false;
 
   // ─── Modal status (ringkas) ────────────────────
   showStatusModal = false;
@@ -482,11 +484,15 @@ export class Invoice {
   }
 
   submitAdd(): void {
-    if (!this.validateAdd()) return; // ← validasi dulu
+    if (!this.validateAdd()) return;
+    if (this.isSubmitting) return; // guard tambahan
+
+    this.isSubmitting = true; // ← set true sebelum request
 
     this.api.addInvoice({ ...this.addForm, barang: this.selectedBarang }).subscribe({
       next: () => {
         const proyek = this.project.find((p: any) => p.id_project == this.addForm.id_project)?.nama_project || 'Proyek';
+        this.isSubmitting = false;
         this.closeAdd();
         this.cdr.detectChanges();
         setTimeout(() => {
@@ -499,7 +505,10 @@ export class Invoice {
           }).then(() => this.loadInvoice(false));
         }, 100);
       },
-      error: (err: any) => Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Pemesanan gagal ditambahkan.' })
+      error: (err: any) => {
+        this.isSubmitting = false; // ← reset juga saat error
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Pemesanan gagal ditambahkan.' });
+      }
     });
   }
 
@@ -747,7 +756,8 @@ export class Invoice {
           id_barang: item.id_barang,
           nama_barang: item.nama_barang,
           jumlah: item.jumlah,
-          harga_jual: Number(item.harga_jual) - Number(item.profit),
+          harga_jual: Number(item.harga_jual), // harga jual asli
+          hpp: Number(item.harga_jual) - Number(item.profit ?? 0),
           satuan: item.satuan || '',
           checked: false,
           jumlah_retur: 1,
@@ -797,7 +807,8 @@ export class Invoice {
           id_barang: item.id_barang,
           id_invoice: this.returInvoice.id_invoice,
           jumlah: item.jumlah_retur,
-          harga_jual: item.harga_jual,
+          harga_jual: item.harga_jual, // harga jual
+          hpp: item.hpp,
           kondisi: item.kondisi
         })
         .subscribe({

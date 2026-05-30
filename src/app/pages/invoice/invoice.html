@@ -76,10 +76,11 @@
                 <span class="price-value">{{ i.total_harga ? 'Rp ' + i.total_harga.toLocaleString('id-ID') : '—' }}</span>
               </td>
               <td>
-                <!-- FIX: status ditampilkan dengan titlecase pipe agar konsisten dengan filter dropdown -->
-                <span class="badge-status badge-{{ i.status }}" [class.badge-retur]="i.has_retur">
+                <!-- Ganti bagian badge status di tabel -->
+                <span class="badge-status badge-{{ i.status }}">
                   <span class="status-dot"></span>
                   {{ i.status | titlecase }}
+                  <mat-icon class="retur-indicator" *ngIf="i.has_retur" title="Ada retur">assignment_return</mat-icon>
                 </span>
               </td>
               <td>
@@ -317,9 +318,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
-        <button type="button" class="btn-modal-save" (click)="submitAdd()">
-          <mat-icon>save</mat-icon>
-          Simpan
+        <!-- Ganti tombol simpan di modal tambah -->
+        <button type="button" class="btn-modal-save" (click)="submitAdd()" [disabled]="isSubmitting">
+          <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+          {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
         </button>
       </div>
     </div>

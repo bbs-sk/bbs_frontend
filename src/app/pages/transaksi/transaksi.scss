@@ -1,104 +1,15 @@
-// ─────────────────────────────────────────────
-// Variables
-// ─────────────────────────────────────────────
-$primary: #185fa5;
-$primary-hover: #0c447c;
-$primary-light: #ebf2fe;
-$primary-mid: #b5d4f4;
-
-$success: #15803d;
-$success-light: #dcfce7;
-
-$warning: #b45309;
-$warning-light: #fef3c7;
-
-$danger: #a32d2d;
-$danger-light: #fcebeb;
-$danger-mid: #f7c1c1;
-
-$border: #e5e7eb;
-$border-hover: #d1d5db;
-
-$surface: #f8fafc;
-
-$muted: #6b7280;
-$muted-light: #9ca3af;
-
-$radius-sm: 6px;
-$radius-md: 8px;
-$radius-lg: 12px;
-$radius-xl: 16px;
+@use '../../../scss/variables' as *;
 
 // ─────────────────────────────────────────────
-// Page
+// Table wrapper (min-width khusus halaman transaksi)
 // ─────────────────────────────────────────────
-.page-wrapper {
-  padding: 4px 0 24px;
+.table-wrapper {
+  min-width: 980px;
 }
 
 // ─────────────────────────────────────────────
-// Card
+// Icon khusus transaksi
 // ─────────────────────────────────────────────
-.tbl-card {
-  background: #fff;
-  border: 1px solid $border;
-  border-radius: $radius-xl;
-  overflow: hidden;
-  margin-bottom: 22px;
-
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 4px 16px rgba(0, 0, 0, 0.03);
-}
-
-// ─────────────────────────────────────────────
-// Header
-// ─────────────────────────────────────────────
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid $border;
-}
-
-.card-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #111827;
-  }
-
-  .subtitle {
-    margin: 2px 0 0;
-    font-size: 12px;
-    color: $muted;
-  }
-}
-
-.title-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: $radius-md;
-  background: $primary-light;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  mat-icon {
-    color: $primary;
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-}
-
 .keluar-icon {
   background: #eef2ff;
 
@@ -116,305 +27,29 @@ $radius-xl: 16px;
 }
 
 // ─────────────────────────────────────────────
-// Button
-// ─────────────────────────────────────────────
-.btn-add {
-  display: inline-flex !important;
-  align-items: center;
-  gap: 6px;
-
-  padding: 9px 18px !important;
-  border-radius: $radius-md !important;
-
-  background: $primary !important;
-  color: white !important;
-
-  box-shadow: none !important;
-
-  font-size: 13px !important;
-  font-weight: 500 !important;
-
-  transition: background 0.15s ease;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  &:hover {
-    background: $primary-hover !important;
-  }
-}
-
-// ─────────────────────────────────────────────
-// Toolbar
-// ─────────────────────────────────────────────
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 12px 24px;
-
-  border-bottom: 1px solid $border;
-  background: $surface;
-
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.toolbar-stats {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.stat-chip {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: $muted;
-}
-
-.stat-value {
-  font-size: 13px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.stat-divider {
-  width: 1px;
-  height: 14px;
-  background: $border;
-}
-
-// ─────────────────────────────────────────────
-// Search
-// ─────────────────────────────────────────────
-.search-box {
-  display: flex;
-  align-items: center;
-
-  height: 38px;
-
-  border: 1px solid $border;
-  border-radius: $radius-md;
-
-  background: white;
-  overflow: hidden;
-
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
-
-  &.focused,
-  &:focus-within {
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.1);
-  }
-
-  .search-icon {
-    margin-left: 10px;
-    margin-right: 4px;
-
-    color: $muted-light;
-
-    font-size: 17px;
-    width: 17px;
-    height: 17px;
-  }
-}
-
-.search-input {
-  width: 240px;
-  height: 100%;
-
-  border: none;
-  outline: none;
-
-  padding: 0 8px;
-
-  font-size: 13px;
-  background: transparent;
-
-  &::placeholder {
-    color: $muted-light;
-    font-size: 12px;
-  }
-}
-
-.btn-clear {
-  width: 28px;
-  height: 28px;
-
-  border: none;
-  border-radius: 50%;
-
-  background: transparent;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-
-  mat-icon {
-    font-size: 15px;
-    width: 15px;
-    height: 15px;
-  }
-
-  &:hover {
-    background: #f3f4f6;
-  }
-}
-
-.btn-search {
-  width: 38px;
-  height: 38px;
-
-  border: none;
-  border-left: 1px solid $border;
-
-  background: $primary;
-  color: white;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-
-  mat-icon {
-    font-size: 17px;
-    width: 17px;
-    height: 17px;
-  }
-
-  &:hover {
-    background: $primary-hover;
-  }
-}
-
-// ─────────────────────────────────────────────
-// Table
-// ─────────────────────────────────────────────
-.table-responsive {
-  overflow-x: auto;
-}
-
-.table-wrapper {
-  min-width: 980px;
-}
-
-table.table {
-  width: 100%;
-  border-collapse: collapse;
-
-  thead tr {
-    background: $surface;
-  }
-
-  th {
-    padding: 11px 16px;
-
-    border-bottom: 1px solid $border;
-
-    font-size: 11px;
-    font-weight: 600;
-
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-
-    white-space: nowrap;
-  }
-
-  td {
-    padding: 14px 16px;
-
-    border-bottom: 1px solid $border;
-
-    font-size: 13px;
-    color: #374151;
-
-    vertical-align: middle;
-  }
-
-  tbody tr:last-child td {
-    border-bottom: none;
-  }
-
-  tbody tr.table-row {
-    transition: background 0.15s ease;
-
-    &:hover {
-      background: #f9fafb;
-    }
-  }
-}
-
-// ─────────────────────────────────────────────
-// Column
-// ─────────────────────────────────────────────
-.col-no {
-  width: 52px;
-  text-align: center;
-}
-
-.col-num {
-  text-align: right;
-}
-
-.col-action {
-  width: 90px;
-  text-align: center;
-}
-
-.text-muted-sm {
-  font-size: 12px;
-  color: $muted-light;
-}
-
-// ─────────────────────────────────────────────
 // Badge
 // ─────────────────────────────────────────────
 .badge-kode {
   display: inline-flex;
   align-items: center;
-
   padding: 4px 10px;
-
   border-radius: $radius-sm;
-
   background: $primary-light;
   color: $primary-hover;
-
   font-size: 11.5px;
   font-weight: 700;
-
   letter-spacing: 0.04em;
-
   font-family: 'Courier New', monospace;
 }
 
 .badge-satuan {
   display: inline-flex;
   align-items: center;
-
   padding: 4px 10px;
-
   border-radius: $radius-sm;
-
   border: 1px solid $border;
-
   background: $surface;
   color: $muted;
-
   font-size: 11.5px;
   font-weight: 500;
 }
@@ -451,331 +86,8 @@ table.table {
 }
 
 // ─────────────────────────────────────────────
-// Action
+// Form hint
 // ─────────────────────────────────────────────
-.action-btns {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn-action {
-  width: 30px;
-  height: 30px;
-
-  border-radius: $radius-sm;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid;
-  background: transparent;
-
-  cursor: pointer;
-
-  transition:
-    background 0.15s,
-    transform 0.1s;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-
-  &:active {
-    transform: scale(0.94);
-  }
-}
-
-.btn-del {
-  border-color: $danger-mid;
-  color: $danger;
-
-  &:hover {
-    background: $danger-light;
-  }
-}
-
-// ─────────────────────────────────────────────
-// Empty
-// ─────────────────────────────────────────────
-.empty-state {
-  padding: 64px 20px;
-  text-align: center;
-}
-
-.empty-icon {
-  width: 56px;
-  height: 56px;
-
-  margin: 0 auto 16px;
-
-  border-radius: 50%;
-  border: 1px solid $border;
-
-  background: $surface;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  mat-icon {
-    color: $muted-light;
-    font-size: 26px;
-    width: 26px;
-    height: 26px;
-  }
-}
-
-.empty-title {
-  margin: 0 0 4px;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  color: #374151;
-}
-
-.empty-sub {
-  margin: 0 0 16px;
-
-  font-size: 13px;
-  color: $muted;
-}
-
-.btn-reset-search {
-  padding: 8px 18px;
-
-  border: none;
-  border-radius: $radius-md;
-
-  background: $primary-light;
-  color: $primary;
-
-  font-size: 13px;
-  font-weight: 500;
-
-  cursor: pointer;
-
-  transition: background 0.15s;
-
-  &:hover {
-    background: $primary-mid;
-  }
-}
-
-// ─────────────────────────────────────────────
-// Paginator
-// ─────────────────────────────────────────────
-.paginator-wrapper {
-  border-top: 1px solid $border;
-  background: $surface;
-
-  mat-paginator {
-    background: transparent;
-  }
-}
-
-.modal-backdrop-custom {
-  position: fixed;
-  inset: 0;
-  z-index: 1050;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
-  animation: fadeIn 0.15s ease;
-}
-
-// ─────────────────────────────────────────────
-// Modal wrapper
-// ─────────────────────────────────────────────
-.modal-custom {
-  position: fixed;
-  inset: 0;
-  z-index: 1060;
-  display: grid;
-  place-items: center;
-  padding: 16px;
-}
-
-// ─────────────────────────────────────────────
-// Modal card
-// ─────────────────────────────────────────────
-.modal-card {
-  width: 100%;
-  max-width: 520px;
-  background: #fff;
-  border-radius: $radius-xl;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.15),
-    0 4px 16px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid $border;
-  background: #fff;
-
-  h5 {
-    font-size: 15px;
-    font-weight: 600;
-    color: #111827;
-    margin: 0;
-  }
-}
-
-.modal-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.modal-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: $radius-sm;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  &.add-icon {
-    background: $primary-light;
-
-    mat-icon {
-      color: $primary;
-    }
-  }
-
-  &.edit-icon {
-    background: #fef3c7;
-
-    mat-icon {
-      color: #b45309;
-    }
-  }
-}
-
-.btn-close-modal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  background: transparent;
-  color: $muted;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-}
-
-.modal-body {
-  padding: 20px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.form-group {
-  margin-bottom: 14px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.form-label {
-  display: block;
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-
-.form-control {
-  width: 100%;
-  padding: 9px 12px;
-  font-size: 13px;
-  color: #111827;
-  background: #fff;
-  border: 1px solid $border;
-  border-radius: $radius-md;
-  outline: none;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
-
-  &::placeholder {
-    color: $muted-light;
-    font-size: 12.5px;
-  }
-
-  &:hover {
-    border-color: $border-hover;
-  }
-
-  &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.1);
-  }
-
-  &:disabled {
-    background: $surface;
-    color: $muted;
-    cursor: not-allowed;
-  }
-}
-
-// Input dengan prefix Rp
-.input-prefix-wrap {
-  position: relative;
-
-  .input-prefix {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 12px;
-    font-weight: 600;
-    color: $muted;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .form-control.has-prefix {
-    padding-left: 34px;
-  }
-}
-
 .form-hint {
   font-size: 11px;
   color: $muted-light;
@@ -783,111 +95,22 @@ table.table {
   font-style: italic;
 }
 
-.modal-footer {
+// ─────────────────────────────────────────────
+// Transaksi header & filter
+// ─────────────────────────────────────────────
+.transaksi-header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: 14px 20px;
-  border-top: 1px solid $border;
-  background: $surface;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-.btn-modal-cancel {
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: $muted;
-  background: #fff;
-  border: 1px solid $border;
-  border-radius: $radius-md;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-}
-
-.btn-modal-save {
-  display: inline-flex;
+.header-filter {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  background: $primary;
-  border: none;
-  border-radius: $radius-md;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    transform 0.1s;
-
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-  }
-
-  &:hover {
-    background: $primary-hover;
-  }
-
-  &:active {
-    transform: scale(0.97);
-  }
-}
-
-// ─────────────────────────────────────────────
-// Animations
-// ─────────────────────────────────────────────
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-// ─────────────────────────────────────────────
-// Responsive
-// ─────────────────────────────────────────────
-@media (max-width: 768px) {
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-box {
-    width: 100%;
-  }
-
-  .search-input {
-    width: 100%;
-  }
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .bar-label {
@@ -896,6 +119,16 @@ table.table {
   margin-right: 4px;
 }
 
+.view-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: $muted;
+  white-space: nowrap;
+}
+
+// ─────────────────────────────────────────────
+// Filter pills
+// ─────────────────────────────────────────────
 .stat-pill {
   display: inline-flex;
   align-items: center;
@@ -964,34 +197,9 @@ table.table {
   margin: 0 2px;
 }
 
-.view-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: $muted;
-  white-space: nowrap;
-}
-
-.transaksi-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.header-filter {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.pill-dot {
-  &.dot-all {
-    background: #64748b;
-  }
-}
-
+// ─────────────────────────────────────────────
+// Responsive (khusus transaksi)
+// ─────────────────────────────────────────────
 @media (max-width: 768px) {
   .filter-select {
     flex: 1;
