@@ -116,21 +116,6 @@ export class Dashboard {
     });
   }
 
-  getStatusColor(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'menunggu':
-        return 'bg-warning';
-      case 'disetujui':
-        return 'bg-primary';
-      case 'selesai':
-        return 'bg-success';
-      case 'ditolak':
-        return 'bg-danger';
-      default:
-        return 'bg-secondary';
-    }
-  }
-
   getActivityBackground(activity: string): string {
     switch (activity) {
       case 'Barang Masuk':
@@ -203,13 +188,12 @@ export class Dashboard {
     const s = status?.toLowerCase()?.trim();
 
     const map: Record<string, string> = {
-      menunggu: 'warning',
-      pending: 'warning',
-      disetujui: 'info',
-      dikirim: 'success',
-      delivery: 'success',
-      selesai: 'success',
-      ditolak: 'danger'
+      menunggu: 'menunggu',
+      disetujui: 'disetujui',
+      dipesan: 'dipesan',
+      dikirim: 'dikirim',
+      selesai: 'selesai',
+      ditolak: 'ditolak'
     };
 
     return map[s] ?? 'default';

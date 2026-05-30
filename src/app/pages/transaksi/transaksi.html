@@ -1,36 +1,44 @@
 <div class="page-wrapper">
-  <div class="top-filter-bar">
-    <div class="bar-left">
-      <div class="stat-pill" [class.active]="selectedView === 'masuk'" (click)="selectedView = 'masuk'">
-        <span class="pill-dot dot-masuk"></span>
-        <span>Masuk</span>
-        <span class="pill-count">{{ barangMasuk.length }}</span>
+  <div class="tbl-card">
+    <div class="card-header transaksi-header">
+      <div class="header-left">
+        <div class="card-title">
+          <div class="title-icon">
+            <mat-icon>swap_horiz</mat-icon>
+          </div>
+
+          <div>
+            <h3 class="mb-0">Transaksi Barang</h3>
+            <p class="subtitle">Monitoring transaksi barang masuk, keluar dan retur</p>
+          </div>
+        </div>
       </div>
 
-      <div class="pill-divider"></div>
+      <div class="header-filter">
+        <div class="stat-pill" [class.active]="selectedView === 'all'" (click)="selectedView = 'all'">
+          <span class="pill-dot dot-all"></span>
+          <span>Semua</span>
+          <span class="pill-count">{{ barangMasuk.length + barangKeluar.length + retur.length }}</span>
+        </div>
 
-      <div class="stat-pill" [class.active]="selectedView === 'keluar'" (click)="selectedView = 'keluar'">
-        <span class="pill-dot dot-keluar"></span>
-        <span>Keluar</span>
-        <span class="pill-count">{{ barangKeluar.length }}</span>
+        <div class="stat-pill" [class.active]="selectedView === 'masuk'" (click)="selectedView = 'masuk'">
+          <span class="pill-dot dot-masuk"></span>
+          <span>Masuk</span>
+          <span class="pill-count">{{ barangMasuk.length }}</span>
+        </div>
+
+        <div class="stat-pill" [class.active]="selectedView === 'keluar'" (click)="selectedView = 'keluar'">
+          <span class="pill-dot dot-keluar"></span>
+          <span>Keluar</span>
+          <span class="pill-count">{{ barangKeluar.length }}</span>
+        </div>
+
+        <div class="stat-pill" [class.active]="selectedView === 'retur'" (click)="selectedView = 'retur'">
+          <span class="pill-dot dot-retur"></span>
+          <span>Retur</span>
+          <span class="pill-count">{{ retur.length }}</span>
+        </div>
       </div>
-
-      <div class="pill-divider"></div>
-
-      <div class="stat-pill" [class.active]="selectedView === 'retur'" (click)="selectedView = 'retur'">
-        <span class="pill-dot dot-retur"></span>
-        <span>Retur</span>
-        <span class="pill-count">{{ retur.length }}</span>
-      </div>
-    </div>
-
-    <div class="bar-right">
-      <select class="filter-select" [(ngModel)]="selectedView">
-        <option value="all">Semua</option>
-        <option value="masuk">Barang Masuk</option>
-        <option value="keluar">Barang Keluar</option>
-        <option value="retur">Barang Retur</option>
-      </select>
     </div>
   </div>
   <div class="tbl-card" *ngIf="isView('masuk')">
@@ -46,7 +54,7 @@
         </div>
       </div>
 
-      <button mat-raised-button class="btn-add" (click)="openAddMasuk()">
+      <button *ngIf="isGudang" mat-raised-button class="btn-add" (click)="openAddMasuk()">
         <mat-icon>add</mat-icon>
         <span>Tambah Stok Barang</span>
       </button>
@@ -104,7 +112,7 @@
               <th class="col-num">Jumlah</th>
               <th class="col-num">Harga Beli</th>
               <th>Tanggal</th>
-              <th class="col-action">Aksi</th>
+              <th *ngIf="isGudang" class="col-action">Aksi</th>
             </tr>
           </thead>
 
@@ -132,7 +140,7 @@
                 <span class="date-time">{{ m.datetime | date:'HH:mm':'':'id' }}</span>
               </td>
 
-              <td>
+              <td *ngIf="isGudang">
                 <div class="action-btns">
                   <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDeleteMasuk(m)">
                     <mat-icon>delete_outline</mat-icon>

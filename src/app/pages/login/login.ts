@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/shared/services/api.service';
+import Swal from 'sweetalert2';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-login',
@@ -15,23 +17,29 @@ export class Login {
   password: string = '';
   showPassword: boolean = false;
   isLoading: boolean = false;
-  errorMessage: string = '';
   fieldError: boolean = false;
 
   constructor(
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   onLogin() {
     // Reset state
-    this.errorMessage = '';
     this.fieldError = false;
 
     // Validasi field kosong
     if (!this.username.trim() || !this.password.trim()) {
       this.fieldError = true;
-      this.errorMessage = 'Username dan password wajib diisi.';
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Validasi',
+        text: 'Username dan password wajib diisi.',
+        confirmButtonColor: '#185fa5'
+      });
+
       return;
     }
 
@@ -57,7 +65,15 @@ export class Login {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err?.error?.message || 'Terjadi kesalahan. Silakan coba lagi.';
+        this.cdr.detectChanges();
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Gagal',
+          text: err?.error?.message || 'Terjadi kesalahan. Silakan coba lagi.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#185fa5'
+        });
       }
     });
   }
