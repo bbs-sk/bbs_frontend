@@ -56,6 +56,13 @@
               </td>
               <td class="text-end fw-500">{{ formatRupiah(order.total_harga) }}</td>
             </tr>
+            } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">
+                <mat-icon>inbox</mat-icon>
+                <p>Belum ada pesanan</p>
+              </td>
+            </tr>
             }
           </tbody>
         </table>
@@ -81,12 +88,15 @@
             <p class="act-time">{{ history.datetime | date:'dd/MM/yyyy HH:mm' }} · {{ history.aktivitas }}</p>
           </div>
           <div class="act-amount">
-            <p class="act-price act-price--{{ getActivityClass(history.aktivitas) }}">
-              {{ getActivityAmount(history.aktivitas) }} {{ formatRupiah(history.harga) }}
-            </p>
+            <p class="act-price">{{ formatRupiah(history.harga) }}</p>
             <p class="act-qty">{{ history.jumlah }} {{ history.satuan }}</p>
           </div>
         </a>
+        } @empty {
+        <div class="empty-state">
+          <mat-icon>history</mat-icon>
+          <p>Belum ada aktivitas</p>
+        </div>
         }
       </div>
     </div>

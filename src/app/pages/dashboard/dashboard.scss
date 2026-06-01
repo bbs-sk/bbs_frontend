@@ -288,8 +288,8 @@
 // ── Activity List ─────────────────────────────────────────
 .activity-list {
   padding: 4px 0;
-  height: 1120px;
-  overflow-y: scroll;
+  max-height: 1120px;
+  overflow-y: auto;
   overflow-x: hidden;
 
   scrollbar-width: thin;
@@ -382,16 +382,7 @@
 .act-price {
   font-size: 12px;
   font-weight: 600;
-
-  &--masuk {
-    color: #993c1d;
-  }
-  &--keluar {
-    color: #0f6e56;
-  }
-  &--retur {
-    color: #854f0b;
-  }
+  color: var(--pc-heading);
 }
 
 .act-qty {
@@ -420,4 +411,25 @@
   margin-left: 2px;
   vertical-align: middle;
   flex-shrink: 0;
+}
+
+// ── Empty State ───────────────────────────────────────────
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--pc-secondary);
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.4;
+    display: block;
+    margin: 0 auto 8px;
+  }
+
+  p {
+    font-size: 13px;
+    margin: 0;
+  }
 }

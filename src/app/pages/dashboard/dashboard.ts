@@ -129,19 +129,6 @@ export class Dashboard {
     }
   }
 
-  getActivityAmount(activity: string): string {
-    switch (activity) {
-      case 'Barang Masuk':
-        return '-';
-      case 'Barang Keluar':
-        return '+';
-      case 'Retur':
-        return '!';
-      default:
-        return '';
-    }
-  }
-
   getCardColor(index: number): string {
     return ['blue', 'teal', 'coral', 'amber'][index] ?? 'blue';
   }
