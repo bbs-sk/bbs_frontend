@@ -135,6 +135,7 @@ export class Invoice {
     this.api.getInvoiceRole({ role: this.userLogin?.role, id_user: this.userLogin?.id_user }).subscribe({
       next: (res: any) => {
         this.invoice = Array.isArray(res) ? res : (res?.val ?? []);
+        console.log(this.invoice);
         this.filteredInvoice = [...this.invoice];
         this.filterStatus = '';
         this.pageIndex = 0;
@@ -303,9 +304,13 @@ export class Invoice {
   }
 
   isFieldsLockedOnEdit(): boolean {
-    if (this.role === 'Admin Kantor' || 'Gudang') {
+    if (this.role === 'Admin Kantor' || this.role === 'Gudang') {
       const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'selesai', 'ditolak'];
+
       return this.editForm?.id_user !== this.userLogin?.id_user || lockedStatus.includes(this.editForm?.status);
+    }
+    if (this.role === 'Lapangan') {
+      return !(this.editForm?.id_user === this.userLogin?.id_user && this.editForm?.status === 'menunggu');
     }
     return false;
   }
@@ -1059,5 +1064,18 @@ export class Invoice {
 
   hasAnyAction(invoice: any): boolean {
     return this.canEdit(invoice) || this.canUpdateStatus(invoice) || this.canRetur(invoice) || this.canDelete(invoice);
+  }
+
+  formatWIB(dateString: string): string {
+    if (!dateString) return '-';
+
+    return new Intl.DateTimeFormat('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Asia/Jakarta'
+    }).format(new Date(dateString));
   }
 }
