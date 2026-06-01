@@ -135,6 +135,8 @@ export class Invoice {
     this.api.getInvoiceRole({ role: this.userLogin?.role, id_user: this.userLogin?.id_user }).subscribe({
       next: (res: any) => {
         this.invoice = Array.isArray(res) ? res : (res?.val ?? []);
+        console.log('DATA INVOICE:', this.invoice);
+        console.log('CREATED_AT PERTAMA:', this.invoice[0]?.created_at);
         console.log(this.invoice);
         this.filteredInvoice = [...this.invoice];
         this.filterStatus = '';
