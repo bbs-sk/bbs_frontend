@@ -23,10 +23,10 @@
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(6px); // muncul dari bawah ke atas
+    transform: translateY(-100%) translateY(-6px); // mulai sedikit lebih atas
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(-100%) translateY(0); // posisi normal
   }
 }

@@ -105,7 +105,13 @@
                       <mat-icon>more_vert</mat-icon>
                     </button>
 
-                    <div class="action-dropdown" *ngIf="activeMenuId === i.id_invoice">
+                    <div
+                      class="action-dropdown"
+                      *ngIf="activeMenuId === i.id_invoice"
+                      [style.top.px]="dropdownTop"
+                      [style.left.px]="dropdownLeft"
+                      [style.transform]="'translateY(-100%)'"
+                    >
                       <button *ngIf="canEdit(i)" type="button" class="action-dropdown-item" (click)="onEdit(i)">
                         <mat-icon>edit</mat-icon>
                         Edit

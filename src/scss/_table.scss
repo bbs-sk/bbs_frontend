@@ -234,21 +234,19 @@
 // ─────────────────────────────────────────────
 .action-menu-wrap {
   position: relative;
+  isolation: isolate;
 }
 
 .action-dropdown {
-  position: absolute;
-  bottom: calc(100% + 6px); // ← ke ATAS, ganti dari top: calc(100% + 6px)
-  top: auto; // ← pastikan top tidak ikut campur
-  right: 0;
+  position: fixed;
   min-width: 160px;
   background: #fff;
   border: 1px solid $border;
   border-radius: 10px;
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1); // shadow ke atas
-  z-index: 200;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  z-index: 9999;
   overflow: hidden;
-  animation: slideDown 0.15s cubic-bezier(0.16, 1, 0.3, 1); // ganti nama animasi
+  animation: slideDown 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .action-dropdown-item {

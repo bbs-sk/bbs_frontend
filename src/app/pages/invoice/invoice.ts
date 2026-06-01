@@ -81,9 +81,8 @@ export class Invoice {
   // ─── Form Tambah ────────────────────────────
   addForm: any = { id_user: null, id_project: null, total_harga: 0, pembayaran: null, detail: '' };
   selectedBarang: any[] = [];
-
-  // FIX: jumlahJenisBarang dihapus, diganti dengan addBarangRow/removeBarangRow
-  // Property dipertahankan sementara agar tidak breaking change jika ada tempat lain yang masih pakai
+  dropdownTop = 0;
+  dropdownLeft = 0;
   jumlahJenisBarang: number | null = null;
 
   // ─── Form Edit ──────────────────────────────
@@ -298,7 +297,21 @@ export class Invoice {
   toggleMenu(event: Event, id: number): void {
     event.stopPropagation();
     this.activeStatusId = null;
-    this.activeMenuId = this.activeMenuId === id ? null : id;
+
+    if (this.activeMenuId === id) {
+      this.activeMenuId = null;
+    } else {
+      this.activeMenuId = id;
+
+      // Hitung posisi tombol ⋮ relatif ke viewport
+      const btn = event.target as HTMLElement;
+      const trigger = btn.closest('button') ?? btn;
+      const rect = trigger.getBoundingClientRect();
+
+      this.dropdownTop = rect.top - 4; // sedikit di atas tombol (akan dikurangi tinggi dropdown via transform)
+      this.dropdownLeft = rect.right - 160; // rata kanan dengan tombol, 160 = min-width dropdown
+    }
+
     this.cdr.detectChanges();
   }
 
