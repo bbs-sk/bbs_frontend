@@ -32,6 +32,7 @@ export class User implements OnInit {
   showAddModal = false;
   showEditModal = false;
   searchFocused = false;
+  isSubmitting = false;
 
   addUserForm!: FormGroup;
   editUserForm!: FormGroup;
@@ -176,22 +177,24 @@ export class User implements OnInit {
 
   closeAdd(): void {
     this.showAddModal = false;
+    this.isSubmitting = false;
   }
 
   submitAdd(): void {
+    if (this.isSubmitting) return;
     if (this.addUserForm.invalid) {
       this.addUserForm.markAllAsTouched();
       return;
     }
 
+    this.isSubmitting = true;
+
     this.api.addUser(this.addUserForm.value).subscribe({
       next: () => {
+        this.isSubmitting = false;
         const nama = this.addUserForm.value.name;
-
         this.closeAdd();
-
         this.cdr.detectChanges();
-
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -199,19 +202,15 @@ export class User implements OnInit {
             text: `Pengguna "${nama}" berhasil ditambahkan.`,
             timer: 2500,
             showConfirmButton: false
-          }).then(() => {
-            this.loadUsers(false);
-          });
+          }).then(() => this.loadUsers(false));
         }, 100);
       },
-
       error: (err) => {
-        const msg = err?.error?.message || err?.message || 'Pengguna gagal ditambahkan.';
-
+        this.isSubmitting = false;
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: msg
+          text: err?.error?.message || err?.message || 'Pengguna gagal ditambahkan.'
         });
       }
     });

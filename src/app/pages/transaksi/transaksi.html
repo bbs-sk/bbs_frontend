@@ -579,10 +579,9 @@
         <div class="modal-footer">
           <button type="button" class="btn-modal-cancel" (click)="closeAddMasuk()">Batal</button>
 
-          <button type="submit" class="btn-modal-save">
-            <mat-icon>save</mat-icon>
-
-            <span>Simpan</span>
+          <button type="submit" class="btn-modal-save" [disabled]="isSubmitting">
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+            <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}</span>
           </button>
         </div>
       </form>

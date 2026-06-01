@@ -36,7 +36,7 @@ export class Barang {
   pageIndex = 0;
   searchKeyword = '';
   searchFocused = false; // ← baru: untuk styling focus state search box
-
+  isSubmitting = false;
   showAddModal = false;
   showEditModal = false;
   hargaJualDisplayAdd = '';
@@ -180,6 +180,7 @@ export class Barang {
 
   closeAdd(): void {
     this.showAddModal = false;
+    this.isSubmitting = false;
   }
 
   onEdit(b: any): void {
@@ -199,22 +200,24 @@ export class Barang {
 
   closeEdit(): void {
     this.showEditModal = false;
+    this.isSubmitting = false;
   }
 
   submitAdd(): void {
+    if (this.isSubmitting) return;
     if (this.addBarangForm.invalid) {
       this.addBarangForm.markAllAsTouched();
       return;
     }
 
+    this.isSubmitting = true;
+
     this.api.addBarang(this.addBarangForm.value).subscribe({
       next: () => {
+        this.isSubmitting = false;
         const nama = this.addBarangForm.value.nama_barang;
-
         this.closeAdd();
-
         this.cdr.detectChanges();
-
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -222,38 +225,35 @@ export class Barang {
             text: `Barang "${nama}" berhasil ditambahkan.`,
             timer: 2500,
             showConfirmButton: false
-          }).then(() => {
-            this.loadBarang(false);
-          });
+          }).then(() => this.loadBarang(false));
         }, 100);
       },
-
       error: (err: any) => {
-        const msg = err?.error?.message || err?.message || 'Barang gagal ditambahkan.';
-
+        this.isSubmitting = false;
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: msg
+          text: err?.error?.message || err?.message || 'Barang gagal ditambahkan.'
         });
       }
     });
   }
 
   submitEdit(): void {
+    if (this.isSubmitting) return;
     if (this.editBarangForm.invalid) {
       this.editBarangForm.markAllAsTouched();
       return;
     }
 
+    this.isSubmitting = true;
+
     this.api.updateBarang(this.editBarangForm.value).subscribe({
       next: () => {
+        this.isSubmitting = false;
         const nama = this.editBarangForm.value.nama_barang;
-
         this.closeEdit();
-
         this.cdr.detectChanges();
-
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -261,19 +261,15 @@ export class Barang {
             text: `Barang "${nama}" berhasil diperbarui.`,
             timer: 3000,
             showConfirmButton: false
-          }).then(() => {
-            this.loadBarang(false);
-          });
+          }).then(() => this.loadBarang(false));
         }, 100);
       },
-
       error: (err: any) => {
-        const msg = err?.error?.message || err?.message || 'Barang gagal diperbarui.';
-
+        this.isSubmitting = false;
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: msg
+          text: err?.error?.message || err?.message || 'Barang gagal diperbarui.'
         });
       }
     });

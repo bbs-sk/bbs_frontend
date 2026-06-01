@@ -255,18 +255,24 @@ export class Invoice {
 
   closeStatus(): void {
     this.showStatusModal = false;
+    this.isSubmitting = false;
     this.statusInvoice = null;
     this.statusForm = { id_invoice: null, status: '' };
   }
 
   submitStatus(): void {
+    if (this.isSubmitting) return;
     if (!this.statusForm.status) {
       Swal.fire({ icon: 'warning', title: 'Validasi', text: 'Pilih status baru terlebih dahulu.' });
       return;
     }
+
+    this.isSubmitting = true;
     const proyek = this.statusInvoice?.nama_project || 'Proyek';
+
     this.api.updateStatusInvoice(this.statusForm).subscribe({
       next: () => {
+        this.isSubmitting = false;
         this.closeStatus();
         this.cdr.detectChanges();
         setTimeout(() => {
@@ -280,6 +286,7 @@ export class Invoice {
         }, 100);
       },
       error: (err: any) => {
+        this.isSubmitting = false;
         Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Status gagal diperbarui.' });
       }
     });
@@ -372,6 +379,9 @@ export class Invoice {
 
   showSuratJalanBtn(): boolean {
     if (this.role !== 'Gudang') return false;
+    // Sembunyikan jika pemesanan milik Gudang sendiri (proyek Kasir/id_project=0)
+    if (this.detailInvoice?.id_project == 0) return false;
+    if (this.detailInvoice?.id_user === this.userLogin?.id_user) return false;
     const s = this.detailInvoice?.status;
     return s === 'dikirim' || s === 'selesai';
   }
@@ -451,6 +461,7 @@ export class Invoice {
 
   closeAdd(): void {
     this.showAddModal = false;
+    this.isSubmitting = false;
   }
 
   // FIX: tambah satu baris barang kosong (menggantikan input jumlah jenis)
@@ -606,11 +617,14 @@ export class Invoice {
 
   closeEdit(): void {
     this.showEditModal = false;
+    this.isSubmitting = false;
   }
 
   submitEdit(): void {
-    // Jika field terkunci (hanya update pembayaran), skip validasi barang
+    if (this.isSubmitting) return;
     if (!this.isFieldsLockedOnEdit() && !this.validateEdit()) return;
+
+    this.isSubmitting = true;
 
     if (this.isFieldsLockedOnEdit()) {
       this.api
@@ -621,6 +635,7 @@ export class Invoice {
         })
         .subscribe({
           next: () => {
+            this.isSubmitting = false;
             const proyek = this.project.find((p: any) => p.id_project == this.editForm.id_project)?.nama_project || 'Proyek';
             this.closeEdit();
             this.cdr.detectChanges();
@@ -636,13 +651,17 @@ export class Invoice {
               100
             );
           },
-          error: (err: any) => Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Pembaruan gagal.' })
+          error: (err: any) => {
+            this.isSubmitting = false;
+            Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Pembaruan gagal.' });
+          }
         });
       return;
     }
 
     this.api.updateInvoice({ ...this.editForm, barang: this.editBarang }).subscribe({
       next: () => {
+        this.isSubmitting = false;
         const proyek = this.project.find((p: any) => p.id_project == this.editForm.id_project)?.nama_project || 'Proyek';
         this.closeEdit();
         this.cdr.detectChanges();
@@ -658,7 +677,10 @@ export class Invoice {
           100
         );
       },
-      error: (err: any) => Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Pemesanan gagal diperbarui.' })
+      error: (err: any) => {
+        this.isSubmitting = false;
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Pemesanan gagal diperbarui.' });
+      }
     });
   }
 
@@ -788,12 +810,13 @@ export class Invoice {
   }
 
   submitRetur(): void {
+    if (this.isSubmitting) return;
+
     const selected = this.returBarang.filter((x: any) => x.checked);
     if (selected.length === 0) {
       Swal.fire({ icon: 'warning', title: 'Pilih Barang', text: 'Pilih minimal satu barang untuk diretur.' });
       return;
     }
-
     for (const item of selected) {
       if (item.jumlah_retur > item.jumlah) {
         Swal.fire({ icon: 'warning', title: 'Validasi', text: `Qty retur "${item.nama_barang}" melebihi jumlah.` });
@@ -805,6 +828,7 @@ export class Invoice {
       }
     }
 
+    this.isSubmitting = true;
     const proyek = this.returInvoice?.nama_project || 'Proyek';
     let done = 0;
 
@@ -814,7 +838,7 @@ export class Invoice {
           id_barang: item.id_barang,
           id_invoice: this.returInvoice.id_invoice,
           jumlah: item.jumlah_retur,
-          harga_jual: item.harga_jual, // harga jual
+          harga_jual: item.harga_jual,
           hpp: item.hpp,
           kondisi: item.kondisi
         })
@@ -822,6 +846,7 @@ export class Invoice {
           next: () => {
             done++;
             if (done === selected.length) {
+              this.isSubmitting = false;
               this.closeRetur();
               this.cdr.detectChanges();
               setTimeout(
@@ -838,6 +863,7 @@ export class Invoice {
             }
           },
           error: (err: any) => {
+            this.isSubmitting = false;
             Swal.fire({
               icon: 'error',
               title: 'Retur Gagal',
@@ -862,9 +888,11 @@ export class Invoice {
 
   closeSuratJalan(): void {
     this.showSuratJalanModal = false;
+    this.isSubmitting = false;
   }
 
   submitSuratJalan(): void {
+    if (this.isSubmitting) return;
     if (!this.suratJalanForm.no_surat_jalan?.trim()) {
       Swal.fire({ icon: 'warning', title: 'Validasi', text: 'No surat jalan wajib diisi.' });
       return;
@@ -874,11 +902,13 @@ export class Invoice {
       return;
     }
 
+    this.isSubmitting = true;
     const isUpdate = !!this.suratJalanData;
     const apiCall = isUpdate ? this.api.updateSuratJalan(this.suratJalanForm) : this.api.addSuratJalan(this.suratJalanForm);
 
     apiCall.subscribe({
       next: () => {
+        this.isSubmitting = false;
         this.suratJalanData = { ...this.suratJalanForm };
         this.closeSuratJalan();
         this.cdr.detectChanges();
@@ -894,7 +924,10 @@ export class Invoice {
           100
         );
       },
-      error: (err: any) => Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Surat jalan gagal disimpan.' })
+      error: (err: any) => {
+        this.isSubmitting = false;
+        Swal.fire({ icon: 'error', title: 'Gagal', text: err?.error?.message || 'Surat jalan gagal disimpan.' });
+      }
     });
   }
 

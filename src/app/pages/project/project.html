@@ -231,9 +231,9 @@
         <div class="modal-footer">
           <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
 
-          <button type="submit" class="btn-modal-save">
-            <mat-icon>save</mat-icon>
-            Simpan Proyek
+          <button type="submit" class="btn-modal-save" [disabled]="isSubmitting">
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+            {{ isSubmitting ? 'Menyimpan...' : 'Simpan Proyek' }}
           </button>
         </div>
       </form>
@@ -327,9 +327,9 @@
         <div class="modal-footer">
           <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
 
-          <button type="submit" class="btn-modal-save">
-            <mat-icon>save</mat-icon>
-            Simpan Perubahan
+          <button type="submit" class="btn-modal-save" [disabled]="isSubmitting">
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+            {{ isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan' }}
           </button>
         </div>
       </form>

@@ -452,9 +452,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
-        <button type="button" class="btn-modal-save" (click)="submitEdit()">
-          <mat-icon>save</mat-icon>
-          Simpan
+        <button type="button" class="btn-modal-save" (click)="submitEdit()" [disabled]="isSubmitting">
+          <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+          {{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}
         </button>
       </div>
     </div>
@@ -704,9 +704,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" (click)="closeRetur()">Batal</button>
-        <button type="button" class="btn-modal-save" (click)="submitRetur()">
-          <mat-icon>assignment_return</mat-icon>
-          Simpan Retur
+        <button type="button" class="btn-modal-save" (click)="submitRetur()" [disabled]="isSubmitting">
+          <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'assignment_return' }}</mat-icon>
+          {{ isSubmitting ? 'Menyimpan...' : 'Simpan Retur' }}
         </button>
       </div>
     </div>
@@ -755,9 +755,9 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn-modal-cancel" (click)="closeStatus()">Batal</button>
-        <button type="button" class="btn-modal-save" (click)="submitStatus()">
-          <mat-icon>task_alt</mat-icon>
-          Simpan Perubahan
+        <button type="button" class="btn-modal-save" (click)="submitStatus()" [disabled]="isSubmitting">
+          <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'task_alt' }}</mat-icon>
+          {{ isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan' }}
         </button>
       </div>
     </div>
@@ -807,9 +807,9 @@
         </div>
         <div class="d-flex gap-2">
           <button type="button" class="btn-modal-cancel" (click)="closeSuratJalan()">Batal</button>
-          <button type="button" class="btn-modal-save" [disabled]="isSuratJalanReadOnly()" (click)="submitSuratJalan()">
-            <mat-icon>save</mat-icon>
-            {{ suratJalanData ? 'Simpan Perubahan' : 'Simpan' }}
+          <button type="button" class="btn-modal-save" [disabled]="isSuratJalanReadOnly() || isSubmitting" (click)="submitSuratJalan()">
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+            {{ isSubmitting ? 'Menyimpan...' : (suratJalanData ? 'Simpan Perubahan' : 'Simpan') }}
           </button>
         </div>
       </div>

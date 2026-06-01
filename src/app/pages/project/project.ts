@@ -34,7 +34,7 @@ export class Project {
   isLoading = false;
   pageSize = 10;
   pageIndex = 0;
-
+  isSubmitting = false;
   searchKeyword = '';
   searchFocused = false;
 
@@ -239,21 +239,24 @@ export class Project {
 
   closeAdd(): void {
     this.showAddModal = false;
+    this.isSubmitting = false;
   }
 
   submitAdd(): void {
+    if (this.isSubmitting) return;
     if (this.addProjectForm.invalid) {
       this.addProjectForm.markAllAsTouched();
       return;
     }
+
+    this.isSubmitting = true;
+
     this.api.addProject(this.addProjectForm.value).subscribe({
       next: () => {
+        this.isSubmitting = false;
         const nama = this.addProjectForm.value.nama_project;
-
         this.closeAdd();
-
         this.cdr.detectChanges();
-
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -261,19 +264,15 @@ export class Project {
             text: `Proyek "${nama}" berhasil ditambahkan.`,
             timer: 2500,
             showConfirmButton: false
-          }).then(() => {
-            this.loadProject(false);
-          });
+          }).then(() => this.loadProject(false));
         }, 100);
       },
-
       error: (err: any) => {
-        const msg = err?.error?.message || err?.message || 'Proyek gagal ditambahkan.';
-
+        this.isSubmitting = false;
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: msg
+          text: err?.error?.message || err?.message || 'Proyek gagal ditambahkan.'
         });
       }
     });
@@ -297,22 +296,24 @@ export class Project {
 
   closeEdit(): void {
     this.showEditModal = false;
+    this.isSubmitting = false;
   }
 
   submitEdit(): void {
+    if (this.isSubmitting) return;
     if (this.editProjectForm.invalid) {
       this.editProjectForm.markAllAsTouched();
       return;
     }
 
+    this.isSubmitting = true;
+
     this.api.updateProject(this.editProjectForm.value).subscribe({
       next: () => {
+        this.isSubmitting = false;
         const nama = this.editProjectForm.value.nama_project;
-
         this.closeEdit();
-
         this.cdr.detectChanges();
-
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -320,19 +321,15 @@ export class Project {
             text: `Proyek "${nama}" berhasil diperbarui.`,
             timer: 3000,
             showConfirmButton: false
-          }).then(() => {
-            this.loadProject(false);
-          });
+          }).then(() => this.loadProject(false));
         }, 100);
       },
-
       error: (err: any) => {
-        const msg = err?.error?.message || err?.message || 'Proyek gagal diperbarui.';
-
+        this.isSubmitting = false;
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: msg
+          text: err?.error?.message || err?.message || 'Proyek gagal diperbarui.'
         });
       }
     });

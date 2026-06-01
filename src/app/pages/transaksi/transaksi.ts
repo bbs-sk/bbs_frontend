@@ -31,58 +31,30 @@ export class Transaksi implements OnInit {
     private fb: FormBuilder
   ) {}
 
-  // =====================================================
-  // DATA
-  // =====================================================
-
   barangMasuk: any[] = [];
   barangKeluar: any[] = [];
   retur: any[] = [];
   barangList: any[] = [];
   selectedView: string = 'all';
 
-  // =====================================================
-  // FILTERED
-  // =====================================================
-
   filteredBarangMasuk: any[] = [];
   filteredBarangKeluar: any[] = [];
   filteredRetur: any[] = [];
-
-  // =====================================================
-  // PAGINATED
-  // =====================================================
 
   paginatedBarangMasuk: any[] = [];
   paginatedBarangKeluar: any[] = [];
   paginatedRetur: any[] = [];
 
-  // =====================================================
-  // STATE
-  // =====================================================
-
   isLoading = false;
 
   showAddMasukModal = false;
 
-  // =====================================================
-  // SEARCH
-  // =====================================================
-
   searchMasukKeyword = '';
-
   searchKeluarKeyword = '';
-
   searchReturKeyword = '';
-
   searchMasukFocused = false;
-
   searchKeluarFocused = false;
-
   searchReturFocused = false;
-  // =====================================================
-  // PAGINATION
-  // =====================================================
 
   pageSizeMasuk = 10;
   pageIndexMasuk = 0;
@@ -93,21 +65,11 @@ export class Transaksi implements OnInit {
   pageSizeRetur = 10;
   pageIndexRetur = 0;
 
-  // =====================================================
-  // FORM
-  // =====================================================
-
   hargaBeliDisplay = '';
-
   addMasukForm!: FormGroup;
-
   userLogin: any = null;
-
   isGudang = false;
-
-  // =====================================================
-  // GETTER
-  // =====================================================
+  isSubmitting = false;
 
   get totalPagesMasuk(): number {
     return Math.ceil(this.filteredBarangMasuk.length / this.pageSizeMasuk) || 1;
@@ -506,6 +468,7 @@ export class Transaksi implements OnInit {
 
   closeAddMasuk(): void {
     this.showAddMasukModal = false;
+    this.isSubmitting = false;
   }
 
   // =====================================================
@@ -513,21 +476,21 @@ export class Transaksi implements OnInit {
   // =====================================================
 
   submitAddMasuk(): void {
+    if (this.isSubmitting) return;
     if (this.addMasukForm.invalid) {
       this.addMasukForm.markAllAsTouched();
       return;
     }
 
+    this.isSubmitting = true;
+
     this.api.addBrgMasuk(this.addMasukForm.value).subscribe({
       next: () => {
+        this.isSubmitting = false;
         const barang = this.barangList.find((b: any) => b.id_barang == this.addMasukForm.value.id_barang);
-
         const namaBarang = barang?.nama_barang || 'Barang';
-
         this.closeAddMasuk();
-
         this.cdr.detectChanges();
-
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -535,18 +498,15 @@ export class Transaksi implements OnInit {
             text: `Barang "${namaBarang}" berhasil ditambahkan.`,
             timer: 2500,
             showConfirmButton: false
-          }).then(() => {
-            this.loadData(false);
-          });
+          }).then(() => this.loadData(false));
         }, 100);
       },
       error: (err: any) => {
-        const msg = err?.error?.message || err?.message || 'Barang masuk gagal ditambahkan.';
-
+        this.isSubmitting = false;
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: msg
+          text: err?.error?.message || err?.message || 'Barang masuk gagal ditambahkan.'
         });
       }
     });

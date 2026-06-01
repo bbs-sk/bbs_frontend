@@ -277,9 +277,9 @@
         <div class="modal-footer">
           <button type="button" class="btn-modal-cancel" (click)="closeAdd()">Batal</button>
 
-          <button type="submit" class="btn-modal-save">
-            <mat-icon>save</mat-icon>
-            Simpan Barang
+          <button type="submit" class="btn-modal-save" [disabled]="isSubmitting">
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+            {{ isSubmitting ? 'Menyimpan...' : 'Simpan Barang' }}
           </button>
         </div>
       </form>
@@ -421,16 +421,16 @@
               />
             </div>
 
-            <p class="form-hint">HPP dihitung otomatis dari transaksi barang masuk</p>
+            <p class="form-hint" style="font-size: 11px; font-style: italic">HPP dihitung otomatis dari transaksi barang masuk</p>
           </div>
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
 
-          <button type="submit" class="btn-modal-save">
-            <mat-icon>save</mat-icon>
-            Simpan Perubahan
+          <button type="submit" class="btn-modal-save" [disabled]="isSubmitting">
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+            {{ isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan' }}
           </button>
         </div>
       </form>
