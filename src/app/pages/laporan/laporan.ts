@@ -229,17 +229,16 @@ export class Laporan implements OnInit, OnDestroy {
 
   applyFilter(): void {
     const start: Date | null = this.filterForm.get('startDate')?.value;
-
     const end: Date | null = this.filterForm.get('endDate')?.value;
 
     if (!start || !end) return;
 
     const startStr = this.localDateToString(start);
-
     const endStr = this.localDateToString(end);
 
     this.filteredTransactions = this.allTransactions.filter((t) => {
-      return t.date >= startStr && t.date <= endStr;
+      const txDate = t.date.split(' ')[0]; // ← ambil "YYYY-MM-DD" saja
+      return txDate >= startStr && txDate <= endStr;
     });
 
     this.recalcSummary();
