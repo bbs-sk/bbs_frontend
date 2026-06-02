@@ -41,6 +41,11 @@
       </div>
     </div>
   </div>
+
+  <!-- ===================================================== -->
+  <!-- BARANG Masuk -->
+  <!-- ===================================================== -->
+
   <div class="tbl-card mb-4" *ngIf="isView('masuk')">
     <div class="card-header">
       <div class="card-title">
@@ -135,9 +140,9 @@
               </td>
 
               <td class="date-cell">
-                <span class="date-main">{{ m.datetime | date:'dd MMM yyyy':'':'id' }}</span>
+                <span class="date-main">{{ m.datetime | date:'dd MMM yyyy' }}</span>
 
-                <span class="date-time">{{ m.datetime | date:'HH:mm':'':'id' }}</span>
+                <span class="date-time">{{ m.datetime | date:'HH:mm' }}</span>
               </td>
 
               <td *ngIf="isGudang">
@@ -278,9 +283,9 @@
               </td>
 
               <td class="date-cell">
-                <span class="date-main">{{ k.datetime | date:'dd MMM yyyy':'':'id' }}</span>
+                <span class="date-main">{{ k.datetime | date:'dd MMM yyyy' }}</span>
 
-                <span class="date-time">{{ k.datetime | date:'HH:mm':'':'id' }}</span>
+                <span class="date-time">{{ k.datetime | date:'HH:mm'}}</span>
               </td>
             </tr>
 
@@ -418,9 +423,9 @@
               </td>
 
               <td class="date-cell">
-                <span class="date-main">{{ r.datetime | date:'dd MMM yyyy':'':'id' }}</span>
+                <span class="date-main">{{ r.datetime | date:'dd MMM yyyy' }}</span>
 
-                <span class="date-time">{{ r.datetime | date:'HH:mm':'':'id' }}</span>
+                <span class="date-time">{{ r.datetime | date:'HH:mm' }}</span>
               </td>
             </tr>
 
