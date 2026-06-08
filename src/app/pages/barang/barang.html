@@ -108,7 +108,7 @@
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button
-                    *ngIf="isRole"
+                    *ngIf="isRole && !b.has_barang_keluar"
                     type="button"
                     class="btn-action btn-del"
                     title="Hapus"
