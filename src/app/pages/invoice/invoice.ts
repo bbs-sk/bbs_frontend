@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import { ApiService } from 'src/app/shared/services/api.service';
 import { NgSelectModule } from '@ng-select/ng-select';
 import localeId from '@angular/common/locales/id';
-import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, TextRun, AlignmentType, BorderStyle } from 'docx';
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, TextRun, AlignmentType, BorderStyle, ShadingType } from 'docx';
 import { saveAs } from 'file-saver';
 
 registerLocaleData(localeId);
@@ -1043,6 +1043,576 @@ export class Invoice {
       ]
     });
     Packer.toBlob(doc).then((blob) => saveAs(blob, `Surat-Jalan-${this.suratJalanData.no_surat_jalan}.docx`));
+  }
+
+  downloadInvoice(): void {
+    if (!this.detailInvoice) return;
+
+    const tanggal = new Date(this.detailInvoice.created_at).toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    const borderCell = { style: BorderStyle.SINGLE, size: 1, color: 'CCCCCC' };
+    const cellBorders = {
+      top: borderCell,
+      bottom: borderCell,
+      left: borderCell,
+      right: borderCell
+    };
+
+    const headerShading = { fill: '1e3a5f', type: ShadingType.CLEAR };
+    const altRowShading = { fill: 'f1f5f9', type: ShadingType.CLEAR };
+
+    // ── Baris item barang ──
+    const itemRows = this.detailBarang.map(
+      (item: any, index: number) =>
+        new TableRow({
+          children: [
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 500, type: WidthType.DXA },
+              shading: index % 2 !== 0 ? altRowShading : undefined,
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({ text: String(index + 1), size: 20, font: 'Arial' })]
+                })
+              ]
+            }),
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 4200, type: WidthType.DXA },
+              shading: index % 2 !== 0 ? altRowShading : undefined,
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  children: [new TextRun({ text: item.nama_barang || '—', size: 20, font: 'Arial' })]
+                })
+              ]
+            }),
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 1000, type: WidthType.DXA },
+              shading: index % 2 !== 0 ? altRowShading : undefined,
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({ text: `${item.jumlah} ${item.satuan}`, size: 20, font: 'Arial' })]
+                })
+              ]
+            }),
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 2000, type: WidthType.DXA },
+              shading: index % 2 !== 0 ? altRowShading : undefined,
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.RIGHT,
+                  children: [
+                    new TextRun({
+                      text: item.harga_jual ? 'Rp ' + Number(item.harga_jual).toLocaleString('id-ID') : '—',
+                      size: 20,
+                      font: 'Arial'
+                    })
+                  ]
+                })
+              ]
+            }),
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 2300, type: WidthType.DXA },
+              shading: index % 2 !== 0 ? altRowShading : undefined,
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.RIGHT,
+                  children: [
+                    new TextRun({
+                      text:
+                        item.harga_jual && item.jumlah
+                          ? 'Rp ' + (Number(item.harga_jual) * Number(item.jumlah)).toLocaleString('id-ID')
+                          : '—',
+                      size: 20,
+                      font: 'Arial'
+                    })
+                  ]
+                })
+              ]
+            })
+          ]
+        })
+    );
+
+    // ── Baris retur (jika ada) ──
+    const returRows = this.detailRetur.map(
+      (r: any, index: number) =>
+        new TableRow({
+          children: [
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 500, type: WidthType.DXA },
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({ text: String(index + 1), size: 20, font: 'Arial' })]
+                })
+              ]
+            }),
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 4200, type: WidthType.DXA },
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  children: [new TextRun({ text: r.nama_barang || '—', size: 20, font: 'Arial' })]
+                })
+              ]
+            }),
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 1500, type: WidthType.DXA },
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({ text: `${r.jumlah} ${r.satuan}`, size: 20, font: 'Arial' })]
+                })
+              ]
+            }),
+            new TableCell({
+              borders: cellBorders,
+              width: { size: 3800, type: WidthType.DXA },
+              margins: { top: 80, bottom: 80, left: 120, right: 120 },
+              children: [
+                new Paragraph({
+                  children: [new TextRun({ text: r.kondisi || '—', size: 20, font: 'Arial' })]
+                })
+              ]
+            })
+          ]
+        })
+    );
+
+    const doc = new Document({
+      styles: {
+        default: {
+          document: { run: { font: 'Arial', size: 22 } }
+        }
+      },
+      sections: [
+        {
+          properties: {
+            page: {
+              size: { width: 11906, height: 16838 },
+              margin: { top: 1134, right: 1134, bottom: 1134, left: 1134 }
+            }
+          },
+          children: [
+            // ── Header: Nama Perusahaan ──
+            // ── Header: Nama Perusahaan ──
+            new Paragraph({
+              children: [new TextRun({ text: 'BINTANG BERJAYA SEJAHTERA', bold: true, size: 40, color: '1e3a5f', font: 'Arial' })],
+              spacing: { after: 40 }
+            }),
+            new Paragraph({
+              children: [new TextRun({ text: 'MENJUAL BAHAN-BAHAN BANGUNAN', size: 22, bold: true, color: '374151', font: 'Arial' })],
+              spacing: { after: 20 }
+            }),
+            new Paragraph({
+              children: [new TextRun({ text: 'PAVING BLOK, LEVERANSIR DAN KUSEN', size: 20, color: '374151', font: 'Arial' })],
+              spacing: { after: 20 }
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: 'DUSUN XIX PASAR IV NO. 16 KLAMBIR 5 KEBUN - HAMPARAN PERAK',
+                  size: 19,
+                  color: '6b7280',
+                  font: 'Arial'
+                })
+              ],
+              spacing: { after: 20 }
+            }),
+            new Paragraph({
+              children: [new TextRun({ text: 'HP. 0811 6081 974  -  0813 6194 0033', size: 19, color: '6b7280', font: 'Arial' })],
+              spacing: { after: 20 }
+            }),
+            new Paragraph({
+              border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: '1e3a5f', space: 1 } },
+              spacing: { after: 280 }
+            }),
+
+            // ── Judul Invoice ──
+            new Paragraph({
+              alignment: AlignmentType.CENTER,
+              children: [new TextRun({ text: 'INVOICE PEMESANAN BARANG', bold: true, size: 32, color: '1e3a5f', font: 'Arial' })],
+              spacing: { after: 280 }
+            }),
+
+            // ── Info Invoice (2 kolom pakai tab stop) ──
+            new Table({
+              width: { size: 9638, type: WidthType.DXA },
+              columnWidths: [4819, 4819],
+              borders: {
+                top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                insideHorizontal: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                insideVertical: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }
+              },
+              rows: [
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      width: { size: 4819, type: WidthType.DXA },
+                      margins: { top: 60, bottom: 60, left: 0, right: 0 },
+                      children: [
+                        new Paragraph({ children: [new TextRun({ text: 'Proyek', size: 20, color: '6b7280', font: 'Arial' })] }),
+                        new Paragraph({
+                          children: [new TextRun({ text: this.detailInvoice.nama_project || '—', size: 22, bold: true, font: 'Arial' })],
+                          spacing: { after: 80 }
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      width: { size: 4819, type: WidthType.DXA },
+                      margins: { top: 60, bottom: 60, left: 0, right: 0 },
+                      children: [
+                        new Paragraph({ children: [new TextRun({ text: 'Tanggal', size: 20, color: '6b7280', font: 'Arial' })] }),
+                        new Paragraph({
+                          children: [new TextRun({ text: tanggal, size: 22, bold: true, font: 'Arial' })],
+                          spacing: { after: 80 }
+                        })
+                      ]
+                    })
+                  ]
+                }),
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      width: { size: 4819, type: WidthType.DXA },
+                      margins: { top: 60, bottom: 60, left: 0, right: 0 },
+                      children: [
+                        new Paragraph({ children: [new TextRun({ text: 'Pemesan', size: 20, color: '6b7280', font: 'Arial' })] }),
+                        new Paragraph({
+                          children: [new TextRun({ text: this.detailInvoice.name || '—', size: 22, bold: true, font: 'Arial' })],
+                          spacing: { after: 80 }
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      width: { size: 4819, type: WidthType.DXA },
+                      margins: { top: 60, bottom: 60, left: 0, right: 0 },
+                      children: [
+                        new Paragraph({ children: [new TextRun({ text: 'Status', size: 20, color: '6b7280', font: 'Arial' })] }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: (this.detailInvoice.status || '—').charAt(0).toUpperCase() + (this.detailInvoice.status || '').slice(1),
+                              size: 22,
+                              bold: true,
+                              font: 'Arial'
+                            })
+                          ],
+                          spacing: { after: 80 }
+                        })
+                      ]
+                    })
+                  ]
+                }),
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      width: { size: 4819, type: WidthType.DXA },
+                      margins: { top: 60, bottom: 60, left: 0, right: 0 },
+                      children: [
+                        new Paragraph({ children: [new TextRun({ text: 'Pembayaran', size: 20, color: '6b7280', font: 'Arial' })] }),
+                        new Paragraph({
+                          children: [
+                            new TextRun({
+                              text: this.detailInvoice.pembayaran === 'lunas' ? 'Lunas' : 'Belum Lunas',
+                              size: 22,
+                              bold: true,
+                              font: 'Arial'
+                            })
+                          ],
+                          spacing: { after: 80 }
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      width: { size: 4819, type: WidthType.DXA },
+                      margins: { top: 60, bottom: 60, left: 0, right: 0 },
+                      children: [
+                        new Paragraph({ children: [new TextRun({ text: 'Detail / Catatan', size: 20, color: '6b7280', font: 'Arial' })] }),
+                        new Paragraph({
+                          children: [new TextRun({ text: this.detailInvoice.detail || '—', size: 22, bold: true, font: 'Arial' })],
+                          spacing: { after: 80 }
+                        })
+                      ]
+                    })
+                  ]
+                })
+              ]
+            }),
+
+            new Paragraph({ spacing: { after: 280 } }),
+
+            // ── Tabel Barang ──
+            new Paragraph({
+              children: [new TextRun({ text: 'Daftar Barang', bold: true, size: 24, color: '1e3a5f', font: 'Arial' })],
+              spacing: { after: 120 }
+            }),
+            new Table({
+              width: { size: 10000, type: WidthType.DXA },
+              columnWidths: [500, 4200, 1000, 2000, 2300],
+              rows: [
+                // Header row
+                new TableRow({
+                  tableHeader: true,
+                  children: [
+                    new TableCell({
+                      borders: cellBorders,
+                      shading: headerShading,
+                      width: { size: 500, type: WidthType.DXA },
+                      margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                      children: [
+                        new Paragraph({
+                          alignment: AlignmentType.CENTER,
+                          children: [new TextRun({ text: 'No', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      borders: cellBorders,
+                      shading: headerShading,
+                      width: { size: 4200, type: WidthType.DXA },
+                      margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                      children: [
+                        new Paragraph({
+                          children: [new TextRun({ text: 'Nama Barang', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      borders: cellBorders,
+                      shading: headerShading,
+                      width: { size: 1000, type: WidthType.DXA },
+                      margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                      children: [
+                        new Paragraph({
+                          alignment: AlignmentType.CENTER,
+                          children: [new TextRun({ text: 'Jumlah', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      borders: cellBorders,
+                      shading: headerShading,
+                      width: { size: 2000, type: WidthType.DXA },
+                      margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                      children: [
+                        new Paragraph({
+                          alignment: AlignmentType.RIGHT,
+                          children: [new TextRun({ text: 'Harga Satuan', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      borders: cellBorders,
+                      shading: headerShading,
+                      width: { size: 2300, type: WidthType.DXA },
+                      margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                      children: [
+                        new Paragraph({
+                          alignment: AlignmentType.RIGHT,
+                          children: [new TextRun({ text: 'Subtotal', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                        })
+                      ]
+                    })
+                  ]
+                }),
+                ...itemRows,
+                // Row total
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      borders: cellBorders,
+                      columnSpan: 4,
+                      shading: { fill: 'e8f0fe', type: ShadingType.CLEAR },
+                      margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                      children: [
+                        new Paragraph({
+                          alignment: AlignmentType.RIGHT,
+                          children: [new TextRun({ text: 'TOTAL', bold: true, size: 22, font: 'Arial' })]
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      borders: cellBorders,
+                      shading: { fill: 'e8f0fe', type: ShadingType.CLEAR },
+                      width: { size: 2300, type: WidthType.DXA },
+                      margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                      children: [
+                        new Paragraph({
+                          alignment: AlignmentType.RIGHT,
+                          children: [
+                            new TextRun({
+                              text: this.detailInvoice.total_harga
+                                ? 'Rp ' + Number(this.detailInvoice.total_harga).toLocaleString('id-ID')
+                                : '—',
+                              bold: true,
+                              size: 22,
+                              font: 'Arial'
+                            })
+                          ]
+                        })
+                      ]
+                    })
+                  ]
+                })
+              ]
+            }),
+
+            // ── Tabel Retur (jika ada) ──
+            ...(this.detailRetur.length > 0
+              ? [
+                  new Paragraph({ spacing: { after: 280 } }),
+                  new Paragraph({
+                    children: [new TextRun({ text: 'Retur Barang', bold: true, size: 24, color: '92400e', font: 'Arial' })],
+                    spacing: { after: 120 }
+                  }),
+                  new Table({
+                    width: { size: 10000, type: WidthType.DXA },
+                    columnWidths: [500, 4200, 1500, 3800],
+                    rows: [
+                      new TableRow({
+                        tableHeader: true,
+                        children: [
+                          new TableCell({
+                            borders: cellBorders,
+                            shading: { fill: '92400e', type: ShadingType.CLEAR },
+                            width: { size: 500, type: WidthType.DXA },
+                            margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                            children: [
+                              new Paragraph({
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: 'No', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                              })
+                            ]
+                          }),
+                          new TableCell({
+                            borders: cellBorders,
+                            shading: { fill: '92400e', type: ShadingType.CLEAR },
+                            width: { size: 4200, type: WidthType.DXA },
+                            margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                            children: [
+                              new Paragraph({
+                                children: [new TextRun({ text: 'Nama Barang', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                              })
+                            ]
+                          }),
+                          new TableCell({
+                            borders: cellBorders,
+                            shading: { fill: '92400e', type: ShadingType.CLEAR },
+                            width: { size: 1500, type: WidthType.DXA },
+                            margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                            children: [
+                              new Paragraph({
+                                alignment: AlignmentType.CENTER,
+                                children: [new TextRun({ text: 'Qty Retur', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                              })
+                            ]
+                          }),
+                          new TableCell({
+                            borders: cellBorders,
+                            shading: { fill: '92400e', type: ShadingType.CLEAR },
+                            width: { size: 3800, type: WidthType.DXA },
+                            margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                            children: [
+                              new Paragraph({
+                                children: [new TextRun({ text: 'Kondisi', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                              })
+                            ]
+                          })
+                        ]
+                      }),
+                      ...returRows
+                    ]
+                  })
+                ]
+              : []),
+
+            // ── Footer tanda tangan ──
+            new Paragraph({ spacing: { after: 560 } }),
+            new Paragraph({
+              border: { top: { style: BorderStyle.SINGLE, size: 6, color: 'e5e7eb', space: 1 } },
+              spacing: { after: 400 }
+            }),
+            new Table({
+              width: { size: 9638, type: WidthType.DXA },
+              columnWidths: [4819, 4819],
+              borders: {
+                top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                insideHorizontal: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                insideVertical: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }
+              },
+              rows: [
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      width: { size: 4819, type: WidthType.DXA },
+                      margins: { top: 0, bottom: 0, left: 0, right: 0 },
+                      children: [
+                        new Paragraph({
+                          alignment: AlignmentType.CENTER,
+                          children: [new TextRun({ text: 'Hormat Kami,', size: 20, font: 'Arial' })]
+                        }),
+                        new Paragraph({ spacing: { after: 900 } }),
+                        new Paragraph({
+                          alignment: AlignmentType.CENTER,
+                          children: [new TextRun({ text: '(                              )', size: 20, font: 'Arial' })]
+                        })
+                      ]
+                    }),
+                    new TableCell({
+                      width: { size: 4819, type: WidthType.DXA },
+                      margins: { top: 0, bottom: 0, left: 0, right: 0 },
+                      children: [
+                        new Paragraph({
+                          alignment: AlignmentType.CENTER,
+                          children: [new TextRun({ text: 'Pemesan,', size: 20, font: 'Arial' })]
+                        }),
+                        new Paragraph({ spacing: { after: 900 } }),
+                        new Paragraph({
+                          alignment: AlignmentType.CENTER,
+                          children: [new TextRun({ text: `( ${this.detailInvoice.name || ''} )`, size: 20, font: 'Arial' })]
+                        })
+                      ]
+                    })
+                  ]
+                })
+              ]
+            })
+          ]
+        }
+      ]
+    });
+
+    Packer.toBlob(doc).then((blob) => {
+      const filename = `Invoice-${this.detailInvoice.nama_project?.replace(/\s+/g, '-') || 'Pemesanan'}-${tanggal.replace(/\s/g, '-')}.docx`;
+      saveAs(blob, filename);
+    });
   }
 
   // ─────────────────────────────────────────────

@@ -246,6 +246,39 @@
   }
 }
 
+.btn-download-invoice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: #d1fae5;
+  color: #065f46;
+  border: 1.5px solid #6ee7b7;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: #a7f3d0;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    background: #6ee7b7;
+  }
+}
+
 // ─────────────────────────────────────────────
 // Retur (modal retur)
 // ─────────────────────────────────────────────

@@ -635,7 +635,15 @@
 
       <!-- Footer: hanya tombol tutup -->
       <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" (click)="closeDetail()">Tutup</button>
+        <button
+          type="button"
+          class="btn-download-invoice"
+          *ngIf="detailInvoice?.status === 'dikirim' || detailInvoice?.status === 'selesai'"
+          (click)="downloadInvoice()"
+        >
+          <mat-icon>download</mat-icon>
+          Unduh Invoice
+        </button>
       </div>
     </div>
   </div>
