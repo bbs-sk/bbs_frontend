@@ -312,7 +312,12 @@
                 <span class="text-danger">*</span>
               </label>
 
-              <input class="form-control" formControlName="kode_barang" placeholder="Masukkan kode barang" />
+              <input
+                class="form-control"
+                formControlName="kode_barang"
+                [attr.disabled]="!isRole ? true : null"
+                placeholder="Masukkan kode barang"
+              />
 
               <div
                 *ngIf="
@@ -334,7 +339,12 @@
                 <span class="text-danger">*</span>
               </label>
 
-              <input class="form-control" formControlName="satuan" placeholder="Masukkan satuan barang" />
+              <input
+                class="form-control"
+                formControlName="satuan"
+                [attr.disabled]="!isRole ? true : null"
+                placeholder="Masukkan satuan barang"
+              />
 
               <div
                 *ngIf="
@@ -357,7 +367,12 @@
               <span class="text-danger">*</span>
             </label>
 
-            <input class="form-control" formControlName="nama_barang" placeholder="Masukkan nama barang" />
+            <input
+              class="form-control"
+              formControlName="nama_barang"
+              [attr.disabled]="!isRole ? true : null"
+              placeholder="Masukkan nama barang"
+            />
 
             <div
               *ngIf="
