@@ -96,7 +96,7 @@ export const NavigationItems: NavigationItem[] = [
       },
       {
         id: 'User',
-        title: 'User',
+        title: 'Daftar Pengguna',
         type: 'item',
         classes: 'nav-item',
         url: '/daftar-pengguna',
