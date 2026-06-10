@@ -194,7 +194,15 @@ export class Barang {
     });
 
     this.hargaJualDisplayEdit = b.harga_jual ? Number(b.harga_jual).toLocaleString('id-ID') : '';
-
+    if (!this.isRole) {
+      this.editBarangForm.get('kode_barang')?.disable();
+      this.editBarangForm.get('nama_barang')?.disable();
+      this.editBarangForm.get('satuan')?.disable();
+    } else {
+      this.editBarangForm.get('kode_barang')?.enable();
+      this.editBarangForm.get('nama_barang')?.enable();
+      this.editBarangForm.get('satuan')?.enable();
+    }
     this.showEditModal = true;
   }
 
