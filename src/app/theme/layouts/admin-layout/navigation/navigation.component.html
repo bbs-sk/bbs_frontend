@@ -1,13 +1,15 @@
 <nav>
   <div class="navbar-wrapper">
-
     <div class="m-header">
       <a href="javascript:" class="b-brand">
-        <img
-          src="assets/images/logo-dark.svg"
-          alt="theme-logo"
-          class="logo logo-dark logo-lg"
-        />
+        <div class="brand-logo-wrap">
+          <img 
+            src="assets/images/Logo_BBS.png" 
+            alt="BBS Logo" 
+            class="logo logo-dark logo-lg brand-img" 
+          />
+          <span class="brand-title">BB<span class="brand-title-accent">S</span></span>
+        </div>
       </a>
     </div>
 
@@ -16,8 +18,6 @@
       (NavCollapsedMob)="navCollapseMob()"
       (SubmenuCollapse)="navSubmenuCollapse()"
       class="scroll-div w-100 compact"
-    >
-    </app-nav-content>
-
+    ></app-nav-content>
   </div>
 </nav>
