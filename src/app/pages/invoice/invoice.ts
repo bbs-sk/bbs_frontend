@@ -346,7 +346,7 @@ export class Invoice {
 
   canDelete(invoice: any): boolean {
     const s = invoice.status;
-    if (this.role === 'Admin Kantor') return s !== 'dikirim' && s !== 'selesai';
+    if (this.role === 'Admin Kantor') return this.isOwner(invoice) && s !== 'dikirim' && s !== 'selesai';
     if (this.role === 'Lapangan') return this.isOwner(invoice) && s === 'menunggu';
     if (this.role === 'Gudang') return this.isOwner(invoice);
     return false;
