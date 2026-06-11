@@ -777,8 +777,10 @@
     </div>
   </div>
 
+  <div class="modal-backdrop-custom modal-backdrop-stacked" *ngIf="showSuratJalanModal" (click)="closeSuratJalan()"></div>
+
   <!-- ═══════════ MODAL SURAT JALAN ═══════════ -->
-  <div class="modal-custom" *ngIf="showSuratJalanModal">
+  <div class="modal-custom modal-surat-jalan" *ngIf="showSuratJalanModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-title-wrap">
