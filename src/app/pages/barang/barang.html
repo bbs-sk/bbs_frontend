@@ -97,14 +97,7 @@
               </td>
               <td *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'">
                 <div class="action-btns">
-                  <button
-                    *ngIf="userLogin?.role === 'Gudang'"
-                    type="button"
-                    class="btn-action btn-edit"
-                    title="Edit"
-                    (click)="onEdit(b)"
-                    aria-label="Edit barang"
-                  >
+                  <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(b)" aria-label="Edit barang">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <!-- <button
