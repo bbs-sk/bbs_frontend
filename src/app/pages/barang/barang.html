@@ -66,7 +66,7 @@
               <th>Satuan</th>
               <th class="col-num">Jumlah</th>
               <th class="col-num">Harga Jual</th>
-              <th class="col-num" *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'">HPP</th>
+              <th class="col-num" *ngIf="userLogin?.role === 'Admin Kantor'">HPP</th>
               <th>Tanggal</th>
               <th class="col-action" *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'">Aksi</th>
             </tr>
@@ -95,10 +95,10 @@
                 <span class="date-main">{{ b.datetime | date:'dd MMM yyyy' }}</span>
                 <span class="date-time">{{ b.datetime | date:'HH:mm' }}</span>
               </td>
-              <td>
+              <td *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'">
                 <div class="action-btns">
                   <button
-                    *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'"
+                    *ngIf="userLogin?.role === 'Gudang'"
                     type="button"
                     class="btn-action btn-edit"
                     title="Edit"
@@ -107,8 +107,18 @@
                   >
                     <mat-icon>edit</mat-icon>
                   </button>
-                  <button
+                  <!-- <button
                     *ngIf="isRole && !b.has_barang_keluar"
+                    type="button"
+                    class="btn-action btn-del"
+                    title="Hapus"
+                    (click)="onDelete(b)"
+                    aria-label="Hapus barang"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                  </button> -->
+                  <button
+                    *ngIf="isRole"
                     type="button"
                     class="btn-action btn-del"
                     title="Hapus"

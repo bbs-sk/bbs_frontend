@@ -56,18 +56,6 @@ const routes: Routes = [
         path: 'laporan-penjualan',
         canActivate: [authGuard, roleGuard(['Admin Kantor'])],
         loadComponent: () => import('./pages/laporan/laporan').then((c) => c.Laporan)
-      },
-      {
-        path: 'typography',
-        loadComponent: () => import('./demo/component/basic-component/typography/typography.component').then((c) => c.TypographyComponent)
-      },
-      {
-        path: 'color',
-        loadComponent: () => import('./demo/component/basic-component/color/color.component').then((c) => c.ColorComponent)
-      },
-      {
-        path: 'sample-page',
-        loadComponent: () => import('./demo/others/sample-page/sample-page.component').then((c) => c.SamplePageComponent)
       }
     ]
   },
@@ -78,11 +66,6 @@ const routes: Routes = [
       {
         path: 'login',
         loadComponent: () => import('./pages/login/login').then((c) => c.Login)
-      },
-      {
-        path: 'register',
-        loadComponent: () =>
-          import('./demo/pages/authentication/auth-register/auth-register.component').then((c) => c.AuthRegisterComponent)
       }
     ]
   }

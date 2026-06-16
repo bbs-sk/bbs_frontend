@@ -102,7 +102,10 @@
                     <mat-icon>edit</mat-icon>
                   </button>
 
-                  <button *ngIf="!p.has_invoice" type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(p)">
+                  <!-- <button *ngIf="!p.has_invoice" type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(p)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button> -->
+                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(p)">
                     <mat-icon>delete_outline</mat-icon>
                   </button>
                 </div>
