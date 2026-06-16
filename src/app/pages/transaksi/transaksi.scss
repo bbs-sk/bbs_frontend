@@ -303,3 +303,9 @@ $text-body: #334155;
     border-color: $navy !important;
   }
 }
+
+.card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px; // atau 12px sesuai selera
+}
