@@ -28,6 +28,14 @@ export class ApiService {
     return this.http.post<any>(`${environment.apiUrl}/user/restore`, { id_user });
   }
 
+  updateProfile(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/user/update-profile`, payload);
+  }
+
+  resetPassword(payload: any) {
+    return this.http.post<any>(`${environment.apiUrl}/user/reset-password`, payload);
+  }
+
   login(payload: any) {
     return this.http.post<any>(`${environment.apiUrl}/user/login`, payload);
   }

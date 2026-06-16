@@ -37,6 +37,10 @@ export class User implements OnInit {
   addUserForm!: FormGroup;
   editUserForm!: FormGroup;
 
+  showResetModal = false;
+  selectedUser: any = null;
+  resetPasswordForm!: FormGroup;
+
   ngOnInit(): void {
     this.loadUsers();
     this.addUserForm = this.fb.group({
@@ -49,9 +53,12 @@ export class User implements OnInit {
     this.editUserForm = this.fb.group({
       id_user: [null],
       name: ['', Validators.required],
-      role: [null, Validators.required],
-      username: ['', Validators.required],
-      password: ['', Validators.required]
+      username: ['', Validators.required]
+    });
+
+    this.resetPasswordForm = this.fb.group({
+      id_user: [null],
+      new_password: ['', Validators.required]
     });
   }
 
@@ -216,36 +223,37 @@ export class User implements OnInit {
     });
   }
 
+  // Ganti onEdit()
   onEdit(u: any): void {
     this.editUserForm.patchValue({
       id_user: u.id_user,
       name: u.name ?? '',
-      role: u.role ?? null,
-      username: u.username ?? '',
-      password: u.password ?? ''
+      username: u.username ?? ''
     });
-
     this.showEditModal = true;
   }
 
   closeEdit(): void {
     this.showEditModal = false;
+    this.isSubmitting = false;
   }
 
+  // Ganti submitEdit() — pakai updateProfile bukan updateUser
   submitEdit(): void {
+    if (this.isSubmitting) return;
     if (this.editUserForm.invalid) {
       this.editUserForm.markAllAsTouched();
       return;
     }
 
-    this.api.updateUser(this.editUserForm.value).subscribe({
+    this.isSubmitting = true;
+
+    this.api.updateProfile(this.editUserForm.value).subscribe({
       next: () => {
+        this.isSubmitting = false;
         const nama = this.editUserForm.value.name;
-
         this.closeEdit();
-
         this.cdr.detectChanges();
-
         setTimeout(() => {
           Swal.fire({
             icon: 'success',
@@ -253,19 +261,64 @@ export class User implements OnInit {
             text: `Pengguna "${nama}" berhasil diperbarui.`,
             timer: 2500,
             showConfirmButton: false
-          }).then(() => {
-            this.loadUsers(false);
-          });
+          }).then(() => this.loadUsers(false));
         }, 100);
       },
-
       error: (err) => {
-        const msg = err?.error?.message || err?.message || 'Pengguna gagal diperbarui.';
-
+        this.isSubmitting = false;
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: msg
+          text: err?.error?.message || 'Pengguna gagal diperbarui.'
+        });
+      }
+    });
+  }
+
+  // Tambah fungsi reset password
+  onResetPassword(u: any): void {
+    this.selectedUser = u;
+    this.resetPasswordForm.reset({ id_user: u.id_user, new_password: '' });
+    this.showResetModal = true;
+  }
+
+  closeResetPassword(): void {
+    this.showResetModal = false;
+    this.isSubmitting = false;
+    this.selectedUser = null;
+  }
+
+  submitResetPassword(): void {
+    if (this.isSubmitting) return;
+    if (this.resetPasswordForm.invalid) {
+      this.resetPasswordForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSubmitting = true;
+
+    this.api.resetPassword(this.resetPasswordForm.value).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        const nama = this.selectedUser?.name;
+        this.closeResetPassword();
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: `Password "${nama}" berhasil direset.`,
+            timer: 2500,
+            showConfirmButton: false
+          }).then(() => this.loadUsers(false));
+        }, 100);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: err?.error?.message || 'Reset password gagal.'
         });
       }
     });

@@ -510,7 +510,7 @@ export class Invoice {
       item.jumlah = stock;
       Swal.fire({ icon: 'warning', title: 'Stok Tidak Mencukupi', text: `Jumlah melebihi stok (${stock}).` });
     }
-    if (Number(item.jumlah) < 1 || !item.jumlah) item.jumlah = 1;
+    // Hapus baris auto-correct ke 1 — biarkan validateAdd yang menolak
     this.calculateTotal();
   }
 

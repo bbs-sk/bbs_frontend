@@ -1,26 +1,40 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule, registerLocaleData } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-
 import localeId from '@angular/common/locales/id';
-
 import Swal from 'sweetalert2';
-
 import { ApiService } from 'src/app/shared/services/api.service';
-
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-
 import { NgSelectModule } from '@ng-select/ng-select';
-
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
 
 registerLocaleData(localeId);
 
 @Component({
   selector: 'app-transaksi',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatButtonModule, MatIconModule, NgSelectModule, MatPaginatorModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatIconModule,
+    NgSelectModule,
+    MatPaginatorModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTooltipModule // ← tambahkan ini
+  ],
   templateUrl: './transaksi.html',
   styleUrl: './transaksi.scss'
 })
@@ -71,6 +85,16 @@ export class Transaksi implements OnInit {
   isGudang = false;
   isSubmitting = false;
 
+  // ─── Filter Tanggal ───────────────────────────
+  filterForm!: FormGroup;
+  isTyping = false;
+  private lastStartDate: string | null = null;
+  private lastEndDate: string | null = null;
+
+  // ─── Filter Tanggal ───────────────────────────
+  filterDateFrom = '';
+  filterDateTo = '';
+
   get totalPagesMasuk(): number {
     return Math.ceil(this.filteredBarangMasuk.length / this.pageSizeMasuk) || 1;
   }
@@ -89,8 +113,30 @@ export class Transaksi implements OnInit {
 
   ngOnInit(): void {
     this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
-
     this.isGudang = this.userLogin?.role === 'Gudang';
+
+    // ── inisialisasi form tanggal ──
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    this.filterForm = this.fb.group({
+      startDate: [null],
+      endDate: [null]
+    });
+    this.filterForm.valueChanges.subscribe((value) => {
+      if (this.isTyping) return;
+      const start = value.startDate;
+      const end = value.endDate;
+      if (!start || !end) return;
+      const startStr = this.localDateToString(start);
+      const endStr = this.localDateToString(end);
+      if (this.lastStartDate !== null && this.lastEndDate !== null && startStr !== this.lastStartDate && endStr === this.lastEndDate) {
+        this.lastStartDate = startStr;
+        return;
+      }
+      this.lastStartDate = startStr;
+      this.lastEndDate = endStr;
+      this.applyDateFilter();
+    });
 
     this.addMasukForm = this.fb.group({
       id_barang: [null, Validators.required],
@@ -553,6 +599,132 @@ export class Transaksi implements OnInit {
         });
       }
     });
+  }
+
+  // =====================================================
+  // FILTER TANGGAL
+  // =====================================================
+
+  onManualEnter(): void {
+    this.isTyping = false;
+    this.applyDateFilter();
+  }
+
+  applyDateFilter(): void {
+    const start: Date | null = this.filterForm.get('startDate')?.value;
+    const end: Date | null = this.filterForm.get('endDate')?.value;
+
+    if (!start || !end) {
+      // tidak ada filter → tampilkan semua
+      this.filteredBarangMasuk = [...this.barangMasuk];
+      this.filteredBarangKeluar = [...this.barangKeluar];
+      this.filteredRetur = [...this.retur];
+    } else {
+      const startStr = this.localDateToString(start);
+      let endDate = new Date(end);
+      endDate.setHours(23, 59, 59, 999);
+
+      const inRange = (dateStr: string) => {
+        const d = new Date(dateStr);
+        return d >= start && d <= endDate;
+      };
+
+      this.filteredBarangMasuk = this.barangMasuk.filter((m) => inRange(m.datetime));
+      this.filteredBarangKeluar = this.barangKeluar.filter((k) => inRange(k.datetime));
+      this.filteredRetur = this.retur.filter((r) => inRange(r.datetime));
+    }
+
+    this.pageIndexMasuk = 0;
+    this.pageIndexKeluar = 0;
+    this.pageIndexRetur = 0;
+
+    this.updatePaginatedMasuk();
+    this.updatePaginatedKeluar();
+    this.updatePaginatedRetur();
+    this.cdr.detectChanges();
+  }
+
+  private localDateToString(date: Date): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  // =====================================================
+  // EXPORT CSV
+  // =====================================================
+
+  private formatFileDate(date: Date): string {
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const y = date.getFullYear();
+    return `${d}-${m}-${y}`;
+  }
+
+  private getDateRangeSuffix(): { start: string; end: string } {
+    const start: Date | null = this.filterForm?.get('startDate')?.value;
+    const end: Date | null = this.filterForm?.get('endDate')?.value;
+    return {
+      start: start ? this.formatFileDate(start) : 'semua',
+      end: end ? this.formatFileDate(end) : 'semua'
+    };
+  }
+
+  private saveAsXlsx(sheetName: string, fileName: string, data: any[]): void {
+    if (data.length === 0) return;
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    const workbook: XLSX.WorkBook = {
+      Sheets: { [sheetName]: worksheet },
+      SheetNames: [sheetName]
+    };
+    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    });
+    FileSaver.saveAs(blob, fileName);
+  }
+
+  exportMasuk(): void {
+    if (this.filteredBarangMasuk.length === 0) return;
+    const { start, end } = this.getDateRangeSuffix();
+    const exportData = this.filteredBarangMasuk.map((m, i) => ({
+      No: i + 1,
+      'Nama Barang': m.nama_barang,
+      Jumlah: m.jumlah,
+      'Harga Beli': m.harga_beli ?? 0,
+      Tanggal: m.datetime ? new Date(m.datetime).toLocaleString('id-ID') : ''
+    }));
+    this.saveAsXlsx('Barang Masuk', `Barang_Masuk_${start}_sampai_${end}.xlsx`, exportData);
+  }
+
+  exportKeluar(): void {
+    if (this.filteredBarangKeluar.length === 0) return;
+    const { start, end } = this.getDateRangeSuffix();
+    const exportData = this.filteredBarangKeluar.map((k, i) => ({
+      No: i + 1,
+      'Nama Barang': k.nama_barang,
+      Keterangan: k.nama_project ?? '',
+      Jumlah: k.jumlah,
+      'Harga Jual': k.harga_jual ?? 0,
+      Tanggal: k.datetime ? new Date(k.datetime).toLocaleString('id-ID') : ''
+    }));
+    this.saveAsXlsx('Barang Keluar', `Barang_Keluar_${start}_sampai_${end}.xlsx`, exportData);
+  }
+
+  exportRetur(): void {
+    if (this.filteredRetur.length === 0) return;
+    const { start, end } = this.getDateRangeSuffix();
+    const exportData = this.filteredRetur.map((r, i) => ({
+      No: i + 1,
+      'Nama Barang': r.nama_barang,
+      Keterangan: r.nama_project ?? '',
+      Jumlah: r.jumlah,
+      'Harga Jual': r.harga_jual ?? 0,
+      Kondisi: r.kondisi ?? '',
+      Tanggal: r.datetime ? new Date(r.datetime).toLocaleString('id-ID') : ''
+    }));
+    this.saveAsXlsx('Retur Barang', `Retur_${start}_sampai_${end}.xlsx`, exportData);
   }
 
   // =====================================================

@@ -103,14 +103,30 @@
                   {{ u.status == 1 ? 'Aktif' : 'Nonaktif' }}
                 </span>
               </td>
+              <!-- Kolom Aksi (ganti yang lama) -->
               <td class="col-action">
                 <div class="action-btns">
-                  <!-- USER AKTIF -->
+                  <!-- EDIT -->
+                  <button *ngIf="u.status == 1" type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(u)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+
+                  <button
+                    *ngIf="u.status == 1"
+                    type="button"
+                    class="btn-action btn-reset-pw"
+                    title="Reset Password"
+                    (click)="onResetPassword(u)"
+                  >
+                    <mat-icon>lock_reset</mat-icon>
+                  </button>
+
+                  <!-- NONAKTIFKAN -->
                   <button *ngIf="u.status == 1" type="button" class="btn-action btn-del" title="Nonaktifkan" (click)="onDelete(u)">
                     <mat-icon>delete_outline</mat-icon>
                   </button>
 
-                  <!-- USER NONAKTIF -->
+                  <!-- AKTIFKAN -->
                   <button *ngIf="u.status == 0" type="button" class="btn-action btn-restore" title="Aktifkan" (click)="onRestore(u)">
                     <mat-icon>restore</mat-icon>
                   </button>
@@ -280,23 +296,18 @@
     </div>
   </div>
 
-  <!-- ============================= -->
-  <!-- MODAL EDIT -->
-  <!-- ============================= -->
+  <!-- MODAL EDIT (taruh setelah modal add) -->
+  <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div>
 
-  <!-- <div class="modal-backdrop-custom" *ngIf="showEditModal" (click)="closeEdit()"></div> -->
-
-  <!-- <div class="modal-custom" *ngIf="showEditModal">
+  <div class="modal-custom" *ngIf="showEditModal">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-title-wrap">
           <div class="modal-icon edit-icon">
             <mat-icon>edit</mat-icon>
           </div>
-
           <h5>Edit Pengguna</h5>
         </div>
-
         <button type="button" class="btn-close-modal" (click)="closeEdit()">
           <mat-icon>close</mat-icon>
         </button>
@@ -305,95 +316,86 @@
       <form [formGroup]="editUserForm" (ngSubmit)="submitEdit()">
         <div class="modal-body">
           <div class="form-group">
-            <label class="form-label">Nama Pengguna</label>
-
+            <label class="form-label">
+              Nama Pengguna
+              <span class="text-danger">*</span>
+            </label>
             <input type="text" class="form-control" formControlName="name" placeholder="Masukkan nama pengguna" />
-
-            <div
-              *ngIf="
-              editUserForm.get('name')?.invalid &&
-              (
-                editUserForm.get('name')?.dirty ||
-                editUserForm.get('name')?.touched
-              )
-            "
-              class="text-danger mt-1"
-            >
+            <div *ngIf="editUserForm.get('name')?.invalid && editUserForm.get('name')?.touched" class="text-danger mt-1">
               Nama pengguna harus diisi.
             </div>
           </div>
 
           <div class="form-group">
-            <label class="form-label">Role Pengguna</label>
-
-            <ng-select formControlName="role" placeholder="Pilih role" [searchable]="true" [clearable]="true">
-              <ng-option value="Admin Kantor">Admin Kantor</ng-option>
-              <ng-option value="Gudang">Gudang</ng-option>
-              <ng-option value="Lapangan">Lapangan</ng-option>
-            </ng-select>
-
-            <div
-              *ngIf="
-              editUserForm.get('role')?.invalid &&
-              (
-                editUserForm.get('role')?.dirty ||
-                editUserForm.get('role')?.touched
-              )
-            "
-              class="text-danger mt-1"
-            >
-              Role pengguna harus dipilih.
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Username</label>
-
+            <label class="form-label">
+              Username
+              <span class="text-danger">*</span>
+            </label>
             <input type="text" class="form-control" formControlName="username" placeholder="Masukkan username" />
-
-            <div
-              *ngIf="
-              editUserForm.get('username')?.invalid &&
-              (
-                editUserForm.get('username')?.dirty ||
-                editUserForm.get('username')?.touched
-              )
-            "
-              class="text-danger mt-1"
-            >
+            <div *ngIf="editUserForm.get('username')?.invalid && editUserForm.get('username')?.touched" class="text-danger mt-1">
               Username harus diisi.
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Password</label>
-
-            <input type="password" class="form-control" formControlName="password" placeholder="Masukkan password" />
-
-            <div
-              *ngIf="
-              editUserForm.get('password')?.invalid &&
-              (
-                editUserForm.get('password')?.dirty ||
-                editUserForm.get('password')?.touched
-              )
-            "
-              class="text-danger mt-1"
-            >
-              Password harus diisi.
             </div>
           </div>
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn-modal-cancel" (click)="closeEdit()">Batal</button>
-
-          <button type="submit" class="btn-modal-save">
-            <mat-icon>save</mat-icon>
-            <span>Simpan Perubahan</span>
+          <button type="submit" class="btn-modal-save" [disabled]="isSubmitting">
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'save' }}</mat-icon>
+            <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan' }}</span>
           </button>
         </div>
       </form>
     </div>
-  </div> -->
+  </div>
+
+  <!-- MODAL RESET PASSWORD (taruh setelah modal edit) -->
+  <div class="modal-backdrop-custom" *ngIf="showResetModal" (click)="closeResetPassword()"></div>
+
+  <div class="modal-custom" *ngIf="showResetModal">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <div class="modal-icon" style="background: #f59e0b1a; color: #f59e0b">
+            <mat-icon>lock_reset</mat-icon>
+          </div>
+          <h5>Reset Password</h5>
+        </div>
+        <button type="button" class="btn-close-modal" (click)="closeResetPassword()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="resetPasswordForm" (ngSubmit)="submitResetPassword()">
+        <div class="modal-body">
+          <p class="text-muted mb-3">
+            Reset password untuk:
+            <strong>{{ selectedUser?.name }}</strong>
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">
+              Password Baru
+              <span class="text-danger">*</span>
+            </label>
+            <input type="password" class="form-control" formControlName="new_password" placeholder="Masukkan password baru" />
+            <div
+              *ngIf="resetPasswordForm.get('new_password')?.invalid && resetPasswordForm.get('new_password')?.touched"
+              class="text-danger mt-1"
+            >
+              Password baru harus diisi.
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" (click)="closeResetPassword()">Batal</button>
+          <button type="submit" class="btn-modal-save" [disabled]="isSubmitting">
+            <mat-icon>{{ isSubmitting ? 'hourglass_empty' : 'lock_reset' }}</mat-icon>
+            <span>{{ isSubmitting ? 'Menyimpan...' : 'Reset Password' }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

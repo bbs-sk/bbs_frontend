@@ -95,3 +95,13 @@
     background: #bbf7d0;
   }
 }
+
+.btn-reset-pw {
+  color: #f59e0b;
+  border-color: #f59e0b;
+
+  &:hover {
+    background-color: #f59e0b;
+    color: #fff;
+  }
+}

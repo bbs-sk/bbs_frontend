@@ -42,6 +42,35 @@
     </div>
   </div>
 
+  <div class="sd-filter-card mb-3">
+    <p class="sd-filter-label">
+      <mat-icon>calendar_month</mat-icon>
+      Filter Periode
+    </p>
+    <form [formGroup]="filterForm">
+      <mat-form-field appearance="outline" class="sd-range-picker">
+        <mat-date-range-input [rangePicker]="picker">
+          <input
+            matStartDate
+            formControlName="startDate"
+            placeholder="Tanggal Awal"
+            (keydown)="isTyping = true"
+            (keyup.enter)="onManualEnter()"
+          />
+          <input
+            matEndDate
+            formControlName="endDate"
+            placeholder="Tanggal Akhir"
+            (keydown)="isTyping = true"
+            (keyup.enter)="onManualEnter()"
+          />
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+    </form>
+  </div>
+
   <!-- ===================================================== -->
   <!-- BARANG Masuk -->
   <!-- ===================================================== -->
@@ -52,17 +81,28 @@
         <div class="title-icon">
           <mat-icon>inventory_2</mat-icon>
         </div>
-
         <div>
           <h3 class="mb-0">Barang Masuk</h3>
           <p class="subtitle">Data penambahan stok barang</p>
         </div>
       </div>
 
-      <button *ngIf="isGudang" mat-raised-button class="btn-add" (click)="openAddMasuk()">
-        <mat-icon>add</mat-icon>
-        <span>Tambah Stok Barang</span>
-      </button>
+      <div class="card-header-actions">
+        <button
+          mat-flat-button
+          class="sd-export-btn"
+          (click)="exportMasuk()"
+          [disabled]="filteredBarangMasuk.length === 0"
+          matTooltip="Export ke file Excel"
+        >
+          <mat-icon>download</mat-icon>
+          Export Barang Masuk
+        </button>
+        <button *ngIf="isGudang" mat-raised-button class="btn-add" (click)="openAddMasuk()">
+          <mat-icon>add</mat-icon>
+          <span>Tambah Stok Barang</span>
+        </button>
+      </div>
     </div>
 
     <!-- TOOLBAR -->
@@ -196,12 +236,21 @@
         <div class="title-icon keluar-icon">
           <mat-icon>outbox</mat-icon>
         </div>
-
         <div>
           <h3 class="mb-0">Barang Keluar</h3>
           <p class="subtitle">Data pengeluaran barang berdasarkan invoice</p>
         </div>
       </div>
+      <button
+        mat-flat-button
+        class="btn-export"
+        (click)="exportKeluar()"
+        [disabled]="filteredBarangKeluar.length === 0"
+        matTooltip="Export data barang keluar ke Excel"
+      >
+        <mat-icon>download</mat-icon>
+        <span>Export Barang Keluar</span>
+      </button>
     </div>
 
     <!-- TOOLBAR -->
@@ -331,12 +380,21 @@
         <div class="title-icon retur-icon">
           <mat-icon>assignment_return</mat-icon>
         </div>
-
         <div>
           <h3 class="mb-0">Barang Retur</h3>
           <p class="subtitle">Data pengembalian barang dari pelanggan</p>
         </div>
       </div>
+      <button
+        mat-flat-button
+        class="btn-export btn-export-retur"
+        (click)="exportRetur()"
+        [disabled]="filteredRetur.length === 0"
+        matTooltip="Export data retur ke Excel"
+      >
+        <mat-icon>download</mat-icon>
+        <span>Export Barang Retur</span>
+      </button>
     </div>
 
     <!-- TOOLBAR -->
