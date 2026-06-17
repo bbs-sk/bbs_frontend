@@ -88,7 +88,7 @@
               <td class="col-num">
                 <span class="price-value">{{ b.harga_jual ? 'Rp ' + b.harga_jual.toLocaleString('id-ID') : '—' }}</span>
               </td>
-              <td class="col-num" *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'">
+              <td class="col-num" *ngIf="userLogin?.role === 'Admin Kantor'">
                 <span class="hpp-value">{{ b.hpp ? ('Rp ' + (b.hpp | number:'1.0-0':'id')) : '—' }}</span>
               </td>
               <td class="date-cell">
