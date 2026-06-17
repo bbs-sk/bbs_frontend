@@ -235,7 +235,15 @@ export class Invoice {
 
   applyStatusFilter(): void {
     const base = [...this.invoice];
-    this.filteredInvoice = this.filterStatus ? base.filter((i: any) => i.status === this.filterStatus) : base;
+    if (!this.filterStatus) {
+      this.filteredInvoice = base;
+    } else if (this.filterStatus === 'pay_lunas') {
+      this.filteredInvoice = base.filter((i: any) => i.pembayaran === 'lunas');
+    } else if (this.filterStatus === 'pay_belum') {
+      this.filteredInvoice = base.filter((i: any) => i.pembayaran === 'belum');
+    } else {
+      this.filteredInvoice = base.filter((i: any) => i.status === this.filterStatus);
+    }
     this.pageIndex = 0;
     this.updatePaginatedData();
     this.cdr.detectChanges();
