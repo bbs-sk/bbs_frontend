@@ -51,7 +51,7 @@ export const NavigationItems: NavigationItem[] = [
         classes: 'nav-item',
         url: '/proyek',
         icon: 'project',
-        roles: ['Admin Kantor', 'Lapangan'],
+        roles: ['Admin Kantor', 'Lapangan', 'Gudang'],
         breadcrumbs: false
       },
       {

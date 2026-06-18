@@ -51,7 +51,7 @@ export class Project {
   ngOnInit(): void {
     this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
 
-    this.isRole = this.userLogin?.role === 'Admin Kantor';
+    this.isRole = this.userLogin?.role !== 'Lapangan';
 
     this.loadProject();
     this.loadUserLapangan();

@@ -34,7 +34,7 @@ const routes: Routes = [
       },
       {
         path: 'proyek',
-        canActivate: [authGuard, roleGuard(['Admin Kantor', 'Lapangan'])],
+        canActivate: [authGuard],
         loadComponent: () => import('./pages/project/project').then((c) => c.Project)
       },
       {

@@ -195,18 +195,21 @@
             Proyek
             <span class="text-danger">*</span>
           </label>
-          <ng-select
-            [(ngModel)]="addForm.id_project"
-            [disabled]="userLogin?.role==='Gudang'"
-            placeholder="Pilih proyek"
-            [searchable]="true"
-            [clearable]="true"
-          >
+          <ng-select [(ngModel)]="addForm.id_project" placeholder="Pilih proyek" [searchable]="true" [clearable]="true">
             @for (p of project; track p.id_project) {
             <ng-option [value]="p.id_project">{{ p.nama_project }}</ng-option>
             }
           </ng-select>
           <div *ngIf="addErrors['id_project']" class="text-danger mt-1">{{ addErrors['id_project'] }}</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Nama Pemesan
+            <span class="text-danger">*</span>
+          </label>
+          <input type="text" class="form-control" [(ngModel)]="addForm.nama_pemesan" placeholder="Masukkan nama pemesan" />
+          <div *ngIf="addErrors['nama_pemesan']" class="text-danger mt-1">{{ addErrors['nama_pemesan'] }}</div>
         </div>
 
         <!-- FIX: ganti input "Jumlah Jenis Barang" ke tombol "+ Tambah Barang" yang lebih intuitif -->
@@ -365,6 +368,20 @@
             }
           </ng-select>
           <div *ngIf="editErrors['id_project']" class="text-danger mt-1">{{ editErrors['id_project'] }}</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            Nama Pemesan
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="editForm.nama_pemesan"
+            [disabled]="isFieldsLockedOnEdit()"
+            placeholder="Masukkan nama pemesan"
+          />
+          <div *ngIf="editErrors['nama_pemesan']" class="text-danger mt-1">{{ editErrors['nama_pemesan'] }}</div>
         </div>
         <div class="barang-list" *ngIf="editBarang.length > 0">
           <div class="barang-list-header">

@@ -162,12 +162,11 @@ export class Invoice {
       next: (res: any) => {
         let data = Array.isArray(res) ? res : (res?.val ?? []);
 
-        if (this.role === 'Gudang') {
-          data = data.filter((p: any) => p.id_project == 0);
-        } else if (this.role === 'Lapangan') {
+        // if (this.role === 'Gudang') {
+        //   data = data.filter((p: any) => p.id_project == 0);
+        // } else
+        if (this.role === 'Lapangan') {
           data = data.filter((p: any) => p.id_user1 == this.userLogin?.id_user || p.id_user2 == this.userLogin?.id_user);
-        } else {
-          data = data.filter((p: any) => p.id_project != 0);
         }
 
         this.project = data;
@@ -334,8 +333,13 @@ export class Invoice {
   }
 
   isFieldsLockedOnEdit(): boolean {
-    if (this.role === 'Admin Kantor' || this.role === 'Gudang') {
+    if (this.role === 'Admin Kantor') {
       const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'selesai', 'ditolak'];
+
+      return this.editForm?.id_user !== this.userLogin?.id_user || lockedStatus.includes(this.editForm?.status);
+    }
+    if (this.role === 'Gudang') {
+      const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'ditolak'];
 
       return this.editForm?.id_user !== this.userLogin?.id_user || lockedStatus.includes(this.editForm?.status);
     }
@@ -393,7 +397,6 @@ export class Invoice {
   }
 
   canRetur(invoice: any): boolean {
-    if (this.role === 'Gudang') return false;
     const s = invoice.status;
     return this.isOwner(invoice) && (s === 'dikirim' || s === 'selesai');
   }
@@ -422,7 +425,8 @@ export class Invoice {
 
     this.addForm = {
       id_user: this.idUser,
-      id_project: this.role === 'Gudang' ? 0 : null,
+      id_project: null,
+      nama_pemesan: '',
       total_harga: 0,
       status: defaultStatus,
       pembayaran: defaultPembayaran,
@@ -442,6 +446,11 @@ export class Invoice {
     this.addErrors = {};
     this.addBarangErrors = [];
     let valid = true;
+
+    if (!this.addForm.nama_pemesan?.trim()) {
+      this.addErrors['nama_pemesan'] = 'Nama pemesan harus diisi.';
+      valid = false;
+    }
 
     // Validasi proyek (kecuali Gudang yang id_project-nya sudah di-set otomatis)
     if (this.role !== 'Gudang' && !this.addForm.id_project) {
@@ -560,6 +569,7 @@ export class Invoice {
       id_invoice: i.id_invoice,
       id_user: i.id_user,
       id_project: i.id_project,
+      nama_pemesan: i.name,
       pembayaran: i.pembayaran,
       detail: i.detail,
       total_harga: i.total_harga,
@@ -602,7 +612,12 @@ export class Invoice {
     this.editBarangErrors = [];
     let valid = true;
 
-    if (this.role !== 'Gudang' && !this.editForm.id_project) {
+    if (!this.editForm.nama_pemesan?.trim()) {
+      this.editErrors['nama_pemesan'] = 'Nama pemesan harus diisi.';
+      valid = false;
+    }
+
+    if (!this.editForm.id_project) {
       this.editErrors['id_project'] = 'Proyek harus dipilih.';
       valid = false;
     }
