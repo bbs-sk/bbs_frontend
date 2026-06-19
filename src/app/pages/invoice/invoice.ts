@@ -404,7 +404,6 @@ export class Invoice {
   showSuratJalanBtn(): boolean {
     if (this.role !== 'Gudang') return false;
     // Sembunyikan jika pemesanan milik Gudang sendiri (proyek Kasir/id_project=0)
-    if (this.detailInvoice?.id_project == 0) return false;
     if (this.detailInvoice?.id_user === this.userLogin?.id_user) return false;
     const s = this.detailInvoice?.status;
     return s === 'dikirim' || s === 'selesai';
