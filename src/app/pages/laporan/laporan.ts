@@ -304,18 +304,73 @@ export class Laporan implements OnInit, OnDestroy {
       return;
     }
 
-    const exportData = this.filteredTransactions.map((item, index) => ({
-      No: index + 1,
-      Tanggal: item.date,
-      Ref: item.nama_project,
-      'Total Barang': item.total_items,
-      'Total Harga': item.total_price,
-      Keuntungan: item.total_profit,
-      Status: item.status_pembayaran
-    }));
+    const start: Date | null = this.filterForm.get('startDate')?.value;
+    const end: Date | null = this.filterForm.get('endDate')?.value;
 
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(exportData);
+    const periodeAwal = start ? this.formatTanggalIndo(start) : '-';
+    const periodeAkhir = end ? this.formatTanggalIndo(end) : '-';
 
+    // ── Baris data tabel (array of array, bukan object, biar urutan kolom pasti) ──
+    const headers = ['No', 'Tanggal', 'Keterangan', 'Total Barang', 'Total Harga', 'Keuntungan', 'Status'];
+
+    const dataRows = this.filteredTransactions.map((item, index) => {
+      const tanggalFormatted = item.date.split(' ')[0].split('-').reverse().join('-') + ' ' + (item.date.split(' ')[1] || '');
+
+      return [
+        index + 1,
+        tanggalFormatted,
+        item.nama_project,
+        `${item.total_items} pcs`,
+        this.formatRupiah(item.total_price),
+        this.formatRupiah(item.total_profit),
+        item.status_pembayaran === 'lunas' ? 'Lunas' : item.status_pembayaran
+      ];
+    });
+
+    const totalRow = [
+      '',
+      '',
+      '',
+      'TOTAL',
+      this.formatRupiah(this.summary.totalPenjualan),
+      this.formatRupiah(this.summary.totalKeuntungan),
+      ''
+    ];
+
+    // ── Susun sheet: judul, periode, baris kosong, header, data, total ──
+    const sheetData: any[][] = [[`LAPORAN PENJUALAN`], [`Periode: ${periodeAwal} – ${periodeAkhir}`], [], headers, ...dataRows, totalRow];
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(sheetData);
+
+    // ── Merge cell untuk judul & periode supaya membentang penuh ──
+    worksheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }, // judul
+      { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } } // periode
+    ];
+
+    // ── AUTO-FIT lebar kolom: hitung panjang teks terpanjang per kolom ──
+    const MIN_WIDTH = 8;
+    const MAX_WIDTH = 40;
+    const PADDING = 2;
+
+    const colWidths = headers.map((h, colIndex) => {
+      let maxLen = h.length;
+
+      dataRows.forEach((row) => {
+        const cellValue = row[colIndex] != null ? String(row[colIndex]) : '';
+        maxLen = Math.max(maxLen, cellValue.length);
+      });
+
+      const totalCellValue = totalRow[colIndex] != null ? String(totalRow[colIndex]) : '';
+      maxLen = Math.max(maxLen, totalCellValue.length);
+
+      const width = Math.min(Math.max(maxLen + PADDING, MIN_WIDTH), MAX_WIDTH);
+      return { wch: width };
+    });
+
+    worksheet['!cols'] = colWidths;
+
+    // ── Susun workbook ──
     const workbook: XLSX.WorkBook = {
       Sheets: {
         'Laporan Penjualan': worksheet
@@ -332,17 +387,19 @@ export class Laporan implements OnInit, OnDestroy {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
     });
 
-    const start: Date | null = this.filterForm.get('startDate')?.value;
-
-    const end: Date | null = this.filterForm.get('endDate')?.value;
-
     const startDate = start ? this.formatFileDate(start) : 'unknown';
-
     const endDate = end ? this.formatFileDate(end) : 'unknown';
-
     const fileName = `laporan-penjualan-${startDate}_sampai_${endDate}.xlsx`;
 
     FileSaver.saveAs(data, fileName);
+  }
+
+  private formatTanggalIndo(date: Date): string {
+    return new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
   }
 
   // ───────────────────────────────────────────────────────────────────────────

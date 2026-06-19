@@ -659,7 +659,7 @@
         <button
           type="button"
           class="btn-download-invoice"
-          *ngIf="detailInvoice?.status === 'dikirim' || detailInvoice?.status === 'selesai'"
+          *ngIf="(detailInvoice?.status === 'dikirim' || detailInvoice?.status === 'selesai') && role !== 'Lapangan'"
           (click)="downloadInvoice()"
         >
           <mat-icon>download</mat-icon>

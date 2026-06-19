@@ -671,18 +671,59 @@ export class Transaksi implements OnInit {
     };
   }
 
-  private saveAsXlsx(sheetName: string, fileName: string, data: any[]): void {
+  private saveAsXlsx(sheetName: string, fileName: string, data: any[], title: string, periodeAwal: string, periodeAkhir: string): void {
     if (data.length === 0) return;
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+
+    const headers = Object.keys(data[0]);
+
+    const dataRows = data.map((row) => headers.map((h) => row[h]));
+
+    const sheetData: any[][] = [[title], [`Periode: ${periodeAwal} – ${periodeAkhir}`], [], headers, ...dataRows];
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(sheetData);
+
+    // merge judul & periode membentang penuh kolom
+    worksheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } }
+    ];
+
+    // auto-fit lebar kolom
+    const MIN_WIDTH = 8;
+    const MAX_WIDTH = 40;
+    const PADDING = 2;
+
+    const colWidths = headers.map((h, colIndex) => {
+      let maxLen = h.length;
+      dataRows.forEach((row) => {
+        const cellValue = row[colIndex] != null ? String(row[colIndex]) : '';
+        maxLen = Math.max(maxLen, cellValue.length);
+      });
+      const width = Math.min(Math.max(maxLen + PADDING, MIN_WIDTH), MAX_WIDTH);
+      return { wch: width };
+    });
+
+    worksheet['!cols'] = colWidths;
+
     const workbook: XLSX.WorkBook = {
       Sheets: { [sheetName]: worksheet },
       SheetNames: [sheetName]
     };
+
     const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
     });
+
     FileSaver.saveAs(blob, fileName);
+  }
+
+  private formatTanggalIndo(date: Date): string {
+    return new Intl.DateTimeFormat('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
   }
 
   exportMasuk(): void {
@@ -695,7 +736,7 @@ export class Transaksi implements OnInit {
       'Harga Beli': m.harga_beli ?? 0,
       Tanggal: m.datetime ? new Date(m.datetime).toLocaleString('id-ID') : ''
     }));
-    this.saveAsXlsx('Barang Masuk', `Barang_Masuk_${start}_sampai_${end}.xlsx`, exportData);
+    this.saveAsXlsx('Barang Masuk', `Barang_Masuk_${start}_sampai_${end}.xlsx`, exportData, 'LAPORAN BARANG MASUK', start, end);
   }
 
   exportKeluar(): void {
@@ -709,7 +750,7 @@ export class Transaksi implements OnInit {
       'Harga Jual': k.harga_jual ?? 0,
       Tanggal: k.datetime ? new Date(k.datetime).toLocaleString('id-ID') : ''
     }));
-    this.saveAsXlsx('Barang Keluar', `Barang_Keluar_${start}_sampai_${end}.xlsx`, exportData);
+    this.saveAsXlsx('Barang Keluar', `Barang_Keluar_${start}_sampai_${end}.xlsx`, exportData, 'LAPORAN BARANG KELUAR', start, end);
   }
 
   exportRetur(): void {
@@ -724,7 +765,7 @@ export class Transaksi implements OnInit {
       Kondisi: r.kondisi ?? '',
       Tanggal: r.datetime ? new Date(r.datetime).toLocaleString('id-ID') : ''
     }));
-    this.saveAsXlsx('Retur Barang', `Retur_${start}_sampai_${end}.xlsx`, exportData);
+    this.saveAsXlsx('Retur Barang', `Retur_${start}_sampai_${end}.xlsx`, exportData, 'LAPORAN RETUR BARANG', start, end);
   }
 
   // =====================================================
