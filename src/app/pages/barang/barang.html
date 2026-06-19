@@ -12,7 +12,12 @@
           <p class="subtitle">Kelola inventaris barang</p>
         </div>
       </div>
-      <button *ngIf="isRole" class="btn-add" mat-raised-button (click)="openAdd()">
+      <button
+        *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'"
+        class="btn-add"
+        mat-raised-button
+        (click)="openAdd()"
+      >
         <mat-icon>add</mat-icon>
         <span>Tambah Barang</span>
       </button>
@@ -110,14 +115,7 @@
                   >
                     <mat-icon>delete_outline</mat-icon>
                   </button> -->
-                  <button
-                    *ngIf="isRole"
-                    type="button"
-                    class="btn-action btn-del"
-                    title="Hapus"
-                    (click)="onDelete(b)"
-                    aria-label="Hapus barang"
-                  >
+                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(b)" aria-label="Hapus barang">
                     <mat-icon>delete_outline</mat-icon>
                   </button>
                 </div>
@@ -315,12 +313,7 @@
                 <span class="text-danger">*</span>
               </label>
 
-              <input
-                class="form-control"
-                formControlName="kode_barang"
-                [attr.disabled]="!isRole ? true : null"
-                placeholder="Masukkan kode barang"
-              />
+              <input class="form-control" formControlName="kode_barang" placeholder="Masukkan kode barang" />
 
               <div
                 *ngIf="
@@ -342,12 +335,7 @@
                 <span class="text-danger">*</span>
               </label>
 
-              <input
-                class="form-control"
-                formControlName="satuan"
-                [attr.disabled]="!isRole ? true : null"
-                placeholder="Masukkan satuan barang"
-              />
+              <input class="form-control" formControlName="satuan" placeholder="Masukkan satuan barang" />
 
               <div
                 *ngIf="
@@ -370,12 +358,7 @@
               <span class="text-danger">*</span>
             </label>
 
-            <input
-              class="form-control"
-              formControlName="nama_barang"
-              [attr.disabled]="!isRole ? true : null"
-              placeholder="Masukkan nama barang"
-            />
+            <input class="form-control" formControlName="nama_barang" placeholder="Masukkan nama barang" />
 
             <div
               *ngIf="
