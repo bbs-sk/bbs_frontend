@@ -56,6 +56,11 @@ const routes: Routes = [
         path: 'laporan-penjualan',
         canActivate: [authGuard, roleGuard(['Admin Kantor'])],
         loadComponent: () => import('./pages/laporan/laporan').then((c) => c.Laporan)
+      },
+      {
+        path: 'kartu-stok',
+        canActivate: [authGuard, roleGuard(['Admin Kantor', 'Gudang'])],
+        loadComponent: () => import('./pages/kartu-stok/kartu-stok').then((c) => c.KartuStok)
       }
     ]
   },

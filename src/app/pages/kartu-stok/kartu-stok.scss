@@ -1,0 +1,617 @@
+// ─────────────────────────────────────────────
+// Variables (Matching Laporan system)
+// ─────────────────────────────────────────────
+$navy: #185fa5;
+$navy-hover: #0c447c;
+$navy-dark: #042c53;
+$navy-light: #e6f1fb;
+$navy-mid: #b5d4f4;
+
+$green: #3b6d11;
+$green-light: #eaf3de;
+
+$purple: #534ab7;
+$purple-light: #eeedfe;
+
+$amber: #854f0b;
+$amber-light: #faeeda;
+
+$danger: #a32d2d;
+$danger-light: #fcebeb;
+
+$border: #e2e8f0;
+$border-light: #f1f5f9;
+$surface: #f8fafc;
+$muted: #64748b;
+$muted-light: #94a3b8;
+$text-main: #0f172a;
+$text-body: #334155;
+
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
+
+// ─────────────────────────────────────────────
+// Page Layout
+// ─────────────────────────────────────────────
+.sd-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 4px 0 32px;
+}
+
+// ─────────────────────────────────────────────
+// Header
+// ─────────────────────────────────────────────
+.sd-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+
+  &__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: $text-main;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: $muted;
+    margin: 5px 0 0;
+  }
+}
+
+.sd-header__title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sd-header__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: $radius-md;
+  background: $navy-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    color: $navy !important;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Export button
+// ─────────────────────────────────────────────
+.sd-export-btn,
+.sd-export-btn.mat-mdc-button {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px !important;
+  height: 44px !important;
+  background: $navy !important;
+  color: #fff !important;
+  border-radius: $radius-md !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba($navy, 0.25) !important;
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s !important;
+  white-space: nowrap;
+
+  mat-icon,
+  .mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    color: #fff !important;
+  }
+
+  &:hover:not([disabled]) {
+    background: $navy-hover !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba($navy, 0.3) !important;
+  }
+
+  &:active {
+    transform: translateY(0) !important;
+  }
+
+  &[disabled] {
+    opacity: 0.45 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Filter card
+// ─────────────────────────────────────────────
+.sd-filter-card {
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  padding: 18px 24px;
+}
+
+.sd-filter-form {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+
+  .sd-filter-field {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 250px;
+
+    &.select-barang {
+      flex: 1.5;
+    }
+  }
+}
+
+.sd-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: $navy-hover;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 10px;
+
+  mat-icon {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    color: $navy;
+  }
+}
+
+
+.sd-range-picker {
+  width: 100%;
+}
+
+::ng-deep .sd-range-picker {
+  .mat-mdc-text-field-wrapper {
+    background: $surface;
+    border-radius: $radius-md !important;
+  }
+
+  .mat-mdc-form-field-flex {
+    min-height: 46px;
+    align-items: center;
+  }
+
+  input {
+    font-size: 13.5px;
+    color: $text-body;
+  }
+
+  input::placeholder {
+    color: $muted-light;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: $border !important;
+  }
+
+  &:hover .mdc-notched-outline__leading,
+  &:hover .mdc-notched-outline__notch,
+  &:hover .mdc-notched-outline__trailing {
+    border-color: $navy-mid !important;
+  }
+
+  .mat-datepicker-toggle {
+    color: $muted;
+  }
+
+  .mdc-notched-outline--upgraded .mdc-notched-outline__leading,
+  .mdc-notched-outline--upgraded .mdc-notched-outline__notch,
+  .mdc-notched-outline--upgraded .mdc-notched-outline__trailing {
+    border-color: $navy !important;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Summary grid & card
+// ─────────────────────────────────────────────
+.sd-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sd-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  transition: box-shadow 0.15s;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  &__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: $radius-md;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 22px !important;
+      width: 22px !important;
+      height: 22px !important;
+    }
+
+    &.blue {
+      background: $navy-light;
+      mat-icon {
+        color: $navy;
+      }
+    }
+    &.green {
+      background: $green-light;
+      mat-icon {
+        color: $green;
+      }
+    }
+    &.purple {
+      background: $purple-light;
+      mat-icon {
+        color: $purple;
+      }
+    }
+    &.amber {
+      background: $amber-light;
+      mat-icon {
+        color: $amber;
+      }
+    }
+    &.danger {
+      background: $danger-light;
+      mat-icon {
+        color: $danger;
+      }
+    }
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  &__label {
+    font-size: 11.5px;
+    color: $muted;
+    font-weight: 500;
+  }
+
+  &__value {
+    font-size: 20px;
+    font-weight: 700;
+    color: $text-main;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.text-success {
+      color: #16a34a !important;
+    }
+    &.text-danger {
+      color: $danger !important;
+    }
+  }
+
+  &__sub {
+    font-size: 11px;
+    color: $muted-light;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Table card
+// ─────────────────────────────────────────────
+.sd-table-card {
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid $border;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: $text-main;
+
+    mat-icon {
+      font-size: 19px !important;
+      width: 19px !important;
+      height: 19px !important;
+      color: $navy;
+    }
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 12px;
+    background: $navy-light;
+    color: $navy-hover;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  &__footer {
+    padding: 12px 24px;
+    border-top: 1px solid $border-light;
+    background: $surface;
+    font-size: 12px;
+    color: $muted;
+  }
+}
+
+.sd-table-wrap {
+  overflow-x: auto;
+}
+
+// ─────────────────────────────────────────────
+// Mat Table
+// ─────────────────────────────────────────────
+.sd-table {
+  width: 100%;
+
+  .mat-mdc-header-row {
+    background: $surface !important;
+    border-bottom: 1px solid $border !important;
+  }
+
+  .mat-mdc-header-cell {
+    padding: 10px 16px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    white-space: nowrap;
+    border-bottom: 1px solid $border !important;
+  }
+
+  .mat-mdc-row {
+    border-bottom: 1px solid $border-light !important;
+    transition: background 0.12s ease;
+
+    &:last-child {
+      border-bottom: none !important;
+    }
+
+    &:hover {
+      background: $navy-light !important;
+    }
+  }
+
+  .mat-mdc-cell {
+    padding: 13px 16px !important;
+    color: $text-body;
+    font-size: 13px !important;
+    border-bottom: none !important;
+    white-space: nowrap;
+  }
+
+  .col-no {
+    width: 52px;
+  }
+
+  .col-center {
+    text-align: center !important;
+  }
+
+  .cell-muted {
+    color: $muted-light !important;
+    font-size: 12px !important;
+  }
+
+  .cell-name {
+    color: $text-main !important;
+  }
+
+  .font-semibold {
+    font-weight: 600;
+  }
+
+  .text-success {
+    color: #16a34a !important;
+  }
+
+  .text-danger {
+    color: $danger !important;
+  }
+
+  .text-main {
+    color: $text-main !important;
+  }
+}
+
+// ─────────────────────────────────────────────
+// Keterangan cell layout & badges
+// ─────────────────────────────────────────────
+.keterangan-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .keterangan-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: $text-main;
+  }
+}
+
+.badge-type {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  &.masuk {
+    background: $green-light;
+    color: $green;
+    border: 1px solid rgba($green, 0.15);
+  }
+
+  &.keluar {
+    background: $navy-light;
+    color: $navy;
+    border: 1px solid rgba($navy, 0.15);
+  }
+
+  &.retur {
+    background: $danger-light;
+    color: $danger;
+    border: 1px solid rgba($danger, 0.15);
+  }
+}
+
+// ─────────────────────────────────────────────
+// Empty state & Prompts
+// ─────────────────────────────────────────────
+.sd-empty {
+  padding: 56px 20px;
+  text-align: center;
+
+  &__icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: $surface;
+    border: 1px solid $border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+
+    mat-icon {
+      font-size: 28px !important;
+      width: 28px !important;
+      height: 28px !important;
+      color: $muted-light;
+    }
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: $text-main;
+    margin: 0 0 4px;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: $muted;
+    margin: 0;
+  }
+}
+
+.sd-filter-prompt {
+  background: #fff;
+  border: 1px dashed $border;
+  border-radius: $radius-xl;
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+
+  mat-icon {
+    font-size: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    color: $muted-light;
+    animation: bounce 2s infinite;
+  }
+
+  p {
+    font-size: 14px;
+    color: $muted;
+    margin: 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+// ─────────────────────────────────────────────
+// Responsive
+// ─────────────────────────────────────────────
+@media (max-width: 640px) {
+  .sd-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sd-export-btn {
+    width: 100%;
+    justify-content: center !important;
+  }
+}

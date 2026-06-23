@@ -28,6 +28,7 @@ import {
   DollarOutline,
   InteractionOutline,
   ShoppingCartOutline,
+  HistoryOutline,
   IdcardOutline
 } from '@ant-design/icons-angular/icons';
 import { NgScrollbarModule } from 'ngx-scrollbar';
@@ -76,6 +77,7 @@ export class NavContentComponent implements OnInit {
         DollarOutline,
         StockOutline,
         ShoppingCartOutline,
+        HistoryOutline,
         InteractionOutline,
         IdcardOutline
       ]

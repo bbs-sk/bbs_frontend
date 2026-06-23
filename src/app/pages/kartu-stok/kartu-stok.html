@@ -1,0 +1,218 @@
+<section class="sd-page">
+  <div class="sd-header">
+    <div class="sd-header__left">
+      <div class="sd-header__title-wrap">
+        <div class="sd-header__icon">
+          <mat-icon>history</mat-icon>
+        </div>
+
+        <div>
+          <h1 class="sd-header__title">Kartu Stok Barang</h1>
+          <p class="sd-header__desc">Monitoring riwayat masuk, keluar, dan penyesuaian stok secara kronologis</p>
+        </div>
+      </div>
+    </div>
+
+    <button
+      mat-flat-button
+      class="sd-export-btn"
+      (click)="onExport()"
+      [disabled]="mutations.length === 0 && stokAwal === 0"
+      matTooltip="Export ke file Excel"
+    >
+      <mat-icon>download</mat-icon>
+      Export Kartu Stok
+    </button>
+  </div>
+
+  <!-- ═══ FILTER -->
+  <div class="sd-filter-card">
+    <form [formGroup]="filterForm" class="sd-filter-form">
+      <div class="sd-filter-field select-barang">
+        <p class="sd-filter-label">
+          <mat-icon>inventory_2</mat-icon>
+          Pilih Barang
+        </p>
+        <ng-select
+          [items]="barangList"
+          bindLabel="nama_barang"
+          bindValue="id_barang"
+          placeholder="Cari dan Pilih Barang..."
+          formControlName="id_barang"
+          [clearable]="true"
+        >
+          <ng-template ng-label-tmp let-item="item">
+            <span class="font-semibold">{{ item.kode_barang }}</span> - {{ item.nama_barang }} ({{ item.satuan }})
+          </ng-template>
+          <ng-template ng-option-tmp let-item="item" let-index="index">
+            <span class="font-semibold">{{ item.kode_barang }}</span> - {{ item.nama_barang }} ({{ item.satuan }})
+          </ng-template>
+        </ng-select>
+      </div>
+
+      <div class="sd-filter-field date-picker-field">
+        <p class="sd-filter-label">
+          <mat-icon>calendar_month</mat-icon>
+          Pilih Periode Tanggal
+        </p>
+        <mat-form-field appearance="outline" class="sd-range-picker">
+          <mat-date-range-input [rangePicker]="picker" [max]="maxDate">
+            <input
+              matStartDate
+              formControlName="startDate"
+              placeholder="Tanggal Awal"
+              (keydown)="isTyping = true"
+              (keyup.enter)="onManualEnter()"
+            />
+            <input
+              matEndDate
+              formControlName="endDate"
+              placeholder="Tanggal Akhir"
+              (keydown)="isTyping = true"
+              (keyup.enter)="onManualEnter()"
+            />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+    </form>
+  </div>
+
+  <!-- ═══ SUMMARY -->
+  <div class="sd-summary-grid" *ngIf="filterForm.get('id_barang')?.value">
+    <div class="sd-summary-card">
+      <div class="sd-summary-card__icon blue">
+        <mat-icon>hourglass_empty</mat-icon>
+      </div>
+      <div class="sd-summary-card__info">
+        <span class="sd-summary-card__label">Stok Awal</span>
+        <span class="sd-summary-card__value">{{ stokAwal | number }}</span>
+        <span class="sd-summary-card__sub">sebelum periode dipilih</span>
+      </div>
+    </div>
+
+    <div class="sd-summary-card">
+      <div class="sd-summary-card__icon green">
+        <mat-icon>add_circle</mat-icon>
+      </div>
+      <div class="sd-summary-card__info">
+        <span class="sd-summary-card__label">Total Barang Masuk</span>
+        <span class="sd-summary-card__value text-success">+{{ totalMasuk | number }}</span>
+        <span class="sd-summary-card__sub">{{ getSelectedBarangSatuan() }} bertambah</span>
+      </div>
+    </div>
+
+    <div class="sd-summary-card">
+      <div class="sd-summary-card__icon danger">
+        <mat-icon>remove_circle</mat-icon>
+      </div>
+      <div class="sd-summary-card__info">
+        <span class="sd-summary-card__label">Total Barang Keluar / Retur</span>
+        <span class="sd-summary-card__value text-danger">-{{ totalKeluar | number }}</span>
+        <span class="sd-summary-card__sub">{{ getSelectedBarangSatuan() }} berkurang</span>
+      </div>
+    </div>
+
+    <div class="sd-summary-card">
+      <div class="sd-summary-card__icon amber">
+        <mat-icon>inventory</mat-icon>
+      </div>
+      <div class="sd-summary-card__info">
+        <span class="sd-summary-card__label">Stok Akhir</span>
+        <span class="sd-summary-card__value">{{ stokAkhir | number }}</span>
+        <span class="sd-summary-card__sub">pada akhir periode</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TABLE CARD -->
+  <div class="sd-table-card" *ngIf="filterForm.get('id_barang')?.value">
+    <div class="sd-table-card__header">
+      <div class="sd-table-card__title">
+        <mat-icon>list_alt</mat-icon>
+        Aliran Riwayat Stok
+      </div>
+      <span class="sd-table-card__badge">{{ mutations.length }} mutasi tercatat</span>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="sd-empty" *ngIf="mutations.length === 0 && stokAwal === 0">
+      <div class="sd-empty__icon">
+        <mat-icon>inbox</mat-icon>
+      </div>
+      <p class="sd-empty__title">Tidak ada transaksi barang ini</p>
+      <p class="sd-empty__sub">Silakan ubah rentang tanggal atau pilih barang lain</p>
+    </div>
+
+    <!-- TABLE -->
+    <div class="sd-table-wrap" *ngIf="mutations.length > 0 || stokAwal !== 0">
+      <table mat-table [dataSource]="mutations" class="sd-table">
+        <ng-container matColumnDef="no">
+          <th mat-header-cell *matHeaderCellDef class="col-no">No</th>
+          <td mat-cell *matCellDef="let row" class="col-no cell-muted">{{ getRowIndex(row) }}</td>
+        </ng-container>
+
+        <!-- TANGGAL -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Tanggal</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="date-cell">
+              <span class="date-main">{{ row.datetime.split(' ')[0].split('-').reverse().join('-') }} {{ row.datetime.split(' ')[1] }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- KETERANGAN -->
+        <ng-container matColumnDef="keterangan">
+          <th mat-header-cell *matHeaderCellDef>Keterangan / Transaksi</th>
+          <td mat-cell *matCellDef="let row" class="cell-name">
+            <div class="keterangan-cell">
+              <span class="keterangan-title">{{ row.keterangan }}</span>
+              <span class="badge-type" [ngClass]="row.tipe">{{ row.tipe | uppercase }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- MASUK -->
+        <ng-container matColumnDef="masuk">
+          <th mat-header-cell *matHeaderCellDef class="col-center">Masuk (+)</th>
+          <td mat-cell *matCellDef="let row" class="col-center text-success font-semibold">
+            <span *ngIf="row.tipe === 'masuk'">+{{ row.jumlah }} {{ getSelectedBarangSatuan() }}</span>
+            <span *ngIf="row.tipe !== 'masuk'" class="text-muted">-</span>
+          </td>
+        </ng-container>
+
+        <!-- KELUAR -->
+        <ng-container matColumnDef="keluar">
+          <th mat-header-cell *matHeaderCellDef class="col-center">Keluar / Retur (-)</th>
+          <td mat-cell *matCellDef="let row" class="col-center text-danger font-semibold">
+            <span *ngIf="row.tipe !== 'masuk'">-{{ row.jumlah }} {{ getSelectedBarangSatuan() }}</span>
+            <span *ngIf="row.tipe === 'masuk'" class="text-muted">-</span>
+          </td>
+        </ng-container>
+
+        <!-- SALDO -->
+        <ng-container matColumnDef="saldo">
+          <th mat-header-cell *matHeaderCellDef class="col-center">Saldo Akhir</th>
+          <td mat-cell *matCellDef="let row" class="col-center font-semibold text-main">
+            {{ row.saldo_akhir }} {{ getSelectedBarangSatuan() }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+
+    <div class="sd-table-card__footer" *ngIf="mutations.length > 0 || stokAwal !== 0">
+      Menampilkan kartu stok untuk <strong>{{ getSelectedBarangName() }}</strong>
+    </div>
+  </div>
+
+  <!-- SELECT BARANG PROMPT -->
+  <div class="sd-filter-prompt" *ngIf="!filterForm.get('id_barang')?.value">
+    <mat-icon>arrow_upward</mat-icon>
+    <p>Silakan pilih barang terlebih dahulu untuk menampilkan kartu stok</p>
+  </div>
+</section>

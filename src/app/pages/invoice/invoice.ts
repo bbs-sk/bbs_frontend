@@ -614,7 +614,8 @@ export class Invoice {
       valid = false;
     }
 
-    if (!this.editForm.id_project) {
+    // Validasi proyek (kecuali Gudang yang id_project-nya sudah di-set otomatis)
+    if (this.role !== 'Gudang' && !this.editForm.id_project) {
       this.editErrors['id_project'] = 'Proyek harus dipilih.';
       valid = false;
     }

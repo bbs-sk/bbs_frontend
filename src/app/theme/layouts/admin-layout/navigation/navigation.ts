@@ -95,6 +95,16 @@ export const NavigationItems: NavigationItem[] = [
         breadcrumbs: false
       },
       {
+        id: 'KartuStok',
+        title: 'Kartu Stok',
+        type: 'item',
+        classes: 'nav-item',
+        url: '/kartu-stok',
+        icon: 'history',
+        roles: ['Admin Kantor', 'Gudang'],
+        breadcrumbs: false
+      },
+      {
         id: 'User',
         title: 'Daftar Pengguna',
         type: 'item',

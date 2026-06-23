@@ -279,6 +279,7 @@ export class Project {
   }
 
   onEdit(p: any): void {
+    if (p.id_project == 0) return;
     const user1Exist = this.userLapangan.some((u) => u.id_user === p.id_user1);
 
     const user2Exist = this.userLapangan.some((u) => u.id_user === p.id_user2);
@@ -336,6 +337,7 @@ export class Project {
   }
 
   onDelete(p: any): void {
+    if (p.id_project == 0) return;
     Swal.fire({
       title: 'Konfirmasi Hapus',
       text: `Apakah Anda yakin ingin menghapus proyek "${p.nama_project}"?`,

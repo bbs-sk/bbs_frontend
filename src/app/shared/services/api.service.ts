@@ -247,4 +247,8 @@ export class ApiService {
   updateSuratJalan(payload: any) {
     return this.http.post<any>(`${environment.apiUrl}/suratJalan/update`, payload);
   }
+
+  getKartuStock(payload: { id_barang: number; startDate: string; endDate: string }) {
+    return this.http.post<any>(`${environment.apiUrl}/barang/kartu-stok`, payload);
+  }
 }

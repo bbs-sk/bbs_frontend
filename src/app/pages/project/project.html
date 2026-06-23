@@ -97,7 +97,7 @@
               </td>
 
               <td *ngIf="isRole">
-                <div class="action-btns">
+                <div class="action-btns" *ngIf="p.id_project != 0">
                   <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(p)">
                     <mat-icon>edit</mat-icon>
                   </button>
