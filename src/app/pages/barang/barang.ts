@@ -57,7 +57,7 @@ export class Barang {
     this.addBarangForm = this.fb.group({
       kode_barang: ['', Validators.required],
       nama_barang: ['', Validators.required],
-      satuan: ['', Validators.required],
+      satuan: [''],
       harga_jual: [null, Validators.required]
     });
 
@@ -65,7 +65,7 @@ export class Barang {
       id_barang: [null],
       kode_barang: ['', Validators.required],
       nama_barang: ['', Validators.required],
-      satuan: ['', Validators.required],
+      satuan: [''],
       harga_jual: [null, Validators.required],
       hpp: [null]
     });

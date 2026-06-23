@@ -67,7 +67,7 @@ export class Dashboard {
   loadDashboard() {
     this.api.getTotalBarang().subscribe({
       next: (res: any) => {
-        this.AnalyticEcommerce[0].amount = res.total;
+        this.AnalyticEcommerce[0].amount = Math.floor(Number(res.total)).toLocaleString('id-ID');
         this.cdr.detectChanges();
       },
       error: (err) => console.log(err)
@@ -75,7 +75,7 @@ export class Dashboard {
 
     this.api.getMonthlyBrgMasuk().subscribe({
       next: (res: any) => {
-        this.AnalyticEcommerce[1].amount = res.total;
+        this.AnalyticEcommerce[1].amount = Math.floor(Number(res.total)).toLocaleString('id-ID');
         this.cdr.detectChanges();
       },
       error: (err) => console.log(err)
@@ -83,7 +83,7 @@ export class Dashboard {
 
     this.api.getMonthlyBrgKeluar().subscribe({
       next: (res: any) => {
-        this.AnalyticEcommerce[2].amount = res.total;
+        this.AnalyticEcommerce[2].amount = Math.floor(Number(res.total)).toLocaleString('id-ID');
         this.cdr.detectChanges();
       },
       error: (err) => console.log(err)
@@ -91,7 +91,7 @@ export class Dashboard {
 
     this.api.getWait().subscribe({
       next: (res: any) => {
-        this.AnalyticEcommerce[3].amount = res.total;
+        this.AnalyticEcommerce[3].amount = Math.floor(Number(res.total)).toLocaleString('id-ID');
         this.cdr.detectChanges();
       },
       error: (err) => console.log(err)

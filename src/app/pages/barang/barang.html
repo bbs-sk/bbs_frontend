@@ -12,12 +12,8 @@
           <p class="subtitle">Kelola inventaris barang</p>
         </div>
       </div>
-      <button
-        *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'"
-        class="btn-add"
-        mat-raised-button
-        (click)="openAdd()"
-      >
+      <button *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'" class="btn-add"
+        mat-raised-button (click)="openAdd()">
         <mat-icon>add</mat-icon>
         <span>Tambah Barang</span>
       </button>
@@ -41,16 +37,10 @@
 
       <div class="search-box" [class.focused]="searchFocused">
         <mat-icon class="search-icon">search</mat-icon>
-        <input
-          type="text"
-          class="search-input"
-          [(ngModel)]="searchKeyword"
-          placeholder="Cari kode atau nama barang..."
-          (keyup.enter)="searchData()"
-          (focus)="searchFocused = true"
-          (blur)="searchFocused = false"
-        />
-        <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()" aria-label="Hapus pencarian">
+        <input type="text" class="search-input" [(ngModel)]="searchKeyword" placeholder="Cari kode atau nama barang..."
+          (keyup.enter)="searchData()" (focus)="searchFocused = true" (blur)="searchFocused = false" />
+        <button *ngIf="searchKeyword" type="button" class="btn-clear" (click)="clearSearch()"
+          aria-label="Hapus pencarian">
           <mat-icon>close</mat-icon>
         </button>
         <button type="button" class="btn-search" (click)="searchData()" aria-label="Cari">
@@ -73,7 +63,8 @@
               <th class="col-num">Harga Jual</th>
               <th class="col-num" *ngIf="userLogin?.role === 'Admin Kantor'">HPP</th>
               <th>Tanggal</th>
-              <th class="col-action" *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'">Aksi</th>
+              <th class="col-action" *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'">Aksi
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -85,10 +76,10 @@
               </td>
               <td class="nama-barang">{{ b.nama_barang }}</td>
               <td>
-                <span class="badge-satuan">{{ b.satuan }}</span>
+                <span class="badge-satuan">{{ b.satuan || '-' }}</span>
               </td>
               <td class="col-num">
-                <span class="qty-value">{{ b.jumlah | number }}</span>
+                <span class="qty-value">{{ b.jumlah | number:'1.0-0':'id' }}</span>
               </td>
               <td class="col-num">
                 <span class="price-value">{{ b.harga_jual ? 'Rp ' + b.harga_jual.toLocaleString('id-ID') : '—' }}</span>
@@ -102,7 +93,8 @@
               </td>
               <td *ngIf="userLogin?.role === 'Gudang' || userLogin?.role === 'Admin Kantor'">
                 <div class="action-btns">
-                  <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(b)" aria-label="Edit barang">
+                  <button type="button" class="btn-action btn-edit" title="Edit" (click)="onEdit(b)"
+                    aria-label="Edit barang">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <!-- <button
@@ -115,7 +107,8 @@
                   >
                     <mat-icon>delete_outline</mat-icon>
                   </button> -->
-                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(b)" aria-label="Hapus barang">
+                  <button type="button" class="btn-action btn-del" title="Hapus" (click)="onDelete(b)"
+                    aria-label="Hapus barang">
                     <mat-icon>delete_outline</mat-icon>
                   </button>
                 </div>
@@ -139,19 +132,14 @@
 
     <!-- Paginator -->
     <div class="paginator-wrapper">
-      <mat-paginator
-        [length]="filteredBarang.length"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 20, 50]"
-        [pageIndex]="pageIndex"
-        (page)="onPageChange($event)"
-        showFirstLastButtons
-      ></mat-paginator>
+      <mat-paginator [length]="filteredBarang.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20, 50]"
+        [pageIndex]="pageIndex" (page)="onPageChange($event)" showFirstLastButtons></mat-paginator>
     </div>
   </div>
 
   <!-- ───── BACKDROP ───── -->
-  <div class="modal-backdrop-custom" *ngIf="showAddModal || showEditModal" (click)="showAddModal ? closeAdd() : closeEdit()"></div>
+  <div class="modal-backdrop-custom" *ngIf="showAddModal || showEditModal"
+    (click)="showAddModal ? closeAdd() : closeEdit()"></div>
 
   <!-- ───── MODAL TAMBAH ───── -->
   <div class="modal-custom" *ngIf="showAddModal">
@@ -172,8 +160,8 @@
 
       <form [formGroup]="addBarangForm" (ngSubmit)="submitAdd()">
         <div class="modal-body">
-          <div class="form-row">
-            <div class="form-group">
+          <div class="form-row" style="margin-bottom: 1rem">
+            <div class="form-group" style="margin-bottom: 0">
               <label class="form-label">
                 Kode Barang
                 <span class="text-danger">*</span>
@@ -181,40 +169,23 @@
 
               <input class="form-control" formControlName="kode_barang" placeholder="Masukkan kode barang" />
 
-              <div
-                *ngIf="
+              <div *ngIf="
                 addBarangForm.get('kode_barang')?.invalid &&
                 (
                   addBarangForm.get('kode_barang')?.dirty ||
                   addBarangForm.get('kode_barang')?.touched
                 )
-              "
-                class="text-danger mt-1"
-              >
+              " class="text-danger mt-1">
                 Kode barang harus diisi.
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 0; padding-top: 4px">
               <label class="form-label">
                 Satuan
-                <span class="text-danger">*</span>
               </label>
 
-              <input class="form-control" formControlName="satuan" placeholder="Masukkan satuan barang" />
-
-              <div
-                *ngIf="
-                addBarangForm.get('satuan')?.invalid &&
-                (
-                  addBarangForm.get('satuan')?.dirty ||
-                  addBarangForm.get('satuan')?.touched
-                )
-              "
-                class="text-danger mt-1"
-              >
-                Satuan harus diisi.
-              </div>
+              <input class="form-control" formControlName="satuan" placeholder="Masukkan satuan barang (opsional)" />
             </div>
           </div>
 
@@ -226,16 +197,13 @@
 
             <input class="form-control" formControlName="nama_barang" placeholder="Masukkan nama barang" />
 
-            <div
-              *ngIf="
+            <div *ngIf="
               addBarangForm.get('nama_barang')?.invalid &&
               (
                 addBarangForm.get('nama_barang')?.dirty ||
                 addBarangForm.get('nama_barang')?.touched
               )
-            "
-              class="text-danger mt-1"
-            >
+            " class="text-danger mt-1">
               Nama barang harus diisi.
             </div>
           </div>
@@ -249,27 +217,18 @@
             <div class="input-prefix-wrap">
               <span class="input-prefix">Rp</span>
 
-              <input
-                type="text"
-                class="form-control has-prefix"
-                [value]="hargaJualDisplayAdd"
-                (input)="onHargaJualInput($event, 'add')"
-                (keypress)="numberOnly($event)"
-                inputmode="numeric"
-                placeholder="0"
-              />
+              <input type="text" class="form-control has-prefix" [value]="hargaJualDisplayAdd"
+                (input)="onHargaJualInput($event, 'add')" (keypress)="numberOnly($event)" inputmode="numeric"
+                placeholder="0" />
             </div>
 
-            <div
-              *ngIf="
+            <div *ngIf="
       addBarangForm.get('harga_jual')?.invalid &&
       (
         addBarangForm.get('harga_jual')?.dirty ||
         addBarangForm.get('harga_jual')?.touched
       )
-    "
-              class="text-danger mt-1"
-            >
+    " class="text-danger mt-1">
               Harga jual harus diisi.
             </div>
           </div>
@@ -306,8 +265,8 @@
 
       <form [formGroup]="editBarangForm" (ngSubmit)="submitEdit()">
         <div class="modal-body">
-          <div class="form-row">
-            <div class="form-group">
+          <div class="form-row" style="margin-bottom: 1rem">
+            <div class="form-group" style="margin-bottom: 0">
               <label class="form-label">
                 Kode Barang
                 <span class="text-danger">*</span>
@@ -315,40 +274,23 @@
 
               <input class="form-control" formControlName="kode_barang" placeholder="Masukkan kode barang" />
 
-              <div
-                *ngIf="
+              <div *ngIf="
                 editBarangForm.get('kode_barang')?.invalid &&
                 (
                   editBarangForm.get('kode_barang')?.dirty ||
                   editBarangForm.get('kode_barang')?.touched
                 )
-              "
-                class="text-danger mt-1"
-              >
+              " class="text-danger mt-1">
                 Kode barang harus diisi.
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 0; padding-top: 4px">
               <label class="form-label">
                 Satuan
-                <span class="text-danger">*</span>
               </label>
 
-              <input class="form-control" formControlName="satuan" placeholder="Masukkan satuan barang" />
-
-              <div
-                *ngIf="
-                editBarangForm.get('satuan')?.invalid &&
-                (
-                  editBarangForm.get('satuan')?.dirty ||
-                  editBarangForm.get('satuan')?.touched
-                )
-              "
-                class="text-danger mt-1"
-              >
-                Satuan harus diisi.
-              </div>
+              <input class="form-control" formControlName="satuan" placeholder="Masukkan satuan barang (opsional)" />
             </div>
           </div>
 
@@ -360,16 +302,13 @@
 
             <input class="form-control" formControlName="nama_barang" placeholder="Masukkan nama barang" />
 
-            <div
-              *ngIf="
+            <div *ngIf="
               editBarangForm.get('nama_barang')?.invalid &&
               (
                 editBarangForm.get('nama_barang')?.dirty ||
                 editBarangForm.get('nama_barang')?.touched
               )
-            "
-              class="text-danger mt-1"
-            >
+            " class="text-danger mt-1">
               Nama barang harus diisi.
             </div>
           </div>
@@ -383,27 +322,18 @@
             <div class="input-prefix-wrap">
               <span class="input-prefix">Rp</span>
 
-              <input
-                type="text"
-                class="form-control has-prefix"
-                [value]="hargaJualDisplayEdit"
-                (input)="onHargaJualInput($event, 'edit')"
-                (keypress)="numberOnly($event)"
-                inputmode="numeric"
-                placeholder="0"
-              />
+              <input type="text" class="form-control has-prefix" [value]="hargaJualDisplayEdit"
+                (input)="onHargaJualInput($event, 'edit')" (keypress)="numberOnly($event)" inputmode="numeric"
+                placeholder="0" />
             </div>
 
-            <div
-              *ngIf="
+            <div *ngIf="
       editBarangForm.get('harga_jual')?.invalid &&
       (
         editBarangForm.get('harga_jual')?.dirty ||
         editBarangForm.get('harga_jual')?.touched
       )
-    "
-              class="text-danger mt-1"
-            >
+    " class="text-danger mt-1">
               Harga jual harus diisi.
             </div>
           </div>
@@ -414,15 +344,13 @@
             <div class="input-prefix-wrap">
               <span class="input-prefix">Rp</span>
 
-              <input
-                type="text"
-                class="form-control has-prefix"
+              <input type="text" class="form-control has-prefix"
                 [value]="editBarangForm.get('hpp')?.value ? formatNumber(editBarangForm.get('hpp')?.value) : '—'"
-                disabled
-              />
+                disabled />
             </div>
 
-            <p class="form-hint" style="font-size: 11px; font-style: italic">HPP dihitung otomatis dari transaksi barang masuk</p>
+            <p class="form-hint" style="font-size: 11px; font-style: italic">HPP dihitung otomatis dari transaksi barang
+              masuk</p>
           </div>
         </div>
 

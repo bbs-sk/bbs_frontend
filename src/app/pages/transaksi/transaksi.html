@@ -172,7 +172,7 @@
               </td>
 
               <td class="col-num">
-                <span class="qty-value">{{ m.jumlah | number }}</span>
+                <span class="qty-value">{{ m.jumlah | number:'1.0-0':'id' }}</span>
               </td>
 
               <td class="col-num">
@@ -320,11 +320,11 @@
               </td>
 
               <td>
-                <span class="barang-name">{{k.nama_project}}</span>
+                <span class="barang-name">{{k.nama_project || '—'}}</span>
               </td>
 
               <td class="col-num">
-                <span class="qty-value">{{ k.jumlah | number }}</span>
+                <span class="qty-value">{{ k.jumlah | number:'1.0-0':'id' }}</span>
               </td>
 
               <td class="col-num">
@@ -469,7 +469,7 @@
               </td>
 
               <td class="col-num">
-                <span class="qty-value">{{ r.jumlah | number }}</span>
+                <span class="qty-value">{{ r.jumlah | number:'1.0-0':'id' }}</span>
               </td>
 
               <td class="col-num">
