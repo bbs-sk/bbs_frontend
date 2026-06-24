@@ -181,7 +181,7 @@
 
   <!-- ═══════════ MODAL TAMBAH ═══════════ -->
   <div class="modal-custom" *ngIf="showAddModal">
-    <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-card modal-xl" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-title-wrap">
           <div class="modal-icon add-icon"><mat-icon>add_shopping_cart</mat-icon></div>
@@ -239,10 +239,7 @@
                   >
                     @for (b of barang; track b.id_barang) {
                     <ng-option [value]="b.id_barang" [disabled]="isBarangSelected(b.id_barang,item)||b.jumlah<=0">
-                      <span [style.color]="b.jumlah<=0?'#dc2626':null">
-                        {{ b.kode_barang }} - Stok: {{ b.jumlah }}
-                        <span *ngIf="b.jumlah<=0">Habis</span>
-                      </span>
+                      <span [style.color]="b.jumlah<=0?'#dc2626':null">{{ b.kode_barang }} ({{ b.jumlah }})</span>
                     </ng-option>
                     }
                   </ng-select>
