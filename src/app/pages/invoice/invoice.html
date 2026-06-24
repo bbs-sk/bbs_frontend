@@ -240,7 +240,7 @@
                     @for (b of barang; track b.id_barang) {
                     <ng-option [value]="b.id_barang" [disabled]="isBarangSelected(b.id_barang,item)||b.jumlah<=0">
                       <span [style.color]="b.jumlah<=0?'#dc2626':null">
-                        {{ b.nama_barang }} - Stok: {{ b.jumlah }}
+                        {{ b.kode_barang }} - Stok: {{ b.jumlah }}
                         <span *ngIf="b.jumlah<=0">Habis</span>
                       </span>
                     </ng-option>
