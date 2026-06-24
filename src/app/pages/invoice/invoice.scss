@@ -567,9 +567,9 @@
   pointer-events: none;
 }
 
-// Override modal-lg specifically for invoice to make it wider
-.modal-card.modal-lg {
-  max-width: 880px;
+// Override modal-xl specifically for invoice to make it wider
+.modal-card.modal-xl {
+  max-width: 1000px;
 }
 
 // Allow long text to wrap in ng-select option dropdown panel
