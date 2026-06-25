@@ -270,10 +270,12 @@ export class Project {
       },
       error: (err: any) => {
         this.isSubmitting = false;
+        const msg = err?.error?.message || 'Proyek gagal ditambahkan.';
+        const detail = err?.error?.detail ? ` (${err.error.detail})` : '';
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: err?.error?.message || err?.message || 'Proyek gagal ditambahkan.'
+          text: msg + detail
         });
       }
     });
@@ -328,10 +330,12 @@ export class Project {
       },
       error: (err: any) => {
         this.isSubmitting = false;
+        const msg = err?.error?.message || 'Proyek gagal diperbarui.';
+        const detail = err?.error?.detail ? ` (${err.error.detail})` : '';
         Swal.fire({
           icon: 'error',
           title: 'Gagal',
-          text: err?.error?.message || err?.message || 'Proyek gagal diperbarui.'
+          text: msg + detail
         });
       }
     });

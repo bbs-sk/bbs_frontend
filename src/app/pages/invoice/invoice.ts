@@ -358,11 +358,13 @@ export class Invoice {
     if (this.role === 'Admin Kantor') {
       if (this.editForm?.user_role === 'Gudang') return false; // Admin bebas edit pesanan Gudang
       const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'selesai', 'ditolak'];
-      return this.editForm?.id_user !== this.userLogin?.id_user || lockedStatus.includes(this.editForm?.status);
+      const isAllowedRole = this.editForm?.user_role === 'Admin Kantor' || this.editForm?.id_user === this.userLogin?.id_user;
+      return !isAllowedRole || lockedStatus.includes(this.editForm?.status);
     }
     if (this.role === 'Gudang') {
       const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'ditolak'];
-      return !this.isOwner(this.editForm) || lockedStatus.includes(this.editForm?.status);
+      const isGudangOrder = this.editForm?.user_role === 'Gudang' || this.isOwner(this.editForm);
+      return !isGudangOrder || lockedStatus.includes(this.editForm?.status);
     }
     if (this.role === 'Lapangan') {
       return !(this.editForm?.id_user === this.userLogin?.id_user && this.editForm?.status === 'menunggu');
@@ -373,7 +375,7 @@ export class Invoice {
   canEdit(invoice: any): boolean {
     if (this.role === 'Admin Kantor') return true;
     if (this.role === 'Lapangan') return this.isOwner(invoice) && invoice.status === 'menunggu';
-    if (this.role === 'Gudang') return this.isOwner(invoice);
+    if (this.role === 'Gudang') return this.isOwner(invoice) || invoice.user_role === 'Gudang';
     return false;
   }
 
@@ -381,10 +383,11 @@ export class Invoice {
     const s = invoice.status;
     if (this.role === 'Admin Kantor') {
       if (invoice.user_role === 'Gudang') return true; // Admin bisa hapus semua pesanan Gudang
-      return this.isOwner(invoice) && s !== 'dikirim' && s !== 'selesai';
+      const isAllowedRole = this.isOwner(invoice) || invoice.user_role === 'Admin Kantor';
+      return isAllowedRole && s !== 'dikirim' && s !== 'selesai';
     }
     if (this.role === 'Lapangan') return this.isOwner(invoice) && s === 'menunggu';
-    if (this.role === 'Gudang') return this.isOwner(invoice);
+    if (this.role === 'Gudang') return this.isOwner(invoice) || invoice.user_role === 'Gudang';
     return false;
   }
 
@@ -421,15 +424,18 @@ export class Invoice {
   }
 
   canRetur(invoice: any): boolean {
-    if (invoice.id_project == 0) return false;
     const s = invoice.status;
-    const isAllowed = this.isOwner(invoice) || (this.role === 'Admin Kantor' && invoice.user_role === 'Gudang');
+    let isAllowed = this.isOwner(invoice);
+    if (this.role === 'Gudang' && invoice.user_role === 'Gudang') {
+      isAllowed = true;
+    } else if (this.role === 'Admin Kantor' && (invoice.user_role === 'Gudang' || invoice.user_role === 'Admin Kantor')) {
+      isAllowed = true;
+    }
     return isAllowed && (s === 'dikirim' || s === 'selesai');
   }
 
   showSuratJalanBtn(): boolean {
     if (this.role !== 'Gudang' && this.role !== 'Admin Kantor') return false;
-    if (this.detailInvoice?.id_project == 0) return false;
     const s = this.detailInvoice?.status;
     return s === 'dikirim' || s === 'selesai';
   }
@@ -1737,13 +1743,10 @@ export class Invoice {
   // Source badge helpers
   // ─────────────────────────────────────────────
   getSourceLabel(invoice: any): string {
-    if (this.isOwner(invoice)) return 'Saya';
-    switch (invoice.user_role) {
-      case 'Lapangan':     return 'Lapangan';
-      case 'Gudang':       return 'Gudang';
-      case 'Admin Kantor': return 'Admin Kantor';
-      default:             return invoice.user_role || '—';
-    }
+    const name: string = invoice.user_name || invoice.name || '';
+    const role: string = invoice.user_role || '—';
+    if (this.isOwner(invoice)) return name ? `${name} · Saya` : 'Saya';
+    return name ? `${name} · ${role}` : role;
   }
 
   getSourceClass(invoice: any): string {
