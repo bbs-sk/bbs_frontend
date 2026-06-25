@@ -34,6 +34,7 @@ export class Invoice {
   barang: any[] = [];
   isLoading = false;
   filterStatus = '';
+  filterSource = 'all'; // 'all' | 'self' | 'lapangan' | 'gudang' | 'kantor'
 
   // ─── Pagination ─────────────────────────────
   pageSize = 10;
@@ -53,7 +54,7 @@ export class Invoice {
     return this.userLogin?.role ?? '';
   }
   isOwner(invoice: any): boolean {
-    return invoice.id_user == this.userLogin?.id_user;
+    return Number(invoice.id_user) === Number(this.userLogin?.id_user);
   }
 
   // ─── Modal flags ────────────────────────────
@@ -134,9 +135,6 @@ export class Invoice {
     this.api.getInvoiceRole({ role: this.userLogin?.role, id_user: this.userLogin?.id_user }).subscribe({
       next: (res: any) => {
         this.invoice = Array.isArray(res) ? res : (res?.val ?? []);
-        console.log('DATA INVOICE:', this.invoice);
-        console.log('CREATED_AT PERTAMA:', this.invoice[0]?.created_at);
-        console.log(this.invoice);
         this.filteredInvoice = [...this.invoice];
         this.filterStatus = '';
         this.pageIndex = 0;
@@ -233,16 +231,40 @@ export class Invoice {
   }
 
   applyStatusFilter(): void {
-    const base = [...this.invoice];
-    if (!this.filterStatus) {
-      this.filteredInvoice = base;
-    } else if (this.filterStatus === 'pay_lunas') {
-      this.filteredInvoice = base.filter((i: any) => i.pembayaran === 'lunas');
+    this.applyFilters();
+  }
+
+  applySourceFilter(): void {
+    this.applyFilters();
+  }
+
+  applyFilters(): void {
+    let base = [...this.invoice];
+
+    // ── Filter status ──
+    if (this.filterStatus === 'pay_lunas') {
+      base = base.filter((i: any) => i.pembayaran === 'lunas');
     } else if (this.filterStatus === 'pay_belum') {
-      this.filteredInvoice = base.filter((i: any) => i.pembayaran === 'belum');
-    } else {
-      this.filteredInvoice = base.filter((i: any) => i.status === this.filterStatus);
+      base = base.filter((i: any) => i.pembayaran === 'belum');
+    } else if (this.filterStatus) {
+      base = base.filter((i: any) => i.status === this.filterStatus);
     }
+
+    // ── Filter sumber (hanya untuk Gudang & Admin Kantor) ──
+    if (this.filterSource !== 'all' && this.role !== 'Lapangan') {
+      base = base.filter((i: any) => {
+        const isSelf = this.isOwner(i);
+        switch (this.filterSource) {
+          case 'self':     return isSelf;
+          case 'lapangan': return i.user_role === 'Lapangan';    // termasuk diri sendiri jika role-nya Lapangan
+          case 'gudang':   return i.user_role === 'Gudang';       // semua pesanan Gudang, termasuk milikmu
+          case 'kantor':   return i.user_role === 'Admin Kantor'; // semua pesanan Admin Kantor, termasuk milikmu
+          default:         return true;
+        }
+      });
+    }
+
+    this.filteredInvoice = base;
     this.pageIndex = 0;
     this.updatePaginatedData();
     this.cdr.detectChanges();
@@ -340,9 +362,7 @@ export class Invoice {
     }
     if (this.role === 'Gudang') {
       const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'ditolak'];
-      const isGudangOrder = this.editForm?.user_role === 'Gudang' || this.editForm?.id_user == this.userLogin?.id_user;
-
-      return !isGudangOrder || lockedStatus.includes(this.editForm?.status);
+      return !this.isOwner(this.editForm) || lockedStatus.includes(this.editForm?.status);
     }
     if (this.role === 'Lapangan') {
       return !(this.editForm?.id_user === this.userLogin?.id_user && this.editForm?.status === 'menunggu');
@@ -353,7 +373,7 @@ export class Invoice {
   canEdit(invoice: any): boolean {
     if (this.role === 'Admin Kantor') return true;
     if (this.role === 'Lapangan') return this.isOwner(invoice) && invoice.status === 'menunggu';
-    if (this.role === 'Gudang') return this.isOwner(invoice) || invoice.user_role === 'Gudang';
+    if (this.role === 'Gudang') return this.isOwner(invoice);
     return false;
   }
 
@@ -361,7 +381,7 @@ export class Invoice {
     const s = invoice.status;
     if (this.role === 'Admin Kantor') return this.isOwner(invoice) && s !== 'dikirim' && s !== 'selesai';
     if (this.role === 'Lapangan') return this.isOwner(invoice) && s === 'menunggu';
-    if (this.role === 'Gudang') return this.isOwner(invoice) || invoice.user_role === 'Gudang';
+    if (this.role === 'Gudang') return this.isOwner(invoice);
     return false;
   }
 
@@ -400,7 +420,7 @@ export class Invoice {
   canRetur(invoice: any): boolean {
     if (invoice.id_project == 0) return false;
     const s = invoice.status;
-    const isAllowed = this.isOwner(invoice) || (this.role === 'Gudang' && invoice.user_role === 'Gudang');
+    const isAllowed = this.isOwner(invoice);
     return isAllowed && (s === 'dikirim' || s === 'selesai');
   }
 
@@ -1708,6 +1728,29 @@ export class Invoice {
 
   hasAnyAction(invoice: any): boolean {
     return this.canEdit(invoice) || this.canUpdateStatus(invoice) || this.canRetur(invoice) || this.canDelete(invoice);
+  }
+
+  // ─────────────────────────────────────────────
+  // Source badge helpers
+  // ─────────────────────────────────────────────
+  getSourceLabel(invoice: any): string {
+    if (this.isOwner(invoice)) return 'Saya';
+    switch (invoice.user_role) {
+      case 'Lapangan':     return 'Lapangan';
+      case 'Gudang':       return 'Gudang';
+      case 'Admin Kantor': return 'Admin Kantor';
+      default:             return invoice.user_role || '—';
+    }
+  }
+
+  getSourceClass(invoice: any): string {
+    if (this.isOwner(invoice)) return 'src-self';
+    switch (invoice.user_role) {
+      case 'Lapangan':     return 'src-lapangan';
+      case 'Gudang':       return 'src-gudang';
+      case 'Admin Kantor': return 'src-kantor';
+      default:             return 'src-other';
+    }
   }
 
   formatWIB(dateString: string): string {

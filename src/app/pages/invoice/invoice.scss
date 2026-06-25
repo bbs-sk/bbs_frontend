@@ -575,3 +575,150 @@
     padding: 8px 12px !important;
   }
 }
+
+// ─────────────────────────────────────────────
+// Source badge (di kolom Pemesan)
+// ─────────────────────────────────────────────
+.source-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 20px;
+  margin-bottom: 3px;
+  letter-spacing: 0.3px;
+  line-height: 1.6;
+
+  &.src-self     { background: #dbeafe; color: #1d4ed8; }   // Biru  — Saya
+  &.src-lapangan { background: #dcfce7; color: #15803d; }   // Hijau — Lapangan
+  &.src-gudang   { background: #ede9fe; color: #6d28d9; }   // Ungu  — Gudang
+  &.src-kantor   { background: #ffedd5; color: #c2410c; }   // Oranye — Admin Kantor
+  &.src-other    { background: #f1f5f9; color: #475569; }
+}
+
+.user-name {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 500;
+}
+
+.proyek-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+// ─────────────────────────────────────────────
+// Row tint (warna latar baris, sangat tipis)
+// ─────────────────────────────────────────────
+.table-row {
+  &.src-self     { background: rgba(219, 234, 254, 0.22) !important; }
+  &.src-lapangan { background: rgba(220, 252, 231, 0.22) !important; }
+  &.src-gudang   { background: rgba(237, 233, 254, 0.22) !important; }
+  &.src-kantor   { background: rgba(255, 237, 213, 0.22) !important; }
+}
+
+// ─────────────────────────────────────────────
+// Filter chip sumber pesanan (di toolbar)
+// ─────────────────────────────────────────────
+.source-filter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 4px 4px 16px;
+}
+
+.source-filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: $muted;
+  margin-right: 2px;
+}
+
+.chip-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1.5px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.5;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  // Semua (default abu)
+  &.chip-all {
+    border-color: #cbd5e1;
+    color: #64748b;
+    &::before { background: #94a3b8; }
+    &.active, &:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #334155;
+    }
+  }
+
+  // Saya (biru)
+  &.chip-self {
+    border-color: #93c5fd;
+    color: #1d4ed8;
+    &::before { background: #3b82f6; }
+    &.active, &:hover {
+      background: #dbeafe;
+      border-color: #3b82f6;
+    }
+  }
+
+  // Lapangan (hijau)
+  &.chip-lapangan {
+    border-color: #86efac;
+    color: #15803d;
+    &::before { background: #22c55e; }
+    &.active, &:hover {
+      background: #dcfce7;
+      border-color: #22c55e;
+    }
+  }
+
+  // Gudang (ungu)
+  &.chip-gudang {
+    border-color: #c4b5fd;
+    color: #6d28d9;
+    &::before { background: #8b5cf6; }
+    &.active, &:hover {
+      background: #ede9fe;
+      border-color: #8b5cf6;
+    }
+  }
+
+  // Admin Kantor (oranye)
+  &.chip-kantor {
+    border-color: #fdba74;
+    color: #c2410c;
+    &::before { background: #f97316; }
+    &.active, &:hover {
+      background: #ffedd5;
+      border-color: #f97316;
+    }
+  }
+
+  &.active {
+    font-weight: 600;
+  }
+}

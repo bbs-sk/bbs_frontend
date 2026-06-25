@@ -44,6 +44,41 @@
       </select>
     </div>
 
+    <!-- ─── Filter Sumber Pesanan (hanya Gudang & Admin Kantor) ─── -->
+    <div class="source-filter-wrap" *ngIf="role !== 'Lapangan'">
+      <span class="source-filter-label">Sumber:</span>
+      <button
+        type="button"
+        class="chip-source chip-all"
+        [class.active]="filterSource === 'all'"
+        (click)="filterSource='all'; applySourceFilter()"
+      >Semua</button>
+      <button
+        type="button"
+        class="chip-source chip-self"
+        [class.active]="filterSource === 'self'"
+        (click)="filterSource='self'; applySourceFilter()"
+      >Saya</button>
+      <button
+        type="button"
+        class="chip-source chip-lapangan"
+        [class.active]="filterSource === 'lapangan'"
+        (click)="filterSource='lapangan'; applySourceFilter()"
+      >Lapangan</button>
+      <button
+        type="button"
+        class="chip-source chip-gudang"
+        [class.active]="filterSource === 'gudang'"
+        (click)="filterSource='gudang'; applySourceFilter()"
+      >Gudang</button>
+      <button
+        type="button"
+        class="chip-source chip-kantor"
+        [class.active]="filterSource === 'kantor'"
+        (click)="filterSource='kantor'; applySourceFilter()"
+      >Admin Kantor</button>
+    </div>
+
     <!-- ─── Tabel ─── -->
     <div class="table-responsive">
       <div class="table-wrapper">
@@ -62,7 +97,7 @@
           </thead>
           <tbody>
             @for (i of paginatedInvoice; track i.id_invoice; let idx = $index) {
-            <tr class="table-row">
+            <tr class="table-row" [ngClass]="getSourceClass(i)">
               <td class="col-no text-muted-sm">{{ (pageIndex * pageSize) + idx + 1 }}</td>
 
               <td class="col-date">
@@ -71,7 +106,10 @@
                 </div>
               </td>
               <td>
-                <div class="badge-proyek">{{ i.nama_project }}</div>
+                <div class="proyek-cell">
+                  <div class="badge-proyek">{{ i.nama_project }}</div>
+                  <span *ngIf="role !== 'Lapangan'" class="source-badge" [ngClass]="getSourceClass(i)">{{ getSourceLabel(i) }}</span>
+                </div>
               </td>
               <td><div class="user-name">{{ i.name }}</div></td>
               <td class="col-num">
@@ -460,7 +498,7 @@
         <div class="form-row-2">
           <div class="form-group" *ngIf="showPembayaranOnEdit()">
             <label class="form-label">Status Pembayaran</label>
-            <ng-select [(ngModel)]="editForm.pembayaran" [searchable]="false" [clearable]="false">
+            <ng-select [(ngModel)]="editForm.pembayaran" [searchable]="false" [clearable]="false" [disabled]="role === 'Gudang' && editForm?.id_user !== userLogin?.id_user">
               <ng-option value="belum">Belum Lunas</ng-option>
               <ng-option value="lunas">Lunas</ng-option>
             </ng-select>
