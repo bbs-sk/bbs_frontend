@@ -143,7 +143,8 @@ export class Project {
   loadUserLapangan(): void {
     this.api.getUserLapangan().subscribe({
       next: (res: any) => {
-        this.userLapangan = Array.isArray(res) ? res : (res?.val ?? []);
+        const list = Array.isArray(res) ? res : (res?.val ?? []);
+        this.userLapangan = list.filter((u: any) => u.status == 1);
       },
 
       error: () => {

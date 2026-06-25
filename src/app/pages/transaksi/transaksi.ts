@@ -113,7 +113,7 @@ export class Transaksi implements OnInit {
 
   ngOnInit(): void {
     this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
-    this.isGudang = this.userLogin?.role === 'Gudang';
+    this.isGudang = this.userLogin?.role === 'Gudang' || this.userLogin?.role === 'Admin Kantor';
 
     // ── inisialisasi form tanggal ──
     const today = new Date();

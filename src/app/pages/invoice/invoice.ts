@@ -356,8 +356,8 @@ export class Invoice {
 
   isFieldsLockedOnEdit(): boolean {
     if (this.role === 'Admin Kantor') {
+      if (this.editForm?.user_role === 'Gudang') return false; // Admin bebas edit pesanan Gudang
       const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'selesai', 'ditolak'];
-
       return this.editForm?.id_user !== this.userLogin?.id_user || lockedStatus.includes(this.editForm?.status);
     }
     if (this.role === 'Gudang') {
@@ -379,7 +379,10 @@ export class Invoice {
 
   canDelete(invoice: any): boolean {
     const s = invoice.status;
-    if (this.role === 'Admin Kantor') return this.isOwner(invoice) && s !== 'dikirim' && s !== 'selesai';
+    if (this.role === 'Admin Kantor') {
+      if (invoice.user_role === 'Gudang') return true; // Admin bisa hapus semua pesanan Gudang
+      return this.isOwner(invoice) && s !== 'dikirim' && s !== 'selesai';
+    }
     if (this.role === 'Lapangan') return this.isOwner(invoice) && s === 'menunggu';
     if (this.role === 'Gudang') return this.isOwner(invoice);
     return false;
@@ -420,12 +423,12 @@ export class Invoice {
   canRetur(invoice: any): boolean {
     if (invoice.id_project == 0) return false;
     const s = invoice.status;
-    const isAllowed = this.isOwner(invoice);
+    const isAllowed = this.isOwner(invoice) || (this.role === 'Admin Kantor' && invoice.user_role === 'Gudang');
     return isAllowed && (s === 'dikirim' || s === 'selesai');
   }
 
   showSuratJalanBtn(): boolean {
-    if (this.role !== 'Gudang') return false;
+    if (this.role !== 'Gudang' && this.role !== 'Admin Kantor') return false;
     if (this.detailInvoice?.id_project == 0) return false;
     const s = this.detailInvoice?.status;
     return s === 'dikirim' || s === 'selesai';
