@@ -259,8 +259,8 @@
                       inputmode="numeric"
                       (input)="onHargaInput($event,item)"
                       placeholder="0"
-                      [readonly]="userLogin?.role !== 'Admin Kantor'"
-                      [class.input-readonly]="userLogin?.role !== 'Admin Kantor'"
+                      [readonly]="userLogin?.role !== 'Admin Kantor' && userLogin?.role !== 'Gudang'"
+                      [class.input-readonly]="userLogin?.role !== 'Admin Kantor' && userLogin?.role !== 'Gudang'"
                     />
                   </div>
                   <div *ngIf="addBarangErrors[$index]?.['harga_jual']" class="text-danger mt-1">

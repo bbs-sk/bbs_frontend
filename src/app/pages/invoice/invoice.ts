@@ -53,7 +53,7 @@ export class Invoice {
     return this.userLogin?.role ?? '';
   }
   isOwner(invoice: any): boolean {
-    return invoice.id_user === this.userLogin?.id_user;
+    return invoice.id_user == this.userLogin?.id_user;
   }
 
   // ─── Modal flags ────────────────────────────
@@ -340,8 +340,9 @@ export class Invoice {
     }
     if (this.role === 'Gudang') {
       const lockedStatus = ['menunggu', 'disetujui', 'dikirim', 'ditolak'];
+      const isGudangOrder = this.editForm?.user_role === 'Gudang' || this.editForm?.id_user == this.userLogin?.id_user;
 
-      return this.editForm?.id_user !== this.userLogin?.id_user || lockedStatus.includes(this.editForm?.status);
+      return !isGudangOrder || lockedStatus.includes(this.editForm?.status);
     }
     if (this.role === 'Lapangan') {
       return !(this.editForm?.id_user === this.userLogin?.id_user && this.editForm?.status === 'menunggu');
@@ -352,7 +353,7 @@ export class Invoice {
   canEdit(invoice: any): boolean {
     if (this.role === 'Admin Kantor') return true;
     if (this.role === 'Lapangan') return this.isOwner(invoice) && invoice.status === 'menunggu';
-    if (this.role === 'Gudang') return this.isOwner(invoice);
+    if (this.role === 'Gudang') return this.isOwner(invoice) || invoice.user_role === 'Gudang';
     return false;
   }
 
@@ -360,7 +361,7 @@ export class Invoice {
     const s = invoice.status;
     if (this.role === 'Admin Kantor') return this.isOwner(invoice) && s !== 'dikirim' && s !== 'selesai';
     if (this.role === 'Lapangan') return this.isOwner(invoice) && s === 'menunggu';
-    if (this.role === 'Gudang') return this.isOwner(invoice);
+    if (this.role === 'Gudang') return this.isOwner(invoice) || invoice.user_role === 'Gudang';
     return false;
   }
 
@@ -397,18 +398,17 @@ export class Invoice {
   }
 
   canRetur(invoice: any): boolean {
+    if (invoice.id_project == 0) return false;
     const s = invoice.status;
-    return this.isOwner(invoice) && (s === 'dikirim' || s === 'selesai');
+    const isGudangOrder = invoice.user_role === 'Gudang' || this.isOwner(invoice);
+    return isGudangOrder && (s === 'dikirim' || s === 'selesai');
   }
 
   showSuratJalanBtn(): boolean {
     if (this.role !== 'Gudang') return false;
     if (this.detailInvoice?.id_project == 0) return false;
     const s = this.detailInvoice?.status;
-    // Tampilkan tombol surat jalan untuk semua status aktif
-    // - Gudang buat pemesanan: langsung selesai, tapi tetap bisa buat/edit surat jalan
-    // - Lapangan buat pemesanan: muncul saat dikirim, read-only saat selesai
-    return s === 'dipesan' || s === 'disetujui' || s === 'dikirim' || s === 'selesai';
+    return s === 'dikirim' || s === 'selesai';
   }
 
   isSuratJalanReadOnly(): boolean {
@@ -574,7 +574,8 @@ export class Invoice {
       pembayaran: i.pembayaran,
       detail: i.detail,
       total_harga: i.total_harga,
-      status: i.status
+      status: i.status,
+      user_role: i.user_role
     };
     this.editBarang = [];
     this.loadingAnimation();
