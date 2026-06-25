@@ -403,12 +403,16 @@ export class Invoice {
 
   showSuratJalanBtn(): boolean {
     if (this.role !== 'Gudang') return false;
+    if (this.detailInvoice?.id_project == 0) return false;
     const s = this.detailInvoice?.status;
-    return s === 'dikirim' || s === 'selesai';
+    // Tampilkan tombol surat jalan untuk semua status aktif
+    // - Gudang buat pemesanan: langsung selesai, tapi tetap bisa buat/edit surat jalan
+    // - Lapangan buat pemesanan: muncul saat dikirim, read-only saat selesai
+    return s === 'dipesan' || s === 'disetujui' || s === 'dikirim' || s === 'selesai';
   }
 
   isSuratJalanReadOnly(): boolean {
-    return this.detailInvoice?.status === 'selesai';
+    return false;
   }
 
   // ─────────────────────────────────────────────
