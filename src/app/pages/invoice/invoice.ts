@@ -400,8 +400,8 @@ export class Invoice {
   canRetur(invoice: any): boolean {
     if (invoice.id_project == 0) return false;
     const s = invoice.status;
-    const isGudangOrder = invoice.user_role === 'Gudang' || this.isOwner(invoice);
-    return isGudangOrder && (s === 'dikirim' || s === 'selesai');
+    const isAllowed = this.isOwner(invoice) || (this.role === 'Gudang' && invoice.user_role === 'Gudang');
+    return isAllowed && (s === 'dikirim' || s === 'selesai');
   }
 
   showSuratJalanBtn(): boolean {
