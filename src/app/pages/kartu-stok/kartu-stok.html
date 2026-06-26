@@ -13,16 +13,29 @@
       </div>
     </div>
 
-    <button
-      mat-flat-button
-      class="sd-export-btn"
-      (click)="onExport()"
-      [disabled]="mutations.length === 0 && stokAwal === 0"
-      matTooltip="Export ke file Excel"
-    >
-      <mat-icon>download</mat-icon>
-      Export Kartu Stok
-    </button>
+    <div class="sd-header__actions">
+      <button
+        mat-stroked-button
+        class="sd-export-all-btn"
+        (click)="onExportSemua()"
+        matTooltip="Export semua barang ke Excel berdasarkan periode tanggal"
+      >
+        <mat-icon>table_chart</mat-icon>
+        Unduh Semua Barang
+      </button>
+
+      <button
+        mat-flat-button
+        class="sd-export-btn"
+        (click)="onExport()"
+        [disabled]="mutations.length === 0 && stokAwal === 0"
+        matTooltip="Export kartu stok barang yang dipilih ke Excel"
+      >
+        <mat-icon>download</mat-icon>
+        Export Kartu Stok
+      </button>
+    </div>
+
   </div>
 
   <!-- ═══ FILTER -->

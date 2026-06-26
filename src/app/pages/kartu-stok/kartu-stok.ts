@@ -364,6 +364,108 @@ export class KartuStok implements OnInit, OnDestroy {
     FileSaver.saveAs(data, fileName);
   }
 
+  onExportSemua(): void {
+    const start: Date | null = this.filterForm.get('startDate')?.value;
+    const end: Date | null = this.filterForm.get('endDate')?.value;
+
+    if (!start || !end) {
+      Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Silakan pilih rentang tanggal terlebih dahulu.' });
+      return;
+    }
+
+    const startStr = this.localDateToString(start);
+    const endStr = this.localDateToString(end);
+    const periodeAwal = this.formatTanggalIndo(start);
+    const periodeAkhir = this.formatTanggalIndo(end);
+
+    Swal.fire({
+      text: 'Sedang Mengambil Data Semua Barang...',
+      icon: 'info',
+      timerProgressBar: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      showConfirmButton: false,
+      didOpen: () => { Swal.showLoading(); }
+    });
+
+    this.api.getKartuStokSemua({ startDate: startStr, endDate: endStr }).subscribe({
+      next: (res: any[]) => {
+        Swal.close();
+
+        if (!res || res.length === 0) {
+          Swal.fire({ icon: 'info', title: 'Tidak Ada Data', text: 'Tidak ada barang aktif ditemukan.' });
+          return;
+        }
+
+        const headers = ['No', 'Kode Barang', 'Nama Barang', 'Stok Awal', 'Masuk', 'Keluar + Retur', 'Stok Akhir'];
+
+        const fmt = (n: number) => Number(n).toLocaleString('id-ID');
+
+        const dataRows = res.map((item, index) => [
+          index + 1,
+          item.kode_barang,
+          item.nama_barang,
+          fmt(item.stok_awal),
+          fmt(item.total_masuk),
+          fmt(item.total_keluar),
+          fmt(item.stok_akhir)
+        ]);
+
+
+        const sheetData: any[][] = [
+          [`REKAP KARTU STOK SEMUA BARANG`],
+          [`Periode: ${periodeAwal} – ${periodeAkhir}`],
+          [],
+          headers,
+          ...dataRows
+        ];
+
+        const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(sheetData);
+
+        // Merge sel judul & periode
+        worksheet['!merges'] = [
+          { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
+          { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } }
+        ];
+
+        // Auto-fit kolom
+        const MIN_WIDTH = 10;
+        const MAX_WIDTH = 45;
+        const PADDING = 2;
+
+        const colWidths = headers.map((h, colIndex) => {
+          let maxLen = h.length;
+          dataRows.forEach((row) => {
+            const cellValue = row[colIndex] != null ? String(row[colIndex]) : '';
+            maxLen = Math.max(maxLen, cellValue.length);
+          });
+          return { wch: Math.min(Math.max(maxLen + PADDING, MIN_WIDTH), MAX_WIDTH) };
+        });
+
+        worksheet['!cols'] = colWidths;
+
+        const workbook: XLSX.WorkBook = {
+          Sheets: { 'Rekap Kartu Stok': worksheet },
+          SheetNames: ['Rekap Kartu Stok']
+        };
+
+        const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob: Blob = new Blob([excelBuffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+        });
+
+        const fileName = `rekap-kartu-stok-${this.formatFileDate(start)}_sampai_${this.formatFileDate(end)}.xlsx`;
+        FileSaver.saveAs(blob, fileName);
+      },
+      error: (err) => {
+        Swal.close();
+        Swal.fire({ icon: 'error', title: 'Gagal', text: 'Gagal mengambil data kartu stok semua barang.' });
+        console.error(err);
+      }
+    });
+  }
+
+
   private localDateToString(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');

@@ -251,4 +251,9 @@ export class ApiService {
   getKartuStock(payload: { id_barang: number; startDate: string; endDate: string }) {
     return this.http.post<any>(`${environment.apiUrl}/barang/kartu-stok`, payload);
   }
+
+  getKartuStokSemua(payload: { startDate: string; endDate: string }) {
+    return this.http.post<any>(`${environment.apiUrl}/barang/kartu-stok-semua`, payload);
+  }
+
 }

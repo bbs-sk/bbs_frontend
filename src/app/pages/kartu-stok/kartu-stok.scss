@@ -144,6 +144,57 @@ $radius-xl: 16px;
 }
 
 // ─────────────────────────────────────────────
+// Header actions group
+// ─────────────────────────────────────────────
+.sd-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+// Outlined secondary button (Unduh Semua Barang)
+.sd-export-all-btn,
+.sd-export-all-btn.mat-mdc-button {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px !important;
+  height: 44px !important;
+  background: transparent !important;
+  color: $navy !important;
+  border: 1.5px solid $navy !important;
+  border-radius: $radius-md !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s !important;
+
+  mat-icon,
+  .mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    color: $navy !important;
+  }
+
+  &:hover {
+    background: $navy-light !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 14px rgba($navy, 0.15) !important;
+  }
+
+  &:active {
+    transform: translateY(0) !important;
+  }
+}
+
+
+
+// ─────────────────────────────────────────────
 // Filter card
 // ─────────────────────────────────────────────
 .sd-filter-card {

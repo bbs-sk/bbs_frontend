@@ -24,7 +24,7 @@ export class Invoice {
   constructor(
     private api: ApiService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   // ─── Data ───────────────────────────────────
   invoice: any[] = [];
@@ -255,11 +255,11 @@ export class Invoice {
       base = base.filter((i: any) => {
         const isSelf = this.isOwner(i);
         switch (this.filterSource) {
-          case 'self':     return isSelf;
+          case 'self': return isSelf;
           case 'lapangan': return i.user_role === 'Lapangan';    // termasuk diri sendiri jika role-nya Lapangan
-          case 'gudang':   return i.user_role === 'Gudang';       // semua pesanan Gudang, termasuk milikmu
-          case 'kantor':   return i.user_role === 'Admin Kantor'; // semua pesanan Admin Kantor, termasuk milikmu
-          default:         return true;
+          case 'gudang': return i.user_role === 'Gudang';       // semua pesanan Gudang, termasuk milikmu
+          case 'kantor': return i.user_role === 'Admin Kantor'; // semua pesanan Admin Kantor, termasuk milikmu
+          default: return true;
         }
       });
     }
@@ -1020,7 +1020,7 @@ export class Invoice {
           properties: {},
           children: [
             new Paragraph({ children: [new TextRun({ text: 'PANGLONG BBS', bold: true, size: 34 })], spacing: { after: 80 } }),
-            new Paragraph({ text: 'Jl Gatot Subroto', spacing: { after: 40 } }),
+            new Paragraph({ text: 'Jln. Germania Klambir 5 Kebun', spacing: { after: 40 } }),
             new Paragraph({ text: 'Medan', spacing: { after: 400 } }),
             new Paragraph({
               alignment: AlignmentType.RIGHT,
@@ -1286,7 +1286,7 @@ export class Invoice {
             new Paragraph({
               children: [
                 new TextRun({
-                  text: 'DUSUN XIX PASAR IV NO. 16 KLAMBIR 5 KEBUN - HAMPARAN PERAK',
+                  text: 'Jln. Germania Klambir 5 Kebun',
                   size: 19,
                   color: '6b7280',
                   font: 'Arial'
@@ -1539,70 +1539,70 @@ export class Invoice {
             // ── Tabel Retur (jika ada) ──
             ...(this.detailRetur.length > 0
               ? [
-                  new Paragraph({ spacing: { after: 280 } }),
-                  new Paragraph({
-                    children: [new TextRun({ text: 'Retur Barang', bold: true, size: 24, color: '92400e', font: 'Arial' })],
-                    spacing: { after: 120 }
-                  }),
-                  new Table({
-                    width: { size: 10000, type: WidthType.DXA },
-                    columnWidths: [500, 4200, 1500, 3800],
-                    rows: [
-                      new TableRow({
-                        tableHeader: true,
-                        children: [
-                          new TableCell({
-                            borders: cellBorders,
-                            shading: { fill: '92400e', type: ShadingType.CLEAR },
-                            width: { size: 500, type: WidthType.DXA },
-                            margins: { top: 100, bottom: 100, left: 120, right: 120 },
-                            children: [
-                              new Paragraph({
-                                alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: 'No', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
-                              })
-                            ]
-                          }),
-                          new TableCell({
-                            borders: cellBorders,
-                            shading: { fill: '92400e', type: ShadingType.CLEAR },
-                            width: { size: 4200, type: WidthType.DXA },
-                            margins: { top: 100, bottom: 100, left: 120, right: 120 },
-                            children: [
-                              new Paragraph({
-                                children: [new TextRun({ text: 'Nama Barang', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
-                              })
-                            ]
-                          }),
-                          new TableCell({
-                            borders: cellBorders,
-                            shading: { fill: '92400e', type: ShadingType.CLEAR },
-                            width: { size: 1500, type: WidthType.DXA },
-                            margins: { top: 100, bottom: 100, left: 120, right: 120 },
-                            children: [
-                              new Paragraph({
-                                alignment: AlignmentType.CENTER,
-                                children: [new TextRun({ text: 'Qty Retur', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
-                              })
-                            ]
-                          }),
-                          new TableCell({
-                            borders: cellBorders,
-                            shading: { fill: '92400e', type: ShadingType.CLEAR },
-                            width: { size: 3800, type: WidthType.DXA },
-                            margins: { top: 100, bottom: 100, left: 120, right: 120 },
-                            children: [
-                              new Paragraph({
-                                children: [new TextRun({ text: 'Kondisi', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
-                              })
-                            ]
-                          })
-                        ]
-                      }),
-                      ...returRows
-                    ]
-                  })
-                ]
+                new Paragraph({ spacing: { after: 280 } }),
+                new Paragraph({
+                  children: [new TextRun({ text: 'Retur Barang', bold: true, size: 24, color: '92400e', font: 'Arial' })],
+                  spacing: { after: 120 }
+                }),
+                new Table({
+                  width: { size: 10000, type: WidthType.DXA },
+                  columnWidths: [500, 4200, 1500, 3800],
+                  rows: [
+                    new TableRow({
+                      tableHeader: true,
+                      children: [
+                        new TableCell({
+                          borders: cellBorders,
+                          shading: { fill: '92400e', type: ShadingType.CLEAR },
+                          width: { size: 500, type: WidthType.DXA },
+                          margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                          children: [
+                            new Paragraph({
+                              alignment: AlignmentType.CENTER,
+                              children: [new TextRun({ text: 'No', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                            })
+                          ]
+                        }),
+                        new TableCell({
+                          borders: cellBorders,
+                          shading: { fill: '92400e', type: ShadingType.CLEAR },
+                          width: { size: 4200, type: WidthType.DXA },
+                          margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                          children: [
+                            new Paragraph({
+                              children: [new TextRun({ text: 'Nama Barang', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                            })
+                          ]
+                        }),
+                        new TableCell({
+                          borders: cellBorders,
+                          shading: { fill: '92400e', type: ShadingType.CLEAR },
+                          width: { size: 1500, type: WidthType.DXA },
+                          margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                          children: [
+                            new Paragraph({
+                              alignment: AlignmentType.CENTER,
+                              children: [new TextRun({ text: 'Qty Retur', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                            })
+                          ]
+                        }),
+                        new TableCell({
+                          borders: cellBorders,
+                          shading: { fill: '92400e', type: ShadingType.CLEAR },
+                          width: { size: 3800, type: WidthType.DXA },
+                          margins: { top: 100, bottom: 100, left: 120, right: 120 },
+                          children: [
+                            new Paragraph({
+                              children: [new TextRun({ text: 'Kondisi', bold: true, size: 20, color: 'FFFFFF', font: 'Arial' })]
+                            })
+                          ]
+                        })
+                      ]
+                    }),
+                    ...returRows
+                  ]
+                })
+              ]
               : []),
 
             // ── Footer tanda tangan ──
@@ -1752,10 +1752,10 @@ export class Invoice {
   getSourceClass(invoice: any): string {
     if (this.isOwner(invoice)) return 'src-self';
     switch (invoice.user_role) {
-      case 'Lapangan':     return 'src-lapangan';
-      case 'Gudang':       return 'src-gudang';
+      case 'Lapangan': return 'src-lapangan';
+      case 'Gudang': return 'src-gudang';
       case 'Admin Kantor': return 'src-kantor';
-      default:             return 'src-other';
+      default: return 'src-other';
     }
   }
 
