@@ -141,7 +141,8 @@ export class Transaksi implements OnInit {
     this.addMasukForm = this.fb.group({
       id_barang: [null, Validators.required],
       jumlah: [null, [Validators.required, Validators.min(1)]],
-      harga_beli: [null, [Validators.required, Validators.min(1)]]
+      harga_beli: [null, [Validators.required, Validators.min(1)]],
+      datetime: [null, Validators.required]
     });
 
     this.loadData();
@@ -501,10 +502,12 @@ export class Transaksi implements OnInit {
   // =====================================================
 
   openAddMasuk(): void {
+    const now = new Date();
     this.addMasukForm.reset({
       id_barang: null,
       jumlah: null,
-      harga_beli: null
+      harga_beli: null,
+      datetime: this.toDatetimeLocal(now)
     });
 
     this.hargaBeliDisplay = '';
@@ -529,6 +532,11 @@ export class Transaksi implements OnInit {
     }
 
     this.isSubmitting = true;
+
+    const payload = {
+      ...this.addMasukForm.value,
+      datetime: this.toPostgresTimestamp(this.addMasukForm.value.datetime)
+    };
 
     this.api.addBrgMasuk(this.addMasukForm.value).subscribe({
       next: () => {
@@ -785,5 +793,21 @@ export class Transaksi implements OnInit {
         Swal.showLoading();
       }
     });
+  }
+
+  toDatetimeLocal(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  toPostgresTimestamp(value: string): string {
+    const date = new Date(value);
+
+    const pad = (n: number, len = 2) => String(n).padStart(len, '0');
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(
+      date.getMinutes()
+    )}:${pad(date.getSeconds())}.${pad(date.getMilliseconds(), 3)}000`;
   }
 }
