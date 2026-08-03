@@ -42,6 +42,8 @@ export class Barang {
   hargaJualDisplayAdd = '';
   hargaJualDisplayEdit = '';
 
+  filterStock: 'all' | 'low' = 'all';
+
   addBarangForm!: FormGroup;
   editBarangForm!: FormGroup;
 
@@ -50,6 +52,13 @@ export class Barang {
     return Math.ceil(this.filteredBarang.length / this.pageSize) || 1;
   }
 
+  get lowStockCount(): number {
+    return this.barang.filter((b) => Number(b.jumlah) <= Number(b.min_jumlah)).length;
+  }
+
+  get role(): string {
+    return this.userLogin?.role ?? '';
+  }
   ngOnInit(): void {
     this.userLogin = JSON.parse(localStorage.getItem('user') || '{}');
     this.isRole = this.userLogin?.role === 'Gudang';
@@ -58,7 +67,8 @@ export class Barang {
       kode_barang: ['', Validators.required],
       nama_barang: ['', Validators.required],
       satuan: [''],
-      harga_jual: [null, Validators.required]
+      harga_jual: [null, Validators.required],
+      min_jumlah: [0, [Validators.required, Validators.min(0)]]
     });
 
     this.editBarangForm = this.fb.group({
@@ -67,6 +77,7 @@ export class Barang {
       nama_barang: ['', Validators.required],
       satuan: [''],
       harga_jual: [null, Validators.required],
+      min_jumlah: [0, [Validators.required, Validators.min(0)]],
       hpp: [null]
     });
   }
@@ -170,7 +181,8 @@ export class Barang {
       kode_barang: '',
       nama_barang: '',
       satuan: '',
-      harga_jual: null
+      harga_jual: null,
+      min_jumlah: 0
     });
 
     this.hargaJualDisplayAdd = '';
@@ -190,19 +202,12 @@ export class Barang {
       nama_barang: b.nama_barang ?? '',
       satuan: b.satuan ?? '',
       harga_jual: b.harga_jual ?? null,
+      min_jumlah: b.min_jumlah ?? 0,
       hpp: b.hpp ?? null
     });
 
     this.hargaJualDisplayEdit = b.harga_jual ? Number(b.harga_jual).toLocaleString('id-ID') : '';
-    if (!this.isRole) {
-      this.editBarangForm.get('kode_barang')?.disable();
-      this.editBarangForm.get('nama_barang')?.disable();
-      this.editBarangForm.get('satuan')?.disable();
-    } else {
-      this.editBarangForm.get('kode_barang')?.enable();
-      this.editBarangForm.get('nama_barang')?.enable();
-      this.editBarangForm.get('satuan')?.enable();
-    }
+
     this.showEditModal = true;
   }
 
@@ -294,30 +299,57 @@ export class Barang {
       confirmButtonText: 'Hapus',
       cancelButtonText: 'Batal'
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.api.deleteBarang(b.id_barang).subscribe({
-          next: () => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Berhasil',
-              text: `Barang "${b.nama_barang}" berhasil dihapus.`,
-              timer: 2500,
-              showConfirmButton: false
-            }).then(() => {
-              // reload data TANPA loading animation
-              this.loadBarang(false);
-            });
-          },
+      if (!result.isConfirmed) return;
 
-          error: (err: any) => {
-            const msg = err?.error?.message || err?.message || 'Barang gagal dihapus.';
-
-            Swal.fire({
-              icon: 'error',
-              title: 'Gagal',
-              text: msg
-            });
+      // Jika stok masih ada, tampilkan konfirmasi tambahan
+      if (Number(b.jumlah) > 0) {
+        Swal.fire({
+          title: 'Stok Masih Tersedia',
+          html: `
+          Barang <b>${b.nama_barang}</b> masih memiliki stok sebanyak
+          <b>${b.jumlah}</b> ${b.satuan ?? ''}.<br><br>
+          Apakah Anda benar-benar ingin menghapus barang ini?
+        `,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Ya, Tetap Hapus',
+          cancelButtonText: 'Batal'
+        }).then((confirmStock) => {
+          if (confirmStock.isConfirmed) {
+            this.deleteBarang(b);
           }
+        });
+
+        return;
+      }
+
+      // Jika stok 0 langsung hapus
+      this.deleteBarang(b);
+    });
+  }
+
+  private deleteBarang(b: any): void {
+    this.api.deleteBarang(b.id_barang).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil',
+          text: `Barang "${b.nama_barang}" berhasil dihapus.`,
+          timer: 2500,
+          showConfirmButton: false
+        }).then(() => {
+          this.loadBarang(false);
+        });
+      },
+      error: (err: any) => {
+        const msg = err?.error?.message || err?.message || 'Barang gagal dihapus.';
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal',
+          text: msg
         });
       }
     });
@@ -383,5 +415,18 @@ export class Barang {
     if (!/^[0-9]$/.test(event.key)) {
       event.preventDefault();
     }
+  }
+
+  changeStockFilter(type: 'all' | 'low') {
+    this.filterStock = type;
+
+    if (type === 'all') {
+      this.filteredBarang = [...this.barang];
+    } else {
+      this.filteredBarang = this.barang.filter((b) => Number(b.jumlah) < Number(b.min_jumlah));
+    }
+
+    this.pageIndex = 0;
+    this.updatePaginatedData();
   }
 }
